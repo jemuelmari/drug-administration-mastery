@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <title>💊 Drug Administration Mastery v1.0</title>
+  <title>💊 Drug Administration Mastery v1.0.1</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -431,14 +431,12 @@
     .certificate .name { font-size: 2rem; font-family: var(--font-head); color: var(--dark); font-weight: 800; border-bottom: 3px solid var(--primary); display: inline-block; padding: 0.5rem 2rem; margin: 1rem 0; }
     .certificate .score { font-size: 1.35rem; color: var(--secondary); font-weight: 800; margin: 0.75rem 0; }
 
-    /* Quiz / Exam buttons */
     .quiz-opt { display:block; width:100%; text-align:left; padding:0.85rem 1rem; border:2px solid var(--gray-light); border-radius:10px; background:#fff; margin-bottom:0.5rem; cursor:pointer; font-family:var(--font-body); font-size:0.9rem; transition:all 0.15s; }
     .quiz-opt:hover { border-color: var(--primary); background: var(--primary-light); }
     .quiz-opt.selected { border-color: var(--primary); background: var(--primary-light); font-weight: 600; }
     .quiz-opt.correct { border-color: var(--secondary); background: var(--secondary-light); font-weight: 600; }
     .quiz-opt.wrong { border-color: var(--accent); background: var(--accent-light); }
 
-    /* Drug database */
     .drug-card { background: var(--white); border-radius: 14px; padding: 1rem 1.15rem; border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); transition: all 0.2s; cursor: pointer; }
     .drug-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--primary); }
     .drug-card .drug-name { font-family: var(--font-head); font-weight: 700; color: var(--primary); font-size: 1rem; margin-bottom: 0.2rem; }
@@ -448,7 +446,6 @@
     .high-alert-flag::before { content: '⚠ '; }
     .drug-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; }
 
-    /* Checklist */
     .checklist-item { display: flex; align-items: flex-start; gap: 0.7rem; padding: 0.6rem 0.85rem; border-radius: 10px; background: var(--white); border: 1px solid var(--gray-light); margin-bottom: 0.4rem; font-size: 0.85rem; transition: all 0.15s; }
     .checklist-item:hover { background: var(--primary-light); }
     .checklist-item.checked { background: var(--secondary-light); border-color: var(--secondary); }
@@ -458,12 +455,10 @@
     .checklist-section-title { font-family: var(--font-head); font-weight: 800; color: var(--primary); font-size: 1rem; padding: 1rem 0 0.5rem; border-bottom: 2px solid var(--primary-light); margin-top: 1rem; margin-bottom: 0.75rem; }
     .checklist-subsection-title { font-family: var(--font-head); font-weight: 700; color: var(--secondary); font-size: 0.9rem; padding: 0.75rem 0 0.35rem; }
 
-    /* Calculator */
     .calc-result { background: linear-gradient(135deg, var(--secondary-light), #C8E6C9); border: 2px solid var(--secondary); border-radius: 14px; padding: 1.25rem; margin-top: 1rem; text-align: center; }
     .calc-result .calc-value { font-family: var(--font-head); font-weight: 800; font-size: 2rem; color: var(--primary-dark); }
     .calc-result .calc-label { font-size: 0.75rem; color: var(--primary-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.35rem; }
 
-    /* Leaderboard */
     .leader-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 0.5rem; background: var(--white); border: 1px solid var(--gray-light); }
     .leader-row.top-1 { background: linear-gradient(135deg, #FFF9C4, #FFECB3); border-color: #F9A825; }
     .leader-row.top-2 { background: linear-gradient(135deg, #ECEFF1, #CFD8DC); border-color: #90A4AE; }
@@ -495,7 +490,7 @@
       <div class="auth-logo">💊</div>
       <h1>Drug Administration Mastery</h1>
       <p class="auth-subtitle" id="authSubtitle">NCM 107 Lab — Please register to begin</p>
-      <span class="auth-version">Version 1.0</span>
+      <span class="auth-version">Version 1.0.1</span>
     </div>
     <div class="auth-tabs" id="authTabs">
       <button class="auth-tab active" data-tab="register" onclick="switchAuthTab('register')">📝 Register</button>
@@ -544,7 +539,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-wrap">💊</div>
-      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0</small></div>
+      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0.1</small></div>
     </div>
     <div class="student-card">
       <div class="avatar" id="chipAvatar">—</div>
@@ -606,7 +601,7 @@
       <div>Clinical Instructor</div>
       <div>Teacher II — DepEd</div>
       <div>Tarlac State University</div>
-      <div class="version-tag">v1.0</div>
+      <div class="version-tag">v1.0.1</div>
     </div>
   </aside>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open'); this.style.display='none'"></div>
@@ -682,7 +677,7 @@
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
 
 var APP = {
-  version: '1.0',
+  version: '1.0.1',
   storageKey: 'drugAdminMastery_v1',
   savedSessionsKey: 'drugAdminMastery_savedSessions',
   state: {
@@ -751,6 +746,84 @@ function getGreeting() {
   if (h < 12) return 'Good morning';
   if (h < 18) return 'Good afternoon';
   return 'Good evening';
+}
+
+/* ============================================================
+   SCORE MIGRATION UTILITY — v1.0.1
+   Fixes historical scoring errors caused by:
+   1. Case-sensitivity in quiz/game/exam comparisons
+   2. Wrong answer key for ampule dot direction (Unit 10 Q1)
+   Runs automatically on app load. Safe to run multiple times.
+   ============================================================ */
+var MIGRATION_KEY = 'drugAdminMastery_migrations';
+var MIGRATION_VERSION = '2025-01-ampule-fix';
+
+function getMigrationsApplied() {
+  try {
+    var raw = localStorage.getItem(MIGRATION_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function setMigrationApplied(version) {
+  var m = getMigrationsApplied();
+  m[version] = new Date().toISOString();
+  try { localStorage.setItem(MIGRATION_KEY, JSON.stringify(m)); } catch (e) {}
+}
+
+function runMigrations() {
+  var applied = getMigrationsApplied();
+  if (applied[MIGRATION_VERSION]) return;
+
+  console.log('[Migration] Running', MIGRATION_VERSION);
+  var fixed = { quizzes: 0, games: 0, exams: 0 };
+
+  // Fix 1: Ampule quiz question in Unit 10
+  // Old answer key: "Toward you" (WRONG)
+  // Correct answer: "Away from you"
+  // Award +10 percentage points to any unit10 attempt that scored 80-89.
+  try {
+    var quizAttempts = APP.state.quizAttempts || {};
+    if (quizAttempts.unit10 && quizAttempts.unit10.length) {
+      var replayed = quizAttempts.unit10.map(function(score) {
+        if (score >= 80 && score < 90) {
+          fixed.quizzes++;
+          return score + 10;
+        }
+        return score;
+      });
+      APP.state.quizAttempts.unit10 = replayed;
+
+      if (APP.state.progress && APP.state.progress.unit10) {
+        var prog = APP.state.progress.unit10;
+        if (prog.score >= 80 && prog.score < 90) {
+          prog.score = prog.score + 10;
+          prog.completed = true;
+          prog.migrated = true;
+          prog.migratedAt = new Date().toISOString();
+          fixed.quizzes++;
+        }
+      }
+    }
+  } catch (e) { console.warn('[Migration] Quiz fix failed:', e); }
+
+  // Fix 2 & 3: Case-sensitivity — no historical data correction possible.
+  // Future submissions use corrected logic.
+
+  // Fix 4: Exam — ampule question not in exam bank. No correction needed.
+
+  if (APP.state.student) {
+    registerSavedSession(buildStudentRecord());
+  }
+  saveState();
+  setMigrationApplied(MIGRATION_VERSION);
+
+  var totalFixed = fixed.quizzes + fixed.games + fixed.exams;
+  if (totalFixed > 0) {
+    console.log('[Migration] Applied corrections:', fixed);
+    setTimeout(function() {
+      toast('📈 ' + totalFixed + ' historical score(s) corrected (ampule fix)', 'success');
+    }, 1500);
+  }
 }
 
 /* ============================================================
@@ -1215,7 +1288,7 @@ var UNITS = [
 ];
 
 /* ============================================================
-   UNIT CONTENT
+   UNIT CONTENT (with corrected ampule direction)
    ============================================================ */
 var UNIT_CONTENT = {
   unit1: {
@@ -1440,7 +1513,16 @@ var UNIT_CONTENT = {
     intro: 'Correct technique in preparing medication from ampules and vials prevents contamination and dosing errors.',
     sections: [
       { heading: '🧪 Ampule Preparation', type: 'list',
-        items: ['Verify order', 'Hand hygiene', 'Tap ampule neck to move fluid down', 'Clean neck with alcohol', 'Break ampule away from body (dot facing you)', 'Use filter needle to withdraw', 'Remove air bubbles', 'Replace with regular needle before injection'] },
+        items: [
+          'Verify order',
+          'Hand hygiene',
+          'Tap ampule neck to move fluid down',
+          'Clean neck with alcohol',
+          'Break ampule with the dot/colored band facing AWAY from you, breaking away from your body',
+          'Use filter needle to withdraw',
+          'Remove air bubbles',
+          'Replace with regular needle before injection'
+        ] },
       { heading: '🧪 Vial Preparation', type: 'table', headers: ['Type', 'Characteristic'],
         rows: [
           ['Single-dose', 'Discard after use'],
@@ -1606,8 +1688,10 @@ function submitQuiz(num) {
     var userChoice = null;
     allOpts.forEach(function(o) { if (o.dataset.selected === '1') userChoice = o; });
     if (userChoice) {
-      var choice = userChoice.textContent.trim();
-      if (choice === q.answer) {
+      // FIXED: Case-insensitive, trimmed comparison
+      var choice = userChoice.textContent.trim().toLowerCase();
+      var correctAns = String(q.answer).trim().toLowerCase();
+      if (choice === correctAns) {
         correct++;
         userChoice.classList.add('correct');
         userChoice.classList.remove('selected');
@@ -1616,7 +1700,7 @@ function submitQuiz(num) {
         userChoice.classList.remove('selected');
       }
       allOpts.forEach(function(o) {
-        if (o.textContent.trim() === q.answer && o !== userChoice) {
+        if (o.textContent.trim().toLowerCase() === correctAns && o !== userChoice) {
           o.classList.add('correct');
         }
       });
@@ -1642,7 +1726,7 @@ function submitQuiz(num) {
 }
 
 /* ============================================================
-   QUIZZES
+   QUIZZES (with corrected unit10 Q1)
    ============================================================ */
 var QUIZZES = {
   unit1: [
@@ -1754,7 +1838,8 @@ var QUIZZES = {
     { q: 'Check before mixing IV meds:', options: ['Temperature','Compatibility','Color','Odor'], answer: 'Compatibility' }
   ],
   unit10: [
-    { q: 'Ampule: break with dot facing:', options: ['Away','Toward you','Up','Down'], answer: 'Toward you' },
+    // FIXED: Ampule question — dot/colored band faces AWAY from you
+    { q: 'Ampule: break with dot/colored band facing:', options: ['Toward you','Away from you','Up','Down'], answer: 'Away from you' },
     { q: 'Ampule needle for withdrawal:', options: ['Regular','Filter','Large','Blunt'], answer: 'Filter' },
     { q: 'Vial rubber stopper must be:', options: ['Not cleaned','Disinfected','Warmed','Cooled'], answer: 'Disinfected' },
     { q: 'Before withdrawing from vial, inject:', options: ['Water','Air','Saline','Nothing'], answer: 'Air' },
@@ -1864,7 +1949,7 @@ function renderDrugs(main) {
 function renderDrugCards(list) {
   if (!list.length) return '<div class="card text-center" style="color:var(--gray);">No matches found.</div>';
   var html = '<div class="drug-grid">';
-  list.forEach(function(d, i) {
+  list.forEach(function(d) {
     html += '<div class="drug-card" onclick="openDrug(' + DRUGS.indexOf(d) + ')">';
     html += '<div class="drug-name">' + escapeHtml(d.name);
     if (d.alert) html += '<span class="high-alert-flag">HIGH ALERT</span>';
@@ -1963,36 +2048,16 @@ function calculateDose() {
    MAR PRACTICE
    ============================================================ */
 var MAR_CASES = [
-  {
-    id: 1,
-    doctorOrder: 'Metformin 500 mg PO BID',
-    patient: 'Juan Dela Cruz, 55 y/o M',
-    correct: { med: 'Metformin', dose: '500 mg', route: 'PO', freq: 'BID' }
-  },
-  {
-    id: 2,
-    doctorOrder: 'Ceftriaxone 1 g IM q24h',
-    patient: 'Maria Santos, 30 y/o F',
-    correct: { med: 'Ceftriaxone', dose: '1 g', route: 'IM', freq: 'q24h' }
-  },
-  {
-    id: 3,
-    doctorOrder: 'Omeprazole 40 mg IV OD',
-    patient: 'Pedro Reyes, 60 y/o M',
-    correct: { med: 'Omeprazole', dose: '40 mg', route: 'IV', freq: 'OD' }
-  },
-  {
-    id: 4,
-    doctorOrder: 'Paracetamol 500 mg PO PRN Fever',
-    patient: 'Ana Lopez, 28 y/o F',
-    correct: { med: 'Paracetamol', dose: '500 mg', route: 'PO', freq: 'PRN' }
-  },
-  {
-    id: 5,
-    doctorOrder: 'Epinephrine 0.3 mg IM STAT',
-    patient: 'Carlos Tan, 40 y/o M',
-    correct: { med: 'Epinephrine', dose: '0.3 mg', route: 'IM', freq: 'STAT' }
-  }
+  { id: 1, doctorOrder: 'Metformin 500 mg PO BID', patient: 'Juan Dela Cruz, 55 y/o M',
+    correct: { med: 'Metformin', dose: '500 mg', route: 'PO', freq: 'BID' } },
+  { id: 2, doctorOrder: 'Ceftriaxone 1 g IM q24h', patient: 'Maria Santos, 30 y/o F',
+    correct: { med: 'Ceftriaxone', dose: '1 g', route: 'IM', freq: 'q24h' } },
+  { id: 3, doctorOrder: 'Omeprazole 40 mg IV OD', patient: 'Pedro Reyes, 60 y/o M',
+    correct: { med: 'Omeprazole', dose: '40 mg', route: 'IV', freq: 'OD' } },
+  { id: 4, doctorOrder: 'Paracetamol 500 mg PO PRN Fever', patient: 'Ana Lopez, 28 y/o F',
+    correct: { med: 'Paracetamol', dose: '500 mg', route: 'PO', freq: 'PRN' } },
+  { id: 5, doctorOrder: 'Epinephrine 0.3 mg IM STAT', patient: 'Carlos Tan, 40 y/o M',
+    correct: { med: 'Epinephrine', dose: '0.3 mg', route: 'IM', freq: 'STAT' } }
 ];
 
 function renderMAR(main) {
@@ -2040,7 +2105,7 @@ function checkMAR(id) {
 }
 
 /* ============================================================
-   CHECKLISTS (Return Demo)
+   CHECKLISTS (Return Demo) — with corrected ampule direction
    ============================================================ */
 var CHECKLIST_ORAL = {
   title: 'Return Demonstration — Oral, Ophthalmic & Otic Medication',
@@ -2169,7 +2234,7 @@ var CHECKLIST_PARENTERAL = {
     ]},
     { title: 'Drug Preparation — Ampule', steps: [
       'Flick the ampule\'s upper stem or shake it like a mercury thermometer.',
-      'Place sterile gauze on ampule neck and break top with dot facing toward you, breaking away from you.',
+      'Place sterile gauze on ampule neck. Break top with the dot/colored band facing AWAY from you, breaking away from the body.',
       'Dispose of ampule top in sharps container.',
       'Attach a filter needle to the syringe.',
       'Remove filter needle cap and insert into ampule center without touching rim.',
@@ -2275,7 +2340,7 @@ function checklistPct(key, checklist) {
 function renderChecklist(checklist, key) {
   var html = '';
   var stepIdx = 0;
-  checklist.sections.forEach(function(sec, si) {
+  checklist.sections.forEach(function(sec) {
     html += '<div class="checklist-section-title">' + escapeHtml(sec.title) + '</div>';
     sec.steps.forEach(function(step) {
       var id = key + '_' + stepIdx;
@@ -2440,7 +2505,8 @@ function answerGame(idx) {
   var data = g.rounds;
   var item = data[activeGame.round];
   var choice = item.options[idx];
-  var correct = choice === item.answer;
+  // FIXED: Case-insensitive, trimmed comparison
+  var correct = String(choice).trim().toLowerCase() === String(item.answer).trim().toLowerCase();
   activeGame.total++;
   if (correct) activeGame.correct++;
 
@@ -2453,7 +2519,7 @@ function answerGame(idx) {
     else btn.classList.add('wrong');
   }
   siblings.forEach(function(s) {
-    if (s.textContent.trim() === item.answer && s !== btn) {
+    if (s.textContent.trim().toLowerCase() === String(item.answer).trim().toLowerCase() && s !== btn) {
       s.classList.add('correct');
     }
   });
@@ -2516,10 +2582,9 @@ function renderLeaderboard(main) {
     var gamesAvg = gamesCount ? Math.round(gamesTotal / gamesCount) : 0;
     var examPct = (s.exam && s.exam.percentage) || 0;
     var composite = Math.round(pct * 0.35 + avg * 0.25 + gamesAvg * 0.2 + examPct * 0.2);
-    return { name: s.student.fullName, section: s.student.section, composite: composite, pct: pct, avg: avg, gamesAvg: gamesAvg, examPct: examPct };
+    return { name: s.student.fullName, section: s.student.section, composite: composite };
   });
   rows.sort(function(a, b) { return b.composite - a.composite; });
-  // Anonymize: show initials + section only
   rows = rows.slice(0, 20);
 
   var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
@@ -2535,10 +2600,9 @@ function renderLeaderboard(main) {
       var rank = i + 1;
       var cls = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
       var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
-      var initials = initialsOf(r.name);
       html += '<div class="leader-row ' + cls + '">';
       html += '<div class="leader-rank">' + medal + '</div>';
-      html += '<div class="leader-name">' + escapeHtml(initials) + ' <small>' + escapeHtml(r.section || '') + '</small></div>';
+      html += '<div class="leader-name">' + escapeHtml(initialsOf(r.name)) + ' <small>' + escapeHtml(r.section || '') + '</small></div>';
       html += '<div class="leader-score">' + r.composite + '%</div>';
       html += '</div>';
     });
@@ -2552,7 +2616,6 @@ function renderLeaderboard(main) {
    EXAM — 30 ITEMS
    ============================================================ */
 var EXAM_BANK = [
-  // Safety & Rights (10 items)
   { q: 'A nurse is about to administer a medication and notices the order is illegible. What is the PRIORITY action?',
     options: ['Guess the medication from context','Clarify the order with the prescriber','Administer the closest match','Skip the dose'],
     answer: 'Clarify the order with the prescriber' },
@@ -2583,7 +2646,6 @@ var EXAM_BANK = [
   { q: 'What does the "Right Evaluation" mean?',
     options: ['Assessing before giving','Assessing the response after giving','Documenting dose','Verifying route'],
     answer: 'Assessing the response after giving' },
-  // Routes (8 items)
   { q: 'A nurse is to administer an intradermal injection. What angle should the needle be inserted?',
     options: ['5–15 degrees','45 degrees','90 degrees','30 degrees'],
     answer: '5–15 degrees' },
@@ -2608,7 +2670,6 @@ var EXAM_BANK = [
   { q: 'After administering otic drops, the client should remain side-lying for:',
     options: ['30 seconds','1 minute','2–5 minutes','15 minutes'],
     answer: '2–5 minutes' },
-  // Calculations (6 items)
   { q: 'Order: Paracetamol 500 mg PO. Available: 250 mg/tablet. How many tablets?',
     options: ['1','2','3','4'],
     answer: '2' },
@@ -2627,7 +2688,6 @@ var EXAM_BANK = [
   { q: 'Order: 750 mg. Available: 250 mg/tablet. How many tablets?',
     options: ['2','2.5','3','4'],
     answer: '3' },
-  // Documentation & Legal (4 items)
   { q: 'When should the nurse document a medication administration?',
     options: ['At the end of the shift','Immediately after giving','Before giving','The next day'],
     answer: 'Immediately after giving' },
@@ -2640,13 +2700,15 @@ var EXAM_BANK = [
   { q: 'A "near miss" in medication administration is:',
     options: ['Harm reached the patient','Error detected before reaching the patient','Adverse reaction','Side effect'],
     answer: 'Error detected before reaching the patient' },
-  // Technology & Trends (2 items)
   { q: 'Which technology scans medications and patient wristbands before administration?',
     options: ['Smart pump','BCMA','eMAR','CDSS'],
     answer: 'BCMA' },
   { q: 'A nurse is preparing a high-alert IV medication. Which is BEST practice?',
     options: ['Manual drip','Infusion pump with drug library','Fast IV push','Gravity'],
-    answer: 'Infusion pump with drug library' }
+    answer: 'Infusion pump with drug library' },
+  { q: 'When breaking an ampule, the dot/colored band should face:',
+    options: ['Toward you','Away from you','Upward','Downward'],
+    answer: 'Away from you' }
 ];
 
 function renderExam(main) {
@@ -2824,7 +2886,8 @@ function finishExam() {
   exam.questions.forEach(function(q, i) {
     var userIdx = exam.answers[i];
     var userAns = (userIdx !== undefined && q.options[userIdx]) ? q.options[userIdx] : '(no answer)';
-    var isCorrect = userAns === q.answer;
+    // FIXED: Case-insensitive, trimmed comparison
+    var isCorrect = String(userAns).trim().toLowerCase() === String(q.answer).trim().toLowerCase();
     if (isCorrect) correct++;
     review.push({ q: q.q, userAnswer: userAns, correctAnswer: q.answer, correct: isCorrect });
   });
@@ -2925,8 +2988,8 @@ function renderHandoff(main) {
   html += '</tbody></table></div>';
   html += '<div class="stat-grid fade-in">' +
     '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + pct + '%</div><div class="stat-label">Units Complete</div></div>' +
-    '<div class="stat-tile"><div class="stat-icon blue">🎯</div><div class="stat-value">' + avg + '%</div><div class="stat-label">Unit Average</div></div>' +
-    '<div class="stat-tile"><div class="stat-icon purple">📝</div><div class="stat-value">' + (exam ? exam.score + '/' + exam.total : '—') + '</div><div class="stat-label">Capstone Exam</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">' + avg + '%</div><div class="stat-label">Unit Average</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon orange">📝</div><div class="stat-value">' + (exam ? exam.score + '/' + exam.total : '—') + '</div><div class="stat-label">Capstone Exam</div></div>' +
     '</div>';
   html += '<div class="card fade-in">';
   html += '<button class="btn btn-primary btn-lg btn-block" onclick="submitToBackend()" id="submitBtn">';
@@ -3124,10 +3187,11 @@ async function submitFeedback() {
 }
 
 /* ============================================================
-   INIT
+   INIT (with migration call)
    ============================================================ */
 function init() {
   loadState();
+  runMigrations();  // Fix historical scores (ampule fix + case-insensitivity)
   document.querySelectorAll('.nav-item').forEach(function(n) {
     n.addEventListener('click', function() { navigate(n.dataset.view); });
   });
