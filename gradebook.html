@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1A5276" />
-  <meta name="description" content="Gradebook v1.1 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
+  <meta name="description" content="Gradebook v1.2 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <title>Gradebook — Drug Administration Mastery v1.1</title>
+  <title>Gradebook — Drug Administration Mastery v1.2</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -61,7 +61,6 @@
     .toolbar-left small { display: block; font-size: 0.75rem; color: var(--gray); font-weight: 400; margin-top: 0.15rem; }
     .toolbar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 
-    /* ============ FILTER BAR ============ */
     .filter-bar {
       background: var(--white); border-radius: var(--radius);
       padding: 0.85rem 1.35rem; box-shadow: var(--shadow-sm);
@@ -71,7 +70,7 @@
       display: flex; flex-wrap: wrap; gap: 1rem;
       align-items: center;
     }
-    .filter-group { display: flex; flex-direction: column; gap: 0.25rem; min-width: 180px; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.25rem; min-width: 160px; }
     .filter-label {
       font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.6px;
       color: var(--gray); font-weight: 700;
@@ -461,8 +460,8 @@
 
 <script>
 /* ============================================================
-   GRADEBOOK — Drug Administration Mastery v1.1
-   NEW: Section & Group filters
+   GRADEBOOK — Drug Administration Mastery v1.2
+   NEW: Auto-sort by last name (with toggle)
    ============================================================ */
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
 
@@ -472,6 +471,8 @@ var GB = {
     students: [],
     filterSection: '',
     filterGroup: '',
+    sortBy: 'lastName',   // 'lastName' | 'firstName' | 'group' | 'finalGrade'
+    sortDir: 'asc',       // 'asc' | 'desc'
     settings: {
       courseName: 'NCM 107 Lab — Drug Administration',
       instructorName: 'JEMUEL C. MARI, MAN, RN, LPT',
@@ -510,6 +511,8 @@ function loadLocal() {
       GB.state.students = parsed.students || [];
       GB.state.filterSection = parsed.filterSection || '';
       GB.state.filterGroup = parsed.filterGroup || '';
+      GB.state.sortBy = parsed.sortBy || 'lastName';
+      GB.state.sortDir = parsed.sortDir || 'asc';
       GB.state.settings = Object.assign({}, GB.state.settings, parsed.settings || {});
       GB.state.lastSync = parsed.lastSync || null;
     }
@@ -630,6 +633,72 @@ function showError(msg) {
     '<h2>Could not load gradebook</h2>' +
     '<p>' + escapeHtml(msg) + '</p>' +
     '<button class="btn btn-primary" onclick="init()">🔄 Retry</button></div>';
+}
+
+/* ============ SORT HELPERS ============ */
+function getLastName(fullName) {
+  if (!fullName) return '';
+  var parts = String(fullName).trim().split(/\s+/);
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0];
+  // Handle "Last, First" format
+  if (fullName.indexOf(',') > -1) {
+    return fullName.split(',')[0].trim();
+  }
+  // Standard: assume LastName is the last token
+  // Handles: Juan Dela Cruz → last name = "Cruz"
+  //          Juan Dela Cruz Jr. → last name = "Jr." (may need manual fix)
+  //          Maria Santos → last name = "Santos"
+  return parts[parts.length - 1];
+}
+function getFirstName(fullName) {
+  if (!fullName) return '';
+  var parts = String(fullName).trim().split(/\s+/);
+  if (parts.length === 0) return '';
+  if (fullName.indexOf(',') > -1) {
+    var after = fullName.split(',')[1];
+    return after ? after.trim().split(/\s+/)[0] : '';
+  }
+  return parts[0];
+}
+function getSortValue(s, sortBy) {
+  if (sortBy === 'lastName') return getLastName(s.name).toLowerCase();
+  if (sortBy === 'firstName') return getFirstName(s.name).toLowerCase();
+  if (sortBy === 'group') return (s.section || '') + '|' + (s.group || '');
+  if (sortBy === 'finalGrade') {
+    var raw = computeWeightedFinal(s, GB.state.settings);
+    return raw === null ? 999 : raw;
+  }
+  if (sortBy === 'name') return (s.name || '').toLowerCase();
+  return (s.name || '').toLowerCase();
+}
+
+function getSortedStudents() {
+  var filtered = getFilteredStudents();
+  var sortBy = GB.state.sortBy || 'lastName';
+  var sortDir = GB.state.sortDir || 'asc';
+  var sorted = filtered.slice().sort(function(a, b) {
+    var va = getSortValue(a, sortBy);
+    var vb = getSortValue(b, sortBy);
+    if (typeof va === 'number' && typeof vb === 'number') {
+      return sortDir === 'asc' ? va - vb : vb - va;
+    }
+    va = String(va); vb = String(vb);
+    var cmp = va.localeCompare(vb);
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+  return sorted;
+}
+
+function setSort(field) {
+  if (GB.state.sortBy === field) {
+    GB.state.sortDir = GB.state.sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    GB.state.sortBy = field;
+    GB.state.sortDir = 'asc';
+  }
+  saveLocal();
+  render();
 }
 
 /* ============ FILTER HELPERS ============ */
@@ -817,7 +886,7 @@ function renderToolbar() {
     '<div class="toolbar-left">' +
     '<div class="logo">📊</div>' +
     '<div><h1>Class Record — Gradebook</h1>' +
-    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.1</small></div>' +
+    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.2</small></div>' +
     '</div>' +
     '<div class="toolbar-right">' +
     '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'index.html\'">💊 Student App</button>' +
@@ -837,6 +906,16 @@ function renderFilterBar() {
   var totalCount = GB.state.students.length;
   var visibleCount = getFilteredStudents().length;
 
+  var sortBy = GB.state.sortBy || 'lastName';
+  var sortDir = GB.state.sortDir || 'asc';
+  var sortIcon = sortDir === 'asc' ? '↑' : '↓';
+  var sortLabel = {
+    lastName: 'Last Name',
+    firstName: 'First Name',
+    group: 'Section / Group',
+    finalGrade: 'Final Grade'
+  };
+
   return '<div class="filter-bar no-print">' +
     '<div class="filter-group">' +
     '<label class="filter-label">🏫 Section</label>' +
@@ -854,7 +933,15 @@ function renderFilterBar() {
       return '<option value="' + escapeHtml(g) + '"' + (activeGroup === g ? ' selected' : '') + '>' + escapeHtml(g) + '</option>';
     }).join('') +
     '</select></div>' +
-    ((activeSection || activeGroup) ?
+    '<div class="filter-group">' +
+    '<label class="filter-label">↕️ Sort By</label>' +
+    '<select class="filter-select" onchange="setSort(this.value)">' +
+    '<option value="lastName"' + (sortBy === 'lastName' ? ' selected' : '') + '>Last Name ' + (sortBy === 'lastName' ? sortIcon : '') + '</option>' +
+    '<option value="firstName"' + (sortBy === 'firstName' ? ' selected' : '') + '>First Name ' + (sortBy === 'firstName' ? sortIcon : '') + '</option>' +
+    '<option value="group"' + (sortBy === 'group' ? ' selected' : '') + '>Section / Group ' + (sortBy === 'group' ? sortIcon : '') + '</option>' +
+    '<option value="finalGrade"' + (sortBy === 'finalGrade' ? ' selected' : '') + '>Final Grade ' + (sortBy === 'finalGrade' ? sortIcon : '') + '</option>' +
+    '</select></div>' +
+    (activeSection || activeGroup ?
       '<div class="filter-active">' +
       '🔎 Showing <strong>' + visibleCount + '</strong> of <strong>' + totalCount + '</strong> students' +
       '<button class="filter-clear" onclick="clearFilters()">✕ Clear</button>' +
@@ -905,13 +992,13 @@ function renderSheetHeader() {
     '<h2>Class Record — Drug Administration Mastery</h2>' +
     '<p>School Year ' + escapeHtml(s.schoolYear) + ' &nbsp;|&nbsp; ' + escapeHtml(s.semester) + ' &nbsp;|&nbsp; Instructor: ' + escapeHtml(s.instructorName) + '</p>' +
     filterLine +
-    '<p>' + todayLong() + '</p>' +
-    '<span class="version-tag">App Version 1.1</span>' +
+    '<p>' + todayLong() + ' &nbsp;|&nbsp; <em>Sorted by Last Name (A–Z)</em></p>' +
+    '<span class="version-tag">App Version 1.2</span>' +
     '</div>';
 }
 
 function renderTable() {
-  var students = getFilteredStudents();
+  var students = getSortedStudents();
   if (!students.length) {
     return '<div class="empty-state" style="padding:2rem;text-align:center;color:var(--gray);">' +
       '<div style="font-size:2.5rem;margin-bottom:0.5rem;">🔍</div>' +
@@ -1115,7 +1202,7 @@ function renderDeveloperFooter() {
     '<div class="dev-name">JEMUEL C. MARI, MAN, RN, LPT</div>' +
     '<div>Clinical Instructor | Teacher II — Department of Education</div>' +
     '<div><strong>Tarlac State University</strong> — College of Science — Nursing Department</div>' +
-    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.1 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
+    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.2 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
     '</div>';
 }
 
@@ -1182,12 +1269,14 @@ function resetWeights() {
 }
 
 function exportCSV() {
-  var students = getFilteredStudents();
+  var students = getSortedStudents();
   var w = GB.state.settings;
   if (!students.length) return toast('No data to export.', 'warning');
   var isFiltered = GB.state.filterSection || GB.state.filterGroup;
   if (isFiltered && !confirm('Export only the ' + students.length + ' filtered student(s)?\n\nClick Cancel to export ALL students instead.')) {
-    students = GB.state.students;
+    students = GB.state.students.slice().sort(function(a, b) {
+      return getLastName(a.name).localeCompare(getLastName(b.name));
+    });
   }
 
   var headers = [
