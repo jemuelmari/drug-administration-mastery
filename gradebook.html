@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A5276" />
+  <meta name="description" content="Gradebook v1.0 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>Gradebook — Drug Administration Mastery v1.0</title>
+  <style>
+    :root {
+      --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
+      --secondary: #2E7D32; --secondary-light: #E8F5E9;
+      --accent: #C62828; --accent-light: #FFEBEE;
+      --success: #43A047; --success-light: #E8F5E9;
+      --warning: #F57C00; --warning-light: #FFF3E0;
+      --purple: #6A1B9A; --purple-light: #F3E5F5;
+      --dark: #0F1B26; --dark-2: #1B2631;
+      --light: #F1F8F4; --white: #FFFFFF;
+      --gray: #607D8B; --gray-light: #CFD8DC;
+      --border: #B0BEC5;
+      --radius: 12px; --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+      --font-head: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body); background: var(--light); color: var(--dark);
+      line-height: 1.5; -webkit-font-smoothing: antialiased; font-size: 14px;
+      padding: 1.5rem;
+    }
+    h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+    h1 { font-size: 1.6rem; font-weight: 800; }
+    h2 { font-size: 1.2rem; }
+    h3 { font-size: 1rem; }
+    p { margin-bottom: 0.5rem; }
+    button { font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    .container { max-width: 1500px; margin: 0 auto; }
+
+    .toolbar {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.1rem 1.35rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-light);
+      margin-bottom: 1.25rem;
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      justify-content: space-between; align-items: center;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 0.75rem; }
+    .toolbar-left .logo {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .toolbar-left h1 { font-size: 1.15rem; color: var(--dark); line-height: 1.2; }
+    .toolbar-left small { display: block; font-size: 0.75rem; color: var(--gray); font-weight: 400; margin-top: 0.15rem; }
+    .toolbar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.55rem 1rem; border-radius: var(--radius-sm); border: none;
+      cursor: pointer; font-family: var(--font-head); font-weight: 600;
+      font-size: 0.82rem; transition: all 0.15s; text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--primary); color: var(--white); box-shadow: 0 2px 6px rgba(26,82,118,0.3); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-secondary { background: var(--secondary); color: var(--white); }
+    .btn-secondary:hover { background: #1B5E20; }
+    .btn-outline { background: var(--white); color: var(--dark); border: 1.5px solid var(--gray-light); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-ghost { background: transparent; color: var(--gray); }
+    .btn-ghost:hover { background: var(--gray-light); color: var(--dark); }
+    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.78rem; }
+
+    .info-banner {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.15rem 1.35rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-light);
+      border-left: 5px solid var(--primary);
+      margin-bottom: 1.25rem;
+    }
+    .info-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
+    }
+    .info-grid .info-item { font-size: 0.85rem; }
+    .info-grid .info-label {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--gray); font-weight: 700; margin-bottom: 0.15rem;
+    }
+    .info-grid .info-value { color: var(--dark); font-weight: 600; }
+
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.85rem; margin-bottom: 1.25rem;
+    }
+    .stat-pill {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1rem 1.15rem; border: 1px solid var(--gray-light);
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .stat-pill::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--primary);
+    }
+    .stat-pill.success::before { background: var(--success); }
+    .stat-pill.warning::before { background: var(--warning); }
+    .stat-pill.alert::before { background: var(--accent); }
+    .stat-pill.purple::before { background: var(--purple); }
+    .stat-pill .stat-label {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--gray); font-weight: 700; margin-bottom: 0.3rem;
+    }
+    .stat-pill .stat-value {
+      font-size: 1.6rem; font-weight: 800; color: var(--dark);
+      font-family: var(--font-head); letter-spacing: -0.03em; line-height: 1;
+    }
+    .stat-pill .stat-sub {
+      font-size: 0.72rem; color: var(--gray); margin-top: 0.3rem;
+    }
+
+    .sheet {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 2rem 1.5rem 1.5rem;
+      margin-bottom: 1.5rem; overflow-x: auto;
+      border: 1px solid var(--gray-light);
+      position: relative;
+    }
+    .sheet-header {
+      text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem;
+      border-bottom: 2px solid var(--primary);
+    }
+    .sheet-header h1 {
+      font-size: 1.35rem; color: var(--primary);
+      margin-bottom: 0.35rem; letter-spacing: -0.02em;
+    }
+    .sheet-header h2 {
+      font-size: 0.95rem; color: var(--dark);
+      font-family: var(--font-body); font-weight: 600;
+      margin-bottom: 0.3rem; letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .sheet-header p {
+      margin: 0.15rem 0; font-size: 0.82rem; color: var(--gray);
+    }
+    .sheet-header .version-tag {
+      display: inline-block; background: var(--primary-light);
+      color: var(--primary-dark); padding: 0.15rem 0.6rem;
+      border-radius: 999px; font-size: 0.68rem; font-weight: 700;
+      margin-top: 0.35rem; letter-spacing: 0.5px;
+    }
+
+    table.gradebook {
+      width: 100%; border-collapse: collapse; font-size: 0.78rem;
+      font-family: var(--font-body);
+    }
+    table.gradebook th, table.gradebook td {
+      border: 1px solid var(--border); padding: 0.5rem 0.4rem;
+      text-align: center; vertical-align: middle;
+    }
+    table.gradebook thead th {
+      background: var(--primary); color: var(--white);
+      font-family: var(--font-head); font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.4px;
+      text-transform: uppercase; padding: 0.6rem 0.4rem;
+      position: sticky; top: 0; z-index: 5;
+    }
+    table.gradebook thead th.sub {
+      background: var(--primary-dark); font-size: 0.65rem;
+    }
+    table.gradebook thead th.exam-header {
+      background: var(--purple);
+    }
+    table.gradebook tbody td.name-cell {
+      text-align: left; font-weight: 700; white-space: nowrap;
+      min-width: 170px; padding-left: 0.75rem;
+      font-size: 0.82rem; color: var(--dark);
+    }
+    table.gradebook tbody td.no-cell {
+      text-align: left; padding-left: 0.65rem; min-width: 95px;
+      font-size: 0.72rem; color: var(--gray); font-weight: 600;
+    }
+    table.gradebook tbody td.group-cell {
+      font-size: 0.72rem; color: var(--gray); font-weight: 600;
+    }
+    table.gradebook tbody tr:nth-child(even) { background: #FAFBFC; }
+    table.gradebook tbody tr:hover { background: var(--primary-light); }
+    table.gradebook td.num {
+      text-align: center; font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    table.gradebook td.final { font-weight: 800; font-size: 0.85rem; }
+
+    td.score-pass { background: var(--success-light); color: #1B5E20; }
+    td.score-warn { background: var(--warning-light); color: #E65100; }
+    td.score-fail { background: var(--accent-light); color: #B71C1C; }
+    td.score-empty { background: #FAFBFC; color: #B0BEC5; font-weight: 400; }
+    td.final-pass { background: #C8E6C9; color: #1B5E20; }
+    td.final-warn { background: #FFE0B2; color: #E65100; }
+    td.final-fail { background: #FFCDD2; color: #B71C1C; }
+    td.exam-pass { background: #C8E6C9; color: #1B5E20; font-weight: 800; }
+    td.exam-fail { background: #FFCDD2; color: #B71C1C; font-weight: 800; }
+    td.remarks-pass { color: var(--success); font-weight: 700; }
+    td.remarks-fail { color: var(--accent); font-weight: 700; }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 1.25rem;
+      font-size: 0.75rem; margin-top: 1.25rem;
+      padding-top: 1rem; border-top: 1px dashed var(--border);
+      color: var(--gray);
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+    .legend-swatch {
+      width: 14px; height: 14px; border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .swatch-pass { background: #C8E6C9; }
+    .swatch-warn { background: #FFE0B2; }
+    .swatch-fail { background: #FFCDD2; }
+    .swatch-empty { background: #FAFBFC; }
+    .swatch-exam { background: #E1BEE7; }
+
+    .signature-block {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3rem; margin-top: 2.5rem; padding-top: 1.5rem;
+      border-top: 2px solid var(--primary);
+    }
+    .signature-line {
+      border-top: 1px solid var(--dark); padding-top: 0.4rem;
+      text-align: center; font-size: 0.82rem; margin-top: 3rem;
+    }
+    .signature-line strong { display: block; font-family: var(--font-head); margin-bottom: 0.15rem; }
+    .signature-line small { color: var(--gray); font-size: 0.72rem; }
+
+    .developer-footer {
+      text-align: center; margin-top: 2rem; padding: 1.25rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.75rem; color: var(--gray);
+    }
+    .developer-footer .dev-label {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
+      font-weight: 700; margin-bottom: 0.25rem;
+    }
+    .developer-footer .dev-name {
+      font-family: var(--font-head); font-weight: 700; font-size: 0.9rem;
+      color: var(--primary); margin: 0.35rem 0;
+    }
+
+    .empty-state {
+      text-align: center; padding: 4rem 1.5rem; color: var(--gray);
+    }
+    .empty-state .icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-state h2 { color: var(--dark); font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .empty-state p { font-size: 0.88rem; max-width: 400px; margin: 0 auto 1.5rem; }
+
+    .loader {
+      display: flex; align-items: center; justify-content: center;
+      padding: 4rem; font-size: 1rem; color: var(--gray);
+      flex-direction: column; gap: 1rem;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--gray-light); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--dark); color: var(--white);
+      padding: 0.85rem 1.25rem; border-radius: 10px;
+      box-shadow: var(--shadow-lg); z-index: 999;
+      transform: translateY(200%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 380px; font-size: 0.85rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .toast.show { transform: translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--accent); }
+    .toast.warning { background: var(--warning); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,27,38,0.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000; padding: 1rem; backdrop-filter: blur(4px);
+      animation: fadeIn 0.2s;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--white); border-radius: var(--radius);
+      max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto;
+      padding: 0; box-shadow: var(--shadow-lg);
+      animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.15rem 1.4rem; border-bottom: 1px solid var(--gray-light);
+      position: sticky; top: 0; background: var(--white); z-index: 3;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .modal-header h2 { font-size: 1.05rem; color: var(--dark); }
+    .modal-close {
+      background: var(--light); border: none; font-size: 1.1rem;
+      cursor: pointer; color: var(--gray); line-height: 1;
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .modal-close:hover { background: var(--accent-light); color: var(--accent); }
+    .modal-body { padding: 1.4rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block; font-weight: 600; margin-bottom: 0.3rem;
+      font-size: 0.8rem; font-family: var(--font-head); color: var(--dark-2);
+    }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--gray-light); border-radius: var(--radius-sm);
+      font-size: 0.9rem; transition: all 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,82,118,0.1);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-1 { gap: 0.5rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .text-center { text-align: center; }
+
+    @media print {
+      @page { size: legal landscape; margin: 0.5cm; }
+      body { background: white; padding: 0; font-size: 9pt; }
+      .toolbar, .no-print, .info-banner, .stats-row, .legend, .developer-footer { display: none !important; }
+      .sheet {
+        box-shadow: none; border: none; border-radius: 0;
+        padding: 0; margin: 0; page-break-inside: avoid;
+      }
+      .sheet-header { margin-bottom: 0.5rem; padding-bottom: 0.5rem; }
+      .sheet-header h1 { font-size: 11pt; }
+      .sheet-header h2 { font-size: 9pt; }
+      table.gradebook { font-size: 7.5pt; }
+      table.gradebook th, table.gradebook td {
+        padding: 0.2rem 0.15rem; border-color: #999;
+      }
+      table.gradebook thead th {
+        background: #1A5276 !important; color: white !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      table.gradebook thead th.sub {
+        background: #0E2F44 !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      table.gradebook thead th.exam-header {
+        background: #6A1B9A !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      td.score-pass, td.final-pass, td.exam-pass {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      td.score-warn, td.final-warn {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      td.score-fail, td.final-fail, td.exam-fail {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .signature-block { margin-top: 1rem; padding-top: 0.75rem; page-break-inside: avoid; }
+      .signature-line { margin-top: 1.5rem; }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 0.75rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar-left, .toolbar-right { justify-content: center; }
+      .signature-block { grid-template-columns: 1fr; gap: 1.5rem; }
+      .sheet { padding: 1rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <div class="loader">
+    <div class="spinner"></div>
+    <div>Loading gradebook...</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Modal</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   GRADEBOOK — Drug Administration Mastery v1.0
+   ============================================================ */
+var BACKEND_URL = 'https://script.google.com/macros/s/REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec';
+
+var GB = {
+  localKey: 'drugAdminMastery_instructor_v1',
+  state: {
+    students: [],
+    settings: {
+      courseName: 'NCM 107 Lab — Drug Administration',
+      instructorName: 'JEMUEL C. MARI, MAN, RN, LPT',
+      schoolYear: '2025–2026',
+      semester: '1st Semester',
+      passingScore: 75,
+      masteryThreshold: 90,
+      examPassingScore: 15,
+      unitsCompletedWeight: 20,
+      unitQuizWeight: 40,
+      gamesWeight: 20,
+      capstoneWeight: 20
+    },
+    lastSync: null
+  }
+};
+
+var UNIT_KEYS = ['unit1','unit2','unit3','unit4','unit5','unit6','unit7','unit8','unit9','unit10','unit11','unit12'];
+var UNIT_NAMES = {
+  unit1: 'U1 Foundations', unit2: 'U2 Ethics', unit3: 'U3 Process',
+  unit4: 'U4 10 Rights', unit5: 'U5 Orders', unit6: 'U6 Oral/Topical',
+  unit7: 'U7 Eye/Ear', unit8: 'U8 ID/SC/IM', unit9: 'U9 IV',
+  unit10: 'U10 Prep', unit11: 'U11 Calc', unit12: 'U12 Docs'
+};
+var GAME_KEYS = ['route','rights','dosage','order','safety'];
+var GAME_NAMES = {
+  route: 'Route', rights: 'Rights', dosage: 'Dosage',
+  order: 'Order', safety: 'Safety'
+};
+
+function loadLocal() {
+  try {
+    var raw = localStorage.getItem(GB.localKey);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      GB.state.students = parsed.students || [];
+      GB.state.settings = Object.assign({}, GB.state.settings, parsed.settings || {});
+      GB.state.lastSync = parsed.lastSync || null;
+    }
+  } catch (e) { console.warn('Local load failed', e); }
+}
+
+async function fetchAllSubmissions() {
+  var res = await fetch(BACKEND_URL + '?action=listAll', { method: 'GET' });
+  return await res.json();
+}
+
+async function syncFromBackend() {
+  showLoading('Syncing from Google Sheets...');
+  try {
+    var result = await fetchAllSubmissions();
+    if (!result.success) throw new Error(result.error || 'Sync failed');
+
+    var added = 0, updated = 0;
+    result.records.forEach(function(rec) {
+      var payload = null;
+      try { payload = JSON.parse(rec.dataJson); } catch (e) {}
+      var s = (payload && payload.student) || {
+        fullName: rec.fullName, studentNo: rec.studentNo, section: rec.section,
+        group: rec.group, email: rec.email
+      };
+
+      var existing = GB.state.students.find(function(x) {
+        var matchNo = s.studentNo && x.studentNo && String(x.studentNo).trim() === String(s.studentNo).trim();
+        var matchEmail = s.email && x.email && String(x.email).trim().toLowerCase() === String(s.email).trim().toLowerCase();
+        return matchNo || matchEmail;
+      });
+
+      var studentRecord = {
+        id: existing ? existing.id : 'S' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: s.fullName,
+        studentNo: s.studentNo || '',
+        section: s.section || '',
+        group: s.group || '',
+        email: s.email || '',
+        enrolled: existing ? existing.enrolled : new Date().toISOString().slice(0, 10),
+        unitsCompleted: rec.unitsCompleted || '0%',
+        unitAvg: rec.unitAvg || '0%',
+        examScore: rec.examScore || null,
+        examTotal: rec.examTotal || null,
+        examPercentage: rec.examPercentage || null,
+        examPassed: rec.examPassed || '',
+        examTakenAt: rec.timestamp || null,
+        integrityFlags: rec.integrityFlags || 0,
+        retakeActive: existing ? existing.retakeActive : 'NO',
+        retakeCode: existing ? existing.retakeCode : null,
+        retakeUsed: existing ? existing.retakeUsed : false,
+        appVersion: rec.appVersion || '1.0',
+        lastActive: rec.timestamp,
+        submissionCode: rec.code,
+        notes: existing ? existing.notes : 'Synced from Sheet',
+        progress: (payload && payload.progress) || {},
+        quizAttempts: (payload && payload.quizAttempts) || {},
+        games: (payload && payload.games) || {},
+        checklists: (payload && payload.checklists) || { oral: {}, parenteral: {} }
+      };
+
+      if (existing) {
+        var idx = GB.state.students.findIndex(function(x) { return x.id === existing.id; });
+        if (idx >= 0) { GB.state.students[idx] = studentRecord; updated++; }
+      } else {
+        GB.state.students.push(studentRecord);
+        added++;
+      }
+    });
+
+    GB.state.lastSync = new Date().toISOString();
+    saveLocal();
+    render();
+    toast('✅ Sync complete — Added: ' + added + ', Updated: ' + updated, 'success');
+  } catch (err) {
+    console.error(err);
+    showError(err.message);
+    toast('Sync failed: ' + err.message, 'error');
+  }
+}
+
+function saveLocal() {
+  try { localStorage.setItem(GB.localKey, JSON.stringify(GB.state)); } catch (e) {}
+}
+
+function toast(msg, type) {
+  type = type || '';
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove('show'); }, 3000);
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+  });
+}
+function todayLong() {
+  return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function downloadFile(content, filename, mime) {
+  var blob = new Blob([content], { type: mime });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function showLoading(msg) {
+  document.getElementById('app').innerHTML =
+    '<div class="loader"><div class="spinner"></div><div>' + escapeHtml(msg || 'Loading...') + '</div></div>';
+}
+function showError(msg) {
+  document.getElementById('app').innerHTML =
+    '<div class="empty-state"><div class="icon">⚠️</div>' +
+    '<h2>Could not load gradebook</h2>' +
+    '<p>' + escapeHtml(msg) + '</p>' +
+    '<button class="btn btn-primary" onclick="init()">🔄 Retry</button></div>';
+}
+
+function getUnitBestScore(s, unit) {
+  if (s.progress && s.progress[unit] && typeof s.progress[unit].score === 'number') {
+    return s.progress[unit].score;
+  }
+  var attempts = s.quizAttempts && s.quizAttempts[unit];
+  if (attempts && attempts.length) return Math.max.apply(null, attempts);
+  return null;
+}
+function getGameBestScore(s, game) {
+  var attempts = s.games && s.games[game];
+  if (attempts && attempts.length) return Math.max.apply(null, attempts);
+  return null;
+}
+function getUnitAvg(s) {
+  if (typeof s.unitAvg === 'string') return parseInt(s.unitAvg, 10) || 0;
+  if (typeof s.unitAvg === 'number') return s.unitAvg;
+  var scores = UNIT_KEYS.map(function(u) { return getUnitBestScore(s, u); }).filter(function(x) { return x !== null; });
+  if (!scores.length) return null;
+  return Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+}
+function getGamesAvg(s) {
+  var scores = GAME_KEYS.map(function(g) { return getGameBestScore(s, g); }).filter(function(x) { return x !== null; });
+  if (!scores.length) return null;
+  return Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+}
+function getExamScore(s) {
+  if (s.examPercentage !== null && s.examPercentage !== undefined && s.examPercentage !== '') {
+    return parseInt(s.examPercentage, 10) || null;
+  }
+  return null;
+}
+function getExamRaw(s) {
+  if (s.examScore !== null && s.examScore !== undefined && s.examScore !== '') {
+    return { score: parseInt(s.examScore, 10), total: parseInt(s.examTotal, 10) || 30 };
+  }
+  return null;
+}
+function getCompletionPercent(s) {
+  if (typeof s.unitsCompleted === 'string') return parseInt(s.unitsCompleted, 10) || 0;
+  if (typeof s.unitsCompleted === 'number') return s.unitsCompleted;
+  return 0;
+}
+function isExamPassed(s) {
+  var p = s.examPassed;
+  return p === true || p === 'PASSED' || p === 'TRUE';
+}
+function hasExam(s) {
+  return s.examTakenAt || (s.examPercentage !== null && s.examPercentage !== undefined && s.examPercentage !== '');
+}
+
+function computeWeightedFinal(s, settings) {
+  var unitAvg = getUnitAvg(s);
+  var gameAvg = getGamesAvg(s);
+  var exam = getExamScore(s);
+  var completion = getCompletionPercent(s);
+  if (unitAvg === null && gameAvg === null && exam === null && completion === 0) return null;
+
+  var w = settings;
+  var total = 0, weightSum = 0;
+  if (completion !== null) { total += completion * (w.unitsCompletedWeight / 100); weightSum += w.unitsCompletedWeight; }
+  if (unitAvg !== null) { total += unitAvg * (w.unitQuizWeight / 100); weightSum += w.unitQuizWeight; }
+  if (gameAvg !== null) { total += gameAvg * (w.gamesWeight / 100); weightSum += w.gamesWeight; }
+  if (exam !== null) { total += exam * (w.capstoneWeight / 100); weightSum += w.capstoneWeight; }
+  if (weightSum === 0) return null;
+  return Math.round((total / weightSum) * 100);
+}
+
+var TRANSMUTATION = [
+  { min: 97, max: 100, grade: 1.00 },
+  { min: 94, max: 96, grade: 1.25 },
+  { min: 91, max: 93, grade: 1.50 },
+  { min: 88, max: 90, grade: 1.75 },
+  { min: 85, max: 87, grade: 2.00 },
+  { min: 82, max: 84, grade: 2.25 },
+  { min: 79, max: 81, grade: 2.50 },
+  { min: 76, max: 78, grade: 2.75 },
+  { min: 75, max: 75, grade: 3.00 },
+  { min: 0, max: 74, grade: 5.00 }
+];
+function transmute(rawPercent) {
+  if (rawPercent === null || rawPercent === undefined) return null;
+  var row = TRANSMUTATION.find(function(r) { return rawPercent >= r.min && rawPercent <= r.max; });
+  return row ? row.grade : 5.00;
+}
+function formatGrade(g) {
+  if (g === null || g === undefined) return '—';
+  return g.toFixed(2);
+}
+function getRemarks(g) {
+  if (g === null || g === undefined) return '—';
+  if (g === 1.00) return 'Excellent';
+  if (g <= 1.50) return 'Very Good';
+  if (g <= 2.00) return 'Good';
+  if (g <= 2.50) return 'Satisfactory';
+  if (g <= 3.00) return 'Passed';
+  return 'Failed';
+}
+function getRemarksClass(g) {
+  if (g === null || g === undefined) return '';
+  return g <= 3.00 ? 'remarks-pass' : 'remarks-fail';
+}
+function scoreClass(val, passThreshold) {
+  passThreshold = passThreshold || 90;
+  if (val === null || val === undefined) return 'score-empty';
+  if (val >= passThreshold) return 'score-pass';
+  if (val >= 75) return 'score-warn';
+  return 'score-fail';
+}
+function finalGradeClass(g) {
+  if (g === null || g === undefined) return '';
+  if (g <= 2.00) return 'final-pass';
+  if (g <= 3.00) return 'final-warn';
+  return 'final-fail';
+}
+function cell(val) {
+  if (val === null || val === undefined) return '<span style="color:#B0BEC5;">—</span>';
+  return val;
+}
+
+function render() {
+  var app = document.getElementById('app');
+  var students = GB.state.students;
+
+  if (!students.length) {
+    app.innerHTML = renderToolbar() +
+      '<div class="empty-state">' +
+      '<div class="icon">📋</div>' +
+      '<h2>No students in the gradebook yet</h2>' +
+      '<p>Click "Sync from Sheet" to pull student data from the backend, or open the Instructor Dashboard to import students by code.</p>' +
+      '<div class="flex gap-1" style="justify-content:center;">' +
+      '<button class="btn btn-primary" onclick="syncFromBackend()">🔄 Sync from Sheet</button>' +
+      '<button class="btn btn-outline" onclick="window.location.href=\'instructor-dashboard.html\'">👨‍🏫 Instructor Dashboard</button>' +
+      '</div></div>' +
+      renderDeveloperFooter();
+    return;
+  }
+
+  app.innerHTML = renderToolbar() +
+    renderInfoBanner() +
+    '<div class="sheet" id="sheet">' +
+      renderSheetHeader() +
+      renderTable() +
+      renderLegend() +
+      renderSignatureBlock() +
+    '</div>' +
+    renderStatsSummary() +
+    renderDeveloperFooter();
+}
+
+function renderToolbar() {
+  var lastSync = GB.state.lastSync;
+  return '<div class="toolbar no-print">' +
+    '<div class="toolbar-left">' +
+    '<div class="logo">📊</div>' +
+    '<div><h1>Class Record — Gradebook</h1>' +
+    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.0</small></div>' +
+    '</div>' +
+    '<div class="toolbar-right">' +
+    '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'index.html\'">💊 Student App</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'instructor-dashboard.html\'">👨‍🏫 Dashboard</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="openWeightsModal()">⚖️ Weights</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="syncFromBackend()">🔄 Sync' + (lastSync ? ' (' + new Date(lastSync).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + ')' : '') + '</button>' +
+    '<button class="btn btn-secondary btn-sm" onclick="exportCSV()">📤 Export CSV</button>' +
+    '<button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print</button>' +
+    '</div></div>';
+}
+
+function renderInfoBanner() {
+  var s = GB.state.settings;
+  return '<div class="info-banner no-print">' +
+    '<div class="info-grid">' +
+    infoItem('Course', s.courseName) +
+    infoItem('Instructor', s.instructorName) +
+    infoItem('School Year', s.schoolYear) +
+    infoItem('Semester', s.semester) +
+    infoItem('Total Students', GB.state.students.length) +
+    infoItem('Generated', todayLong()) +
+    '</div></div>';
+}
+function infoItem(label, value) {
+  return '<div class="info-item">' +
+    '<div class="info-label">' + escapeHtml(label) + '</div>' +
+    '<div class="info-value">' + escapeHtml(value) + '</div></div>';
+}
+
+function renderSheetHeader() {
+  var s = GB.state.settings;
+  return '<div class="sheet-header">' +
+    '<h1>' + escapeHtml(s.courseName) + '</h1>' +
+    '<h2>Class Record — Drug Administration Mastery</h2>' +
+    '<p>School Year ' + escapeHtml(s.schoolYear) + ' &nbsp;|&nbsp; ' + escapeHtml(s.semester) + ' &nbsp;|&nbsp; Instructor: ' + escapeHtml(s.instructorName) + '</p>' +
+    '<p>' + todayLong() + '</p>' +
+    '<span class="version-tag">App Version 1.0</span>' +
+    '</div>';
+}
+
+function renderTable() {
+  var students = GB.state.students;
+  var html = '<table class="gradebook"><thead><tr>';
+  html += '<th rowspan="2" style="min-width:170px;">STUDENT NAME</th>';
+  html += '<th rowspan="2" style="min-width:95px;">STUDENT NO.</th>';
+  html += '<th rowspan="2" style="min-width:60px;">SECTION</th>';
+  html += '<th rowspan="2" style="min-width:60px;">GROUP</th>';
+  html += '<th colspan="' + UNIT_KEYS.length + '">UNIT QUIZ SCORES (Best Attempt)</th>';
+  html += '<th rowspan="2" style="min-width:55px;">UNIT<br>AVG</th>';
+  html += '<th colspan="' + GAME_KEYS.length + '">MASTERY GAMES</th>';
+  html += '<th rowspan="2" style="min-width:55px;">GAMES<br>AVG</th>';
+  html += '<th colspan="2" class="exam-header">CAPSTONE EXAM</th>';
+  html += '<th rowspan="2" style="min-width:60px;">UNITS<br>COMPL.</th>';
+  html += '<th rowspan="2" style="min-width:60px;">RAW<br>%</th>';
+  html += '<th rowspan="2" style="min-width:60px;">FINAL<br>GRADE</th>';
+  html += '<th rowspan="2" style="min-width:95px;">REMARKS</th>';
+  html += '</tr><tr>';
+  UNIT_KEYS.forEach(function(u) {
+    html += '<th class="sub" style="min-width:50px;">' + escapeHtml(UNIT_NAMES[u]) + '</th>';
+  });
+  GAME_KEYS.forEach(function(g) {
+    html += '<th class="sub" style="min-width:50px;">' + escapeHtml(GAME_NAMES[g]) + '</th>';
+  });
+  html += '<th class="sub exam-header" style="min-width:55px;">SCORE</th>';
+  html += '<th class="sub exam-header" style="min-width:70px;">RESULT</th>';
+  html += '</tr></thead><tbody>';
+
+  students.forEach(function(s) { html += renderStudentRow(s); });
+  html += renderClassAverageRow();
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderStudentRow(s) {
+  var w = GB.state.settings;
+  var unitScores = UNIT_KEYS.map(function(u) { return getUnitBestScore(s, u); });
+  var gameScores = GAME_KEYS.map(function(g) { return getGameBestScore(s, g); });
+  var unitAvg = getUnitAvg(s);
+  var gameAvg = getGamesAvg(s);
+  var examPct = getExamScore(s);
+  var examRaw = getExamRaw(s);
+  var examTaken = hasExam(s);
+  var examPass = isExamPassed(s);
+  var completion = getCompletionPercent(s);
+  var rawFinal = computeWeightedFinal(s, w);
+  var transmuted = transmute(rawFinal);
+  var remarks = getRemarks(transmuted);
+
+  var html = '<tr>';
+  html += '<td class="name-cell">' + escapeHtml(s.name) + '</td>';
+  html += '<td class="no-cell">' + escapeHtml(s.studentNo || '—') + '</td>';
+  html += '<td class="group-cell">' + escapeHtml(s.section || '—') + '</td>';
+  html += '<td class="group-cell">' + escapeHtml(s.group || '—') + '</td>';
+
+  unitScores.forEach(function(v) {
+    html += '<td class="num ' + scoreClass(v, w.masteryThreshold) + '">' + cell(v) + '</td>';
+  });
+
+  html += '<td class="num final ' + scoreClass(unitAvg, w.masteryThreshold) + '">' + cell(unitAvg) + '</td>';
+
+  gameScores.forEach(function(v) {
+    html += '<td class="num ' + scoreClass(v, 90) + '">' + cell(v) + '</td>';
+  });
+
+  html += '<td class="num final ' + scoreClass(gameAvg, 90) + '">' + cell(gameAvg) + '</td>';
+
+  if (examTaken) {
+    var examScoreText = examRaw ? (examRaw.score + '/' + examRaw.total) : (examPct + '%');
+    html += '<td class="num ' + scoreClass(examPct, 50) + '">' + examScoreText + '<br><small>' + examPct + '%</small></td>';
+    html += '<td class="num ' + (examPass ? 'exam-pass' : 'exam-fail') + '">' + (examPass ? '✅ PASS' : '❌ FAIL') + '</td>';
+  } else {
+    html += '<td class="num score-empty">—</td>';
+    html += '<td class="num score-empty">Not taken</td>';
+  }
+
+  html += '<td class="num">' + completion + '%</td>';
+  html += '<td class="num final">' + (rawFinal !== null ? rawFinal : '—') + '</td>';
+  html += '<td class="num final ' + finalGradeClass(transmuted) + '">' + formatGrade(transmuted) + '</td>';
+  html += '<td class="remarks ' + getRemarksClass(transmuted) + '">' + remarks + '</td>';
+  html += '</tr>';
+  return html;
+}
+
+function renderClassAverageRow() {
+  var students = GB.state.students;
+  var w = GB.state.settings;
+  var n = students.length;
+  if (!n) return '';
+
+  var avg = function(vals) {
+    var nums = vals.filter(function(v) { return v !== null && v !== undefined; });
+    if (!nums.length) return null;
+    return Math.round(nums.reduce(function(a, b) { return a + b; }, 0) / nums.length);
+  };
+
+  var unitAvgs = UNIT_KEYS.map(function(u) {
+    return avg(students.map(function(s) { return getUnitBestScore(s, u); }));
+  });
+  var gameAvgs = GAME_KEYS.map(function(g) {
+    return avg(students.map(function(s) { return getGameBestScore(s, g); }));
+  });
+  var unitAvgOfAvgs = avg(unitAvgs);
+  var gameAvgOfAvgs = avg(gameAvgs);
+  var examAvg = avg(students.map(function(s) { return getExamScore(s); }));
+  var completionAvg = avg(students.map(function(s) { return getCompletionPercent(s); }));
+  var rawAvg = avg(students.map(function(s) { return computeWeightedFinal(s, w); }));
+  var transmutedAvg = avg(students.map(function(s) { return transmute(computeWeightedFinal(s, w)); }));
+  var examPassCount = students.filter(function(s) { return isExamPassed(s); }).length;
+  var examTakenCount = students.filter(function(s) { return hasExam(s); }).length;
+
+  var html = '<tr style="background:#E3EEF5;font-weight:800;border-top:2px solid var(--primary);">';
+  html += '<td class="name-cell" colspan="4" style="text-align:right;padding-right:0.75rem;font-size:0.8rem;">CLASS AVERAGE →</td>';
+
+  unitAvgs.forEach(function(v) { html += '<td class="num">' + (v !== null ? v : '—') + '</td>'; });
+  html += '<td class="num final">' + (unitAvgOfAvgs !== null ? unitAvgOfAvgs : '—') + '</td>';
+
+  gameAvgs.forEach(function(v) { html += '<td class="num">' + (v !== null ? v : '—') + '</td>'; });
+  html += '<td class="num final">' + (gameAvgOfAvgs !== null ? gameAvgOfAvgs : '—') + '</td>';
+
+  html += '<td class="num">' + (examAvg !== null ? examAvg + '%' : '—') + '<br><small>' + examPassCount + '/' + examTakenCount + '</small></td>';
+  html += '<td class="num">' + (examTakenCount ? Math.round((examPassCount / examTakenCount) * 100) + '%' : '—') + '</td>';
+
+  html += '<td class="num">' + (completionAvg !== null ? completionAvg + '%' : '—') + '</td>';
+  html += '<td class="num final">' + (rawAvg !== null ? rawAvg : '—') + '</td>';
+  html += '<td class="num final">' + (transmutedAvg !== null ? formatGrade(transmutedAvg) : '—') + '</td>';
+  html += '<td class="remarks"></td>';
+  html += '</tr>';
+  return html;
+}
+
+function renderLegend() {
+  var w = GB.state.settings;
+  return '<div class="legend">' +
+    '<div class="legend-item"><span class="legend-swatch swatch-pass"></span> ≥' + w.masteryThreshold + '% — Mastered</div>' +
+    '<div class="legend-item"><span class="legend-swatch swatch-warn"></span> 75–' + (w.masteryThreshold - 1) + '% — Passing</div>' +
+    '<div class="legend-item"><span class="legend-swatch swatch-fail"></span> &lt;75% — Failing</div>' +
+    '<div class="legend-item"><span class="legend-swatch swatch-empty"></span> No data</div>' +
+    '<div class="legend-item"><span class="legend-swatch swatch-exam"></span> Capstone Exam (15/30 passing = 50% = 3.0)</div>' +
+    '<div class="legend-item" style="margin-left:auto;"><strong>Transmutation:</strong> 97+ → 1.00 | 94 → 1.25 | 91 → 1.50 | 88 → 1.75 | 85 → 2.00 | 82 → 2.25 | 79 → 2.50 | 76 → 2.75 | 75 → 3.00 | &lt;75 → 5.00</div>' +
+    '</div>';
+}
+
+function renderSignatureBlock() {
+  var s = GB.state.settings;
+  return '<div class="signature-block">' +
+    '<div><div class="signature-line">' +
+    '<strong>' + escapeHtml(s.instructorName) + '</strong>' +
+    '<small>Instructor</small></div></div>' +
+    '<div><div class="signature-line">' +
+    '<strong>_____________________________</strong>' +
+    '<small>Program Chair / Dean</small></div></div>' +
+    '</div>';
+}
+
+function renderStatsSummary() {
+  var students = GB.state.students;
+  var w = GB.state.settings;
+  var n = students.length;
+  var finals = students.map(function(s) { return transmute(computeWeightedFinal(s, w)); }).filter(function(x) { return x !== null; });
+  var passed = finals.filter(function(g) { return g <= 3.00; }).length;
+  var failed = finals.filter(function(g) { return g > 3.00; }).length;
+  var mastered = students.filter(function(s) {
+    var raw = computeWeightedFinal(s, w);
+    return raw !== null && raw >= w.masteryThreshold;
+  }).length;
+  var avgFinal = finals.length ? (finals.reduce(function(a, b) { return a + b; }, 0) / finals.length) : null;
+  var highest = finals.length ? Math.min.apply(null, finals) : null;
+  var lowest = finals.length ? Math.max.apply(null, finals) : null;
+  var passRate = finals.length ? Math.round((passed / finals.length) * 100) : 0;
+
+  var html = '<div class="stats-row no-print">';
+  html += statPill('Students', n, '', 'Enrolled');
+  html += statPill('Passed', passed, 'success', passRate + '% pass rate');
+  html += statPill('Failed', failed, 'alert', (100 - passRate) + '% fail rate');
+  html += statPill('Mastered', mastered, 'purple', '≥' + w.masteryThreshold + '% final');
+  html += statPill('Class Avg', avgFinal !== null ? formatGrade(avgFinal) : '—', '', 'Transmuted');
+  html += statPill('Highest', highest !== null ? formatGrade(highest) : '—', 'success', 'Best grade');
+  html += statPill('Lowest', lowest !== null ? formatGrade(lowest) : '—', 'alert', 'Needs help');
+  html += '</div>';
+  return html;
+}
+
+function statPill(label, value, colorClass, sub) {
+  return '<div class="stat-pill ' + (colorClass || '') + '">' +
+    '<div class="stat-label">' + label + '</div>' +
+    '<div class="stat-value">' + value + '</div>' +
+    (sub ? '<div class="stat-sub">' + sub + '</div>' : '') +
+    '</div>';
+}
+
+function renderDeveloperFooter() {
+  return '<div class="developer-footer no-print">' +
+    '<div class="dev-label">Class Record System Developed by</div>' +
+    '<div class="dev-name">JEMUEL C. MARI, MAN, RN, LPT</div>' +
+    '<div>Clinical Instructor | Teacher II — Department of Education</div>' +
+    '<div><strong>Tarlac State University</strong> — College of Science — Nursing Department</div>' +
+    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.0 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
+    '</div>';
+}
+
+function openWeightsModal() {
+  var w = GB.state.settings;
+  document.getElementById('modalTitle').textContent = '⚖️ Adjust Grade Weights';
+  document.getElementById('modalBody').innerHTML =
+    '<p style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;">' +
+    'Set how much each component contributes to the final raw percentage. Weights should sum to 100%.' +
+    '</p>' +
+    '<div class="form-row">' +
+    '<div class="form-group"><label>Units Completed (%)</label>' +
+    '<input type="number" id="w_completion" min="0" max="100" value="' + w.unitsCompletedWeight + '" /></div>' +
+    '<div class="form-group"><label>Unit Quiz Average (%)</label>' +
+    '<input type="number" id="w_unitavg" min="0" max="100" value="' + w.unitQuizWeight + '" /></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+    '<div class="form-group"><label>Mastery Games (%)</label>' +
+    '<input type="number" id="w_games" min="0" max="100" value="' + w.gamesWeight + '" /></div>' +
+    '<div class="form-group"><label>Capstone Exam (%)</label>' +
+    '<input type="number" id="w_capstone" min="0" max="100" value="' + w.capstoneWeight + '" /></div>' +
+    '</div>' +
+    '<div id="weightSum" style="font-size:0.9rem;margin-bottom:1rem;font-weight:700;"></div>' +
+    '<div class="flex gap-1" style="flex-wrap:wrap;">' +
+    '<button class="btn btn-primary" onclick="saveWeights()">💾 Save Weights</button>' +
+    '<button class="btn btn-outline" onclick="resetWeights()">↺ Reset Default</button>' +
+    '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>' +
+    '</div>';
+  document.getElementById('modalOverlay').classList.add('show');
+  updateWeightSum();
+  ['w_completion','w_unitavg','w_games','w_capstone'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateWeightSum);
+  });
+}
+
+function updateWeightSum() {
+  var sum = ['w_completion','w_unitavg','w_games','w_capstone']
+    .map(function(id) { return parseInt(document.getElementById(id).value, 10) || 0; })
+    .reduce(function(a, b) { return a + b; }, 0);
+  var el = document.getElementById('weightSum');
+  if (!el) return;
+  var ok = sum === 100;
+  el.innerHTML = 'Total: <span style="color:' + (ok ? 'var(--success)' : 'var(--accent)') + ';">' + sum + '%</span> ' + (ok ? '✅' : '— will be normalized');
+}
+
+function saveWeights() {
+  GB.state.settings.unitsCompletedWeight = parseInt(document.getElementById('w_completion').value, 10) || 0;
+  GB.state.settings.unitQuizWeight = parseInt(document.getElementById('w_unitavg').value, 10) || 0;
+  GB.state.settings.gamesWeight = parseInt(document.getElementById('w_games').value, 10) || 0;
+  GB.state.settings.capstoneWeight = parseInt(document.getElementById('w_capstone').value, 10) || 0;
+  saveLocal();
+  closeModal();
+  toast('✅ Weights saved.', 'success');
+  render();
+}
+
+function resetWeights() {
+  document.getElementById('w_completion').value = 20;
+  document.getElementById('w_unitavg').value = 40;
+  document.getElementById('w_games').value = 20;
+  document.getElementById('w_capstone').value = 20;
+  updateWeightSum();
+}
+
+function exportCSV() {
+  var students = GB.state.students;
+  var w = GB.state.settings;
+  if (!students.length) return toast('No data to export.', 'warning');
+
+  var headers = [
+    'Student Name','Student No.','Section','Group','Email',
+    'Unit1','Unit2','Unit3','Unit4','Unit5','Unit6','Unit7','Unit8','Unit9','Unit10','Unit11','Unit12',
+    'Unit Avg',
+    'Route','Rights','Dosage','Order','Safety',
+    'Games Avg',
+    'Exam Score','Exam Total','Exam Percentage','Exam Result','Exam Date',
+    'Units Completed %','Weighted Raw %','Final Grade','Remarks',
+    'Retake Active','Retake Code','Submission Code','Last Active'
+  ];
+
+  var rows = students.map(function(s) {
+    var unitScores = UNIT_KEYS.map(function(u) { return getUnitBestScore(s, u) !== null ? getUnitBestScore(s, u) : ''; });
+    var gameScores = GAME_KEYS.map(function(g) { return getGameBestScore(s, g) !== null ? getGameBestScore(s, g) : ''; });
+    var unitAvg = getUnitAvg(s);
+    var gameAvg = getGamesAvg(s);
+    var examRaw = getExamRaw(s);
+    var examPct = getExamScore(s);
+    var examResult = hasExam(s) ? (isExamPassed(s) ? 'PASSED' : 'FAILED') : 'NOT TAKEN';
+    var completion = getCompletionPercent(s);
+    var raw = computeWeightedFinal(s, w);
+    var g = transmute(raw);
+
+    return [
+      s.name, s.studentNo || '', s.section || '', s.group || '', s.email || '',
+      unitScores[0], unitScores[1], unitScores[2], unitScores[3], unitScores[4], unitScores[5],
+      unitScores[6], unitScores[7], unitScores[8], unitScores[9], unitScores[10], unitScores[11],
+      unitAvg !== null ? unitAvg : '',
+      gameScores[0], gameScores[1], gameScores[2], gameScores[3], gameScores[4],
+      gameAvg !== null ? gameAvg : '',
+      examRaw ? examRaw.score : '',
+      examRaw ? examRaw.total : '',
+      examPct !== null ? examPct : '',
+      examResult,
+      s.examTakenAt || '',
+      completion + '%',
+      raw !== null ? raw : '',
+      formatGrade(g),
+      getRemarks(g),
+      s.retakeActive || 'NO',
+      s.retakeCode || '',
+      s.submissionCode || '',
+      s.lastActive || ''
+    ];
+  });
+
+  var csv = [headers].concat(rows).map(function(r) {
+    return r.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
+  }).join('\n');
+
+  downloadFile(csv, 'class-record-' + todayISO() + '.csv', 'text/csv');
+  toast('✅ CSV exported.', 'success');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function init() {
+  loadLocal();
+  if (!GB.state.students.length) {
+    syncFromBackend();
+  } else {
+    render();
+    setTimeout(function() {
+      fetchAllSubmissions().then(function(result) {
+        if (result.success && result.records.length !== GB.state.students.length) {
+          syncFromBackend();
+        }
+      }).catch(function() {});
+    }, 2000);
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
