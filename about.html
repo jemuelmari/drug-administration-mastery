@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A5276" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>About — Drug Administration Mastery</title>
+  <style>
+    :root {
+      --primary: #1A5276; --primary-dark: #0E2F44; --secondary: #2E7D32;
+      --accent: #C62828; --dark: #1B2631; --light: #F1F8F4;
+      --white: #FFFFFF; --gray: #607D8B;
+      --font-head: 'Montserrat', -apple-system, sans-serif;
+      --font-body: 'Open Sans', -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body); background: var(--light);
+      color: var(--dark); line-height: 1.6; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(26,82,118,0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(46,125,50,0.06) 0%, transparent 40%);
+    }
+    .card {
+      background: var(--white); border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      max-width: 680px; width: 100%; padding: 2.5rem; text-align: center;
+    }
+    .logo { font-size: 3.5rem; margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-head); color: var(--primary); font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--gray); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .divider { height: 3px; width: 60px; background: var(--secondary); margin: 1.25rem auto; border-radius: 2px; }
+    .developer-name {
+      font-family: var(--font-head); font-weight: 700;
+      font-size: 1.3rem; color: var(--primary); margin-bottom: 0.5rem;
+    }
+    .credentials { font-size: 0.9rem; color: var(--dark); margin-bottom: 0.4rem; }
+    .affiliation {
+      font-size: 0.9rem; color: var(--gray); margin-top: 0.75rem; line-height: 1.8;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem; margin: 1.5rem 0;
+    }
+    .feature-item {
+      background: var(--light); padding: 0.85rem 0.5rem; border-radius: 10px;
+      font-size: 0.78rem; color: var(--dark); font-weight: 600;
+    }
+    .feature-item .icon { display: block; font-size: 1.5rem; margin-bottom: 0.35rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 2rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.4rem; border-radius: 8px;
+      text-decoration: none; font-family: var(--font-head);
+      font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: var(--white); }
+    .footer {
+      margin-top: 2rem; padding-top: 1.5rem;
+      border-top: 1px solid #E0E0E0;
+      font-size: 0.75rem; color: var(--gray);
+    }
+    @media (max-width: 480px) {
+      .card { padding: 1.5rem; }
+      h1 { font-size: 1.3rem; }
+      .developer-name { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">💊</div>
+    <h1>Drug Administration Mastery</h1>
+    <p class="subtitle">NCM 107 Lab — Level II BSN</p>
+
+    <div class="divider"></div>
+
+    <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);font-weight:600;">Developed by</p>
+    <p class="developer-name">JEMUEL C. MARI, MAN, RN, LPT</p>
+    <p class="credentials"><strong>Clinical Instructor</strong></p>
+    <p class="credentials"><strong>Teacher II — Department of Education</strong></p>
+    <p class="affiliation">
+      <strong>Tarlac State University</strong><br>
+      College of Science<br>
+      Nursing Department
+    </p>
+
+    <div class="divider"></div>
+
+    <p style="font-size:0.85rem;color:var(--gray);">
+      An interactive learning module for mastering safe medication administration — including the 10 Rights, 3 Checks, drug routes, dosage calculations, drug preparation, and evidence-based nursing practice.
+    </p>
+
+    <div class="features-grid">
+      <div class="feature-item"><span class="icon">📚</span>12 Learning Units</div>
+      <div class="feature-item"><span class="icon">🎮</span>5 Mastery Games</div>
+      <div class="feature-item"><span class="icon">💊</span>Drug Database</div>
+      <div class="feature-item"><span class="icon">🧮</span>Dosage Calculator</div>
+      <div class="feature-item"><span class="icon">📋</span>MAR Simulator</div>
+      <div class="feature-item"><span class="icon">✅</span>Return Demo Checklists</div>
+      <div class="feature-item"><span class="icon">📝</span>Capstone Exam</div>
+      <div class="feature-item"><span class="icon">🏆</span>Certificate of Mastery</div>
+    </div>
+
+    <div class="actions">
+      <a href="index.html" class="btn btn-primary">💊 Open Student App</a>
+      <a href="instructor-dashboard.html" class="btn btn-outline">👨‍🏫 Instructor Dashboard</a>
+    </div>
+
+    <div class="footer">
+      © 2025 JEMUEL C. MARI, MAN, RN, LPT — All Rights Reserved<br>
+      Version 1.0.0
+    </div>
+  </div>
+</body>
+</html>
