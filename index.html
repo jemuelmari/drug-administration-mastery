@@ -1,0 +1,3158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1A5276" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <title>💊 Drug Administration Mastery v1.0</title>
+  <style>
+    :root {
+      --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
+      --secondary: #2E7D32; --secondary-light: #E8F5E9;
+      --accent: #C62828; --accent-light: #FFEBEE;
+      --success: #43A047; --success-light: #E8F5E9;
+      --warning: #F57C00; --warning-light: #FFF3E0;
+      --purple: #6A1B9A; --purple-light: #F3E5F5;
+      --pink: #C2185B; --pink-light: #FCE4EC;
+      --indigo: #3949AB; --indigo-light: #E8EAF6;
+      --teal: #00897B; --teal-light: #E0F2F1;
+      --dark: #0F1B26; --dark-2: #1B2631; --dark-3: #2C3E50;
+      --light: #F1F8F4; --white: #FFFFFF;
+      --gray: #607D8B; --gray-light: #CFD8DC; --border: #B0BEC5;
+      --radius: 16px; --radius-sm: 10px; --radius-lg: 24px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.15);
+      --shadow-glow: 0 0 24px rgba(26,82,118,0.3);
+      --font-head: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --sidebar-w: 280px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body); background: var(--light); color: var(--dark);
+      line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 15px;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(26,82,118,0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(46,125,50,0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+    h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+    h1 { font-size: 1.85rem; font-weight: 800; }
+    h2 { font-size: 1.4rem; font-weight: 700; }
+    h3 { font-size: 1.1rem; font-weight: 700; }
+    p { margin-bottom: 0.6rem; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    a { color: var(--primary); text-decoration: none; }
+
+    .app-container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+      color: var(--white); padding: 1.5rem 1rem;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      overflow-y: auto; z-index: 100;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+    }
+    .sidebar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 240px;
+      background: radial-gradient(circle at 30% 20%, rgba(26,82,118,0.4) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .sidebar-header {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 0.5rem 0.5rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 1.25rem; position: relative; z-index: 1;
+    }
+    .sidebar-header .logo-wrap {
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; flex-shrink: 0;
+      box-shadow: var(--shadow-glow);
+    }
+    .sidebar-header h1 { font-size: 1.05rem; color: var(--white); }
+    .sidebar-header small {
+      display: block; font-size: 0.7rem; color: rgba(255,255,255,0.6);
+      font-weight: 500; margin-top: 0.15rem; letter-spacing: 0.3px;
+    }
+    .student-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 1rem; margin-bottom: 1.25rem;
+      position: relative; z-index: 1; backdrop-filter: blur(8px);
+    }
+    .student-card .avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 800; font-size: 1.2rem;
+      color: var(--white); margin-bottom: 0.65rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .student-card .name {
+      font-family: var(--font-head); font-weight: 700;
+      font-size: 0.95rem; color: var(--white); margin-bottom: 0.2rem;
+      line-height: 1.2;
+    }
+    .student-card .meta {
+      font-size: 0.72rem; color: rgba(255,255,255,0.65);
+      line-height: 1.5; margin-bottom: 0.75rem;
+    }
+    .student-card .chip-actions { display: flex; gap: 0.4rem; }
+    .student-card .chip-btn {
+      flex: 1; background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white); padding: 0.45rem 0.5rem;
+      border-radius: 8px; font-size: 0.72rem;
+      font-family: var(--font-head); font-weight: 600;
+      transition: all 0.15s;
+    }
+    .student-card .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+    .student-card .chip-btn.danger { background: rgba(198,40,40,0.25); border-color: rgba(198,40,40,0.4); }
+    .student-card .chip-btn.danger:hover { background: rgba(198,40,40,0.4); }
+
+    .nav-section { margin-bottom: 1.25rem; position: relative; z-index: 1; }
+    .nav-section-title {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.4); margin-bottom: 0.5rem;
+      padding: 0 0.65rem; font-weight: 700;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.7rem 0.85rem; border-radius: 10px;
+      color: rgba(255,255,255,0.75); cursor: pointer;
+      font-size: 0.88rem; transition: all 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: var(--font-body); font-weight: 500;
+      position: relative; margin-bottom: 0.15rem;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); transform: translateX(2px); }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(26,82,118,0.5), rgba(46,125,50,0.2));
+      color: var(--white); font-weight: 600;
+      box-shadow: inset 3px 0 0 var(--primary), 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .nav-item .icon { font-size: 1.05rem; width: 1.5rem; text-align: center; display: flex; align-items: center; justify-content: center; }
+    .nav-item.logout { color: #FFCDD2; }
+
+    .sidebar-footer {
+      margin-top: auto; padding: 1rem 0.5rem 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.72rem; line-height: 1.55;
+      color: rgba(255,255,255,0.55); position: relative; z-index: 1;
+    }
+    .sidebar-footer .dev-label {
+      font-size: 0.62rem; text-transform: uppercase;
+      letter-spacing: 1px; opacity: 0.6; margin-bottom: 0.3rem;
+    }
+    .sidebar-footer .dev-name { font-weight: 700; color: var(--white); font-size: 0.78rem; }
+    .sidebar-footer .version-tag {
+      display: inline-block; margin-top: 0.5rem;
+      padding: 0.2rem 0.55rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white); border-radius: 999px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+    }
+
+    .main-content {
+      margin-left: var(--sidebar-w); flex: 1;
+      padding: 2rem 2.5rem 4rem; max-width: 1100px;
+    }
+    .menu-toggle {
+      display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200;
+      background: var(--dark); color: var(--white);
+      border: none; border-radius: 12px; width: 46px; height: 46px;
+      font-size: 1.4rem; box-shadow: var(--shadow-lg);
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 99;
+      backdrop-filter: blur(4px);
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar.open + .sidebar-overlay { display: block; }
+      .main-content { margin-left: 0; padding: 1.25rem; padding-top: 4.5rem; }
+      .menu-toggle { display: flex; align-items: center; justify-content: center; }
+      h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.2rem; }
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius-lg); padding: 2rem 2.25rem;
+      color: var(--white); margin-bottom: 1.5rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 12px 32px rgba(26,82,118,0.25);
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -50%; right: -10%;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-greeting {
+      font-size: 0.85rem; text-transform: uppercase;
+      letter-spacing: 2px; opacity: 0.85; margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+    .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; line-height: 1.15; letter-spacing: -0.03em; }
+    .hero-subtitle { font-size: 0.9rem; opacity: 0.9; margin-bottom: 1.25rem; max-width: 500px; }
+    .hero-stats {
+      display: flex; gap: 2rem; flex-wrap: wrap;
+      padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    .hero-stat .stat-value { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; line-height: 1; }
+    .hero-stat .stat-label { font-size: 0.72rem; opacity: 0.8; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.5rem; box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,0.04);
+      margin-bottom: 1.25rem; transition: all 0.2s;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 0.5rem; }
+    .card-subtitle { font-size: 0.82rem; color: var(--gray); margin-top: 0.2rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.7rem 1.35rem;
+      border-radius: 12px; border: none;
+      font-family: var(--font-head); font-weight: 600;
+      font-size: 0.88rem; transition: all 0.2s;
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); box-shadow: 0 4px 14px rgba(26,82,118,0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,82,118,0.4); }
+    .btn-secondary { background: linear-gradient(135deg, var(--secondary), #1B5E20); color: var(--white); box-shadow: 0 4px 14px rgba(46,125,50,0.3); }
+    .btn-success { background: linear-gradient(135deg, var(--success), #2E7D32); color: var(--white); }
+    .btn-danger { background: linear-gradient(135deg, var(--accent), #8E0000); color: var(--white); }
+    .btn-outline { background: var(--white); color: var(--primary); border: 2px solid var(--primary-light); }
+    .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+    .btn-sm { padding: 0.45rem 0.85rem; font-size: 0.78rem; border-radius: 10px; }
+    .btn-lg { padding: 0.9rem 1.75rem; font-size: 0.95rem; border-radius: 14px; }
+    .btn-block { width: 100%; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+    .stat-tile {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.15rem; border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm); transition: all 0.2s;
+    }
+    .stat-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .stat-tile .stat-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 0.75rem;
+      background: var(--primary-light);
+    }
+    .stat-tile .stat-icon.green { background: var(--secondary-light); }
+    .stat-tile .stat-icon.purple { background: var(--purple-light); }
+    .stat-tile .stat-icon.orange { background: var(--warning-light); }
+    .stat-tile .stat-icon.red { background: var(--accent-light); }
+    .stat-tile .stat-value { font-family: var(--font-head); font-weight: 800; font-size: 1.75rem; color: var(--dark); line-height: 1; letter-spacing: -0.03em; }
+    .stat-tile .stat-label { font-size: 0.75rem; color: var(--gray); margin-top: 0.3rem; font-weight: 500; }
+
+    .progress-ring-wrap { display: flex; align-items: center; gap: 1.75rem; padding: 0.5rem 0; flex-wrap: wrap; }
+    .progress-ring { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring .ring-bg { fill: none; stroke: var(--gray-light); stroke-width: 10; }
+    .progress-ring .ring-fill { fill: none; stroke: url(#ringGradient); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1s ease; }
+    .progress-ring .ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .progress-ring .ring-value { font-family: var(--font-head); font-weight: 800; font-size: 1.75rem; color: var(--primary); line-height: 1; }
+    .progress-ring .ring-label { font-size: 0.68rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; font-weight: 600; }
+    .progress-details { flex: 1; min-width: 200px; }
+    .progress-details .progress-info { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.82rem; color: var(--gray); }
+    .progress-details .progress-info strong { color: var(--primary); font-family: var(--font-head); }
+
+    .badge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+    .badge-tile { background: var(--light); border-radius: 14px; padding: 1rem 0.75rem; text-align: center; border: 2px solid transparent; transition: all 0.3s; }
+    .badge-tile.unlocked { background: linear-gradient(135deg, var(--secondary-light), #C8E6C9); border-color: var(--secondary); box-shadow: 0 4px 12px rgba(46,125,50,0.2); }
+    .badge-tile.unlocked .badge-icon { filter: drop-shadow(0 4px 8px rgba(46,125,50,0.4)); animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .badge-tile.locked { opacity: 0.55; }
+    .badge-icon { font-size: 2rem; display: block; }
+    .badge-name { font-size: 0.72rem; font-weight: 700; margin-top: 0.35rem; font-family: var(--font-head); color: var(--dark); }
+
+    .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .unit-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.25rem; border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm); cursor: pointer;
+      transition: all 0.25s; position: relative;
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .unit-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--primary); }
+    .unit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--primary-light); }
+    .unit-card.completed::after {
+      content: '✓'; position: absolute; top: 0.75rem; right: 0.75rem;
+      background: var(--secondary); color: var(--white);
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .unit-card .unit-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.85rem; background: var(--primary-light); }
+    .unit-card .unit-num { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray); font-weight: 700; margin-bottom: 0.2rem; }
+    .unit-card .unit-title { font-family: var(--font-head); font-weight: 700; font-size: 1rem; color: var(--dark); margin-bottom: 0.35rem; line-height: 1.3; }
+    .unit-card .unit-desc { font-size: 0.78rem; color: var(--gray); margin-bottom: 0.85rem; flex: 1; }
+    .unit-card .unit-status { display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--gray-light); font-size: 0.75rem; font-weight: 600; }
+    .unit-card .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.35rem; }
+    .status-pending { background: var(--gray); }
+    .status-progress { background: var(--warning); }
+    .status-complete { background: var(--secondary); }
+
+    .exam-hero {
+      background: linear-gradient(135deg, var(--purple) 0%, #4A148C 100%);
+      border-radius: var(--radius); padding: 1.75rem;
+      color: var(--white); margin-bottom: 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .exam-hero.locked { background: linear-gradient(135deg, var(--gray) 0%, #455A64 100%); }
+    .exam-hero.passed { background: linear-gradient(135deg, var(--secondary) 0%, #1B5E20 100%); }
+    .exam-hero.failed { background: linear-gradient(135deg, var(--accent) 0%, #B71C1C 100%); }
+    .exam-hero-content { position: relative; z-index: 1; }
+    .exam-hero h3 { font-size: 1.15rem; margin-bottom: 0.4rem; }
+    .exam-hero p { font-size: 0.85rem; opacity: 0.9; margin-bottom: 1rem; }
+
+    .table-wrap { overflow-x: auto; margin: 0 -0.5rem; padding: 0 0.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 0.75rem; text-align: left; font-family: var(--font-head); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    th:first-child { border-radius: 10px 0 0 0; }
+    th:last-child { border-radius: 0 10px 0 0; }
+    td { padding: 0.85rem 0.75rem; border-bottom: 1px solid var(--gray-light); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--primary-light); }
+
+    .callout { padding: 1rem 1.25rem; border-radius: 12px; margin: 1rem 0; border-left: 4px solid; font-size: 0.88rem; }
+    .callout-warning { background: var(--warning-light); border-color: var(--warning); }
+    .callout-danger { background: var(--accent-light); border-color: var(--accent); }
+    .callout-success { background: var(--secondary-light); border-color: var(--secondary); }
+    .callout-info { background: var(--primary-light); border-color: var(--primary); }
+
+    .auth-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; background: linear-gradient(135deg, #1A5276 0%, #2E7D32 50%, #3949AB 100%);
+      position: relative; overflow: hidden;
+    }
+    .auth-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      max-width: 620px; width: 100%;
+      padding: 2.5rem 2rem; position: relative; z-index: 1;
+    }
+    .auth-header { text-align: center; margin-bottom: 1.75rem; }
+    .auth-logo {
+      width: 72px; height: 72px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; margin: 0 auto 1rem;
+      box-shadow: 0 12px 32px rgba(26,82,118,0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+    .auth-card h1 { color: var(--dark); font-size: 1.6rem; margin-bottom: 0.35rem; font-weight: 800; }
+    .auth-subtitle { color: var(--gray); font-size: 0.9rem; }
+    .auth-version { font-size: 0.72rem; color: var(--gray); margin-top: 0.35rem; font-weight: 600; display: inline-block; padding: 0.15rem 0.6rem; background: var(--light); border-radius: 999px; }
+    .auth-tabs { display: flex; gap: 0.35rem; margin-bottom: 1.5rem; background: var(--light); padding: 0.35rem; border-radius: 14px; }
+    .auth-tab { flex: 1; padding: 0.75rem; border: none; background: transparent; border-radius: 10px; font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; color: var(--gray); transition: all 0.2s; }
+    .auth-tab.active { background: var(--white); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .back-btn { position: absolute; top: 1.25rem; left: 1.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 10px; border: 2px solid var(--primary-light); background: var(--white); color: var(--primary); font-family: var(--font-head); font-weight: 600; font-size: 0.82rem; transition: all 0.2s; }
+    .back-btn:hover { background: var(--primary-light); transform: translateX(-2px); }
+
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.82rem; font-family: var(--font-head); color: var(--dark-2); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.85rem 1rem; border: 2px solid var(--gray-light); border-radius: 12px; font-size: 0.92rem; background: var(--white); color: var(--dark); transition: all 0.2s; font-family: var(--font-body); }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,82,118,0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+    .form-hint { font-size: 0.72rem; color: var(--gray); margin-top: 0.35rem; }
+    .form-error { background: var(--accent-light); color: var(--accent); padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 1rem; display: none; border-left: 3px solid var(--accent); }
+    .form-error.show { display: block; }
+
+    .saved-list { display: flex; flex-direction: column; gap: 0.7rem; max-height: 380px; overflow-y: auto; padding: 0.25rem; margin-bottom: 1rem; }
+    .saved-card { display: flex; align-items: center; gap: 0.9rem; padding: 0.9rem 1rem; border: 2px solid var(--gray-light); border-radius: 14px; cursor: pointer; background: var(--white); transition: all 0.2s; text-align: left; width: 100%; font-family: var(--font-body); }
+    .saved-card:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .saved-card .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
+    .saved-card .saved-name { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; color: var(--dark); margin-bottom: 0.15rem; }
+    .saved-card .saved-meta { font-size: 0.75rem; color: var(--gray); }
+    .saved-card .saved-progress { font-family: var(--font-head); font-weight: 800; color: var(--primary); font-size: 1rem; text-align: right; flex-shrink: 0; }
+    .saved-card .saved-progress small { display: block; font-size: 0.65rem; color: var(--gray); font-weight: 500; }
+    .empty-saved { text-align: center; padding: 3rem 1.5rem; color: var(--gray); font-size: 0.9rem; background: var(--light); border-radius: 14px; margin-bottom: 1rem; }
+    .empty-saved .icon { font-size: 3rem; display: block; margin-bottom: 0.75rem; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,27,38,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; backdrop-filter: blur(6px); }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--white); border-radius: var(--radius-lg); max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+    .modal-content { padding: 2rem; text-align: center; }
+    .modal-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.25rem; }
+    .modal h2 { color: var(--dark); font-size: 1.35rem; margin-bottom: 0.5rem; font-weight: 800; }
+    .modal p { color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .modal-student { background: var(--light); border-radius: 12px; padding: 1rem; text-align: left; margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; flex-direction: column; gap: 0.65rem; }
+    .modal-btn { display: flex; align-items: center; gap: 0.85rem; padding: 1rem 1.15rem; border-radius: 12px; border: 2px solid var(--gray-light); background: var(--white); cursor: pointer; text-align: left; width: 100%; font-family: var(--font-body); transition: all 0.2s; }
+    .modal-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+    .modal-btn .opt-icon { font-size: 1.75rem; flex-shrink: 0; }
+    .modal-btn .opt-title { font-family: var(--font-head); font-weight: 700; font-size: 0.9rem; color: var(--dark); margin-bottom: 0.15rem; }
+    .modal-btn .opt-desc { font-size: 0.75rem; color: var(--gray); line-height: 1.4; }
+    .btn-cancel { background: transparent; color: var(--gray); border: none; padding: 0.75rem; margin-top: 0.5rem; font-family: var(--font-head); font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--dark); color: var(--white); padding: 1rem 1.25rem; border-radius: 14px; box-shadow: var(--shadow-lg); z-index: 999; transform: translateY(200%); transition: transform 0.3s; max-width: 360px; font-size: 0.88rem; display: flex; align-items: center; gap: 0.65rem; font-weight: 500; }
+    .toast.show { transform: translateY(0); }
+    .toast.success { background: linear-gradient(135deg, var(--secondary), #1B5E20); }
+    .toast.error { background: linear-gradient(135deg, var(--accent), #B71C1C); }
+    .toast.warning { background: linear-gradient(135deg, var(--warning), #E65100); }
+
+    .loader { display: flex; align-items: center; justify-content: center; padding: 4rem; flex-direction: column; gap: 1rem; color: var(--gray); }
+    .spinner { width: 44px; height: 44px; border: 4px solid var(--gray-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .code-display { background: linear-gradient(135deg, var(--secondary-light), #A5D6A7); border: 3px solid var(--secondary); border-radius: var(--radius); padding: 2rem 1.5rem; text-align: center; }
+    .code-display .code-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary-dark); font-weight: 700; margin-bottom: 0.75rem; }
+    .code-display .code-value { font-family: 'Courier New', monospace; font-size: 2.5rem; font-weight: 800; color: var(--primary-dark); letter-spacing: 5px; background: var(--white); padding: 1rem 1.25rem; border-radius: 14px; border: 3px dashed var(--primary); margin: 0 auto 1rem; max-width: 400px; }
+
+    .certificate { background: linear-gradient(135deg, #FFFDF5 0%, #FFF8E1 50%, #FFFDF5 100%); border: 8px double var(--primary); border-radius: var(--radius); padding: 2.5rem 2rem; text-align: center; max-width: 700px; margin: 1rem auto; }
+    .certificate h2 { color: var(--primary); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .certificate .name { font-size: 2rem; font-family: var(--font-head); color: var(--dark); font-weight: 800; border-bottom: 3px solid var(--primary); display: inline-block; padding: 0.5rem 2rem; margin: 1rem 0; }
+    .certificate .score { font-size: 1.35rem; color: var(--secondary); font-weight: 800; margin: 0.75rem 0; }
+
+    /* Quiz / Exam buttons */
+    .quiz-opt { display:block; width:100%; text-align:left; padding:0.85rem 1rem; border:2px solid var(--gray-light); border-radius:10px; background:#fff; margin-bottom:0.5rem; cursor:pointer; font-family:var(--font-body); font-size:0.9rem; transition:all 0.15s; }
+    .quiz-opt:hover { border-color: var(--primary); background: var(--primary-light); }
+    .quiz-opt.selected { border-color: var(--primary); background: var(--primary-light); font-weight: 600; }
+    .quiz-opt.correct { border-color: var(--secondary); background: var(--secondary-light); font-weight: 600; }
+    .quiz-opt.wrong { border-color: var(--accent); background: var(--accent-light); }
+
+    /* Drug database */
+    .drug-card { background: var(--white); border-radius: 14px; padding: 1rem 1.15rem; border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); transition: all 0.2s; cursor: pointer; }
+    .drug-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--primary); }
+    .drug-card .drug-name { font-family: var(--font-head); font-weight: 700; color: var(--primary); font-size: 1rem; margin-bottom: 0.2rem; }
+    .drug-card .drug-brand { font-size: 0.78rem; color: var(--gray); margin-bottom: 0.5rem; }
+    .drug-card .drug-class { display: inline-block; background: var(--primary-light); color: var(--primary-dark); padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .high-alert-flag { display: inline-block; background: var(--accent); color: white; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-left: 0.35rem; }
+    .high-alert-flag::before { content: '⚠ '; }
+    .drug-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; }
+
+    /* Checklist */
+    .checklist-item { display: flex; align-items: flex-start; gap: 0.7rem; padding: 0.6rem 0.85rem; border-radius: 10px; background: var(--white); border: 1px solid var(--gray-light); margin-bottom: 0.4rem; font-size: 0.85rem; transition: all 0.15s; }
+    .checklist-item:hover { background: var(--primary-light); }
+    .checklist-item.checked { background: var(--secondary-light); border-color: var(--secondary); }
+    .checklist-item.instructor-checked { background: #C8E6C9; border-color: #1B5E20; }
+    .checklist-item input[type="checkbox"] { width: 18px; height: 18px; margin-top: 0.15rem; cursor: pointer; accent-color: var(--secondary); flex-shrink: 0; }
+    .checklist-item .step-num { font-weight: 700; color: var(--primary); font-family: var(--font-head); min-width: 1.5rem; flex-shrink: 0; }
+    .checklist-section-title { font-family: var(--font-head); font-weight: 800; color: var(--primary); font-size: 1rem; padding: 1rem 0 0.5rem; border-bottom: 2px solid var(--primary-light); margin-top: 1rem; margin-bottom: 0.75rem; }
+    .checklist-subsection-title { font-family: var(--font-head); font-weight: 700; color: var(--secondary); font-size: 0.9rem; padding: 0.75rem 0 0.35rem; }
+
+    /* Calculator */
+    .calc-result { background: linear-gradient(135deg, var(--secondary-light), #C8E6C9); border: 2px solid var(--secondary); border-radius: 14px; padding: 1.25rem; margin-top: 1rem; text-align: center; }
+    .calc-result .calc-value { font-family: var(--font-head); font-weight: 800; font-size: 2rem; color: var(--primary-dark); }
+    .calc-result .calc-label { font-size: 0.75rem; color: var(--primary-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.35rem; }
+
+    /* Leaderboard */
+    .leader-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 0.5rem; background: var(--white); border: 1px solid var(--gray-light); }
+    .leader-row.top-1 { background: linear-gradient(135deg, #FFF9C4, #FFECB3); border-color: #F9A825; }
+    .leader-row.top-2 { background: linear-gradient(135deg, #ECEFF1, #CFD8DC); border-color: #90A4AE; }
+    .leader-row.top-3 { background: linear-gradient(135deg, #FFE0B2, #FFCC80); border-color: #F57C00; }
+    .leader-rank { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; color: var(--primary); min-width: 2rem; text-align: center; }
+    .leader-name { flex: 1; font-weight: 700; font-size: 0.9rem; }
+    .leader-name small { display: block; color: var(--gray); font-weight: 500; font-size: 0.72rem; }
+    .leader-score { font-family: var(--font-head); font-weight: 800; color: var(--secondary); font-size: 1rem; }
+
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .flex { display: flex; }
+    .flex-wrap { flex-wrap: wrap; }
+    .gap-1 { gap: 0.5rem; }
+    code { background: var(--light); padding: 0.2rem 0.5rem; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85em; color: var(--primary-dark); font-weight: 700; }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<!-- ============================ AUTH SCREEN ============================ -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <button class="back-btn hidden" id="backBtn" onclick="closeEditProfile()">← Back</button>
+    <div class="auth-header">
+      <div class="auth-logo">💊</div>
+      <h1>Drug Administration Mastery</h1>
+      <p class="auth-subtitle" id="authSubtitle">NCM 107 Lab — Please register to begin</p>
+      <span class="auth-version">Version 1.0</span>
+    </div>
+    <div class="auth-tabs" id="authTabs">
+      <button class="auth-tab active" data-tab="register" onclick="switchAuthTab('register')">📝 Register</button>
+      <button class="auth-tab" data-tab="login" onclick="switchAuthTab('login')">🔓 Login</button>
+    </div>
+    <div class="form-error" id="authError"></div>
+    <form id="registerForm" onsubmit="submitRegistration(event)">
+      <div class="form-row">
+        <div class="form-group"><label>First Name *</label><input type="text" id="reg_firstName" required placeholder="Juan" /></div>
+        <div class="form-group"><label>Last Name *</label><input type="text" id="reg_lastName" required placeholder="Dela Cruz" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Student Number *</label><input type="text" id="reg_studentNo" required placeholder="2024-00123" /></div>
+        <div class="form-group"><label>Section *</label><input type="text" id="reg_section" required placeholder="BSN 2-A" /></div>
+      </div>
+      <div class="form-group">
+        <label>Group Number *</label>
+        <select id="reg_group" required>
+          <option value="">— Select your group —</option>
+          <option>Group 1</option><option>Group 2</option><option>Group 3</option>
+          <option>Group 4</option><option>Group 5</option><option>Group 6</option>
+          <option>Group 7</option><option>Group 8</option><option>Group 9</option>
+          <option>Group 10</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>TSU Email *</label>
+        <input type="email" id="reg_email" required placeholder="juan.delacruz@tsu.edu.ph" />
+        <div class="form-hint">Use your official TSU email address</div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block" id="regSubmitBtn">✅ Register & Start Learning</button>
+    </form>
+    <div id="loginForm" class="hidden">
+      <div class="saved-students" id="savedStudentsArea"></div>
+    </div>
+    <div style="text-align:center;margin-top:1.75rem;font-size:0.75rem;color:var(--gray);line-height:1.7;">
+      Developed by <strong style="color:var(--primary);">JEMUEL C. MARI, MAN, RN, LPT</strong><br>
+      Tarlac State University — College of Science — Nursing Department
+    </div>
+  </div>
+</div>
+
+<!-- ============================ APP ============================ -->
+<div class="app-container" id="appContainer" style="display:none;">
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wrap">💊</div>
+      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0</small></div>
+    </div>
+    <div class="student-card">
+      <div class="avatar" id="chipAvatar">—</div>
+      <div class="name" id="chipName">—</div>
+      <div class="meta" id="chipMeta">—</div>
+      <div class="chip-actions">
+        <button class="chip-btn" onclick="openEditProfile()">✏️ Edit</button>
+        <button class="chip-btn danger" onclick="openLogoutModal()">🚪 Logout</button>
+      </div>
+    </div>
+    <nav id="navMenu">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <button class="nav-item active" data-view="home"><span class="icon">🏠</span> Dashboard</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Learning Units</div>
+        <button class="nav-item" data-view="unit1"><span class="icon">📖</span> Foundations</button>
+        <button class="nav-item" data-view="unit2"><span class="icon">⚖️</span> Ethics & Law</button>
+        <button class="nav-item" data-view="unit3"><span class="icon">🔄</span> Nursing Process</button>
+        <button class="nav-item" data-view="unit4"><span class="icon">1️⃣0️⃣</span> 10 Rights & 3 Checks</button>
+        <button class="nav-item" data-view="unit5"><span class="icon">📋</span> Types of Orders</button>
+        <button class="nav-item" data-view="unit6"><span class="icon">💊</span> Oral & Topical</button>
+        <button class="nav-item" data-view="unit7"><span class="icon">👁️</span> Ophthalmic & Otic</button>
+        <button class="nav-item" data-view="unit8"><span class="icon">💉</span> ID, SC, IM</button>
+        <button class="nav-item" data-view="unit9"><span class="icon">🩸</span> IV Route</button>
+        <button class="nav-item" data-view="unit10"><span class="icon">🧪</span> Preparation</button>
+        <button class="nav-item" data-view="unit11"><span class="icon">🧮</span> Calculations</button>
+        <button class="nav-item" data-view="unit12"><span class="icon">📊</span> Docs & Safety</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Tools</div>
+        <button class="nav-item" data-view="drugs"><span class="icon">🔍</span> Drug Database</button>
+        <button class="nav-item" data-view="calculator"><span class="icon">🧮</span> Dosage Calculator</button>
+        <button class="nav-item" data-view="mar"><span class="icon">📋</span> MAR Practice</button>
+        <button class="nav-item" data-view="checklists"><span class="icon">✅</span> Return Demo</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Mastery</div>
+        <button class="nav-item" data-view="games"><span class="icon">🎮</span> Mastery Games</button>
+        <button class="nav-item" data-view="leaderboard"><span class="icon">🏆</span> Leaderboard</button>
+        <button class="nav-item" id="navExam" data-view="exam"><span class="icon">📝</span> Capstone Exam</button>
+        <button class="nav-item" id="navCert" data-view="certificate"><span class="icon">🏅</span> Certificate</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Submit</div>
+        <button class="nav-item" data-view="handoff"><span class="icon">📤</span> Submit Progress</button>
+        <button class="nav-item" data-view="inbox"><span class="icon">📬</span> Instructor Feedback</button>
+        <button class="nav-item" data-view="feedback"><span class="icon">💬</span> Send Feedback</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <button class="nav-item logout" onclick="openLogoutModal()"><span class="icon">🚪</span> Logout</button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="dev-label">Developed by</div>
+      <div class="dev-name">JEMUEL C. MARI, MAN, RN, LPT</div>
+      <div>Clinical Instructor</div>
+      <div>Teacher II — DepEd</div>
+      <div>Tarlac State University</div>
+      <div class="version-tag">v1.0</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open'); this.style.display='none'"></div>
+  <main class="main-content" id="mainContent">
+    <div class="loader"><div class="spinner"></div><div>Loading module...</div></div>
+  </main>
+</div>
+
+<!-- ============================ MODALS ============================ -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-icon">🚪</div>
+      <h2>Logout Confirmation</h2>
+      <p>Choose what to do with your data:</p>
+      <div class="modal-student" id="logoutStudentInfo"></div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="performLogout('keep')">
+          <span class="opt-icon">🔄</span>
+          <div><div class="opt-title">Logout — Keep My Data</div><div class="opt-desc">Your progress stays on this device.</div></div>
+        </button>
+        <button class="modal-btn" onclick="performLogout('clear')">
+          <span class="opt-icon">🗑️</span>
+          <div><div class="opt-title">Logout — Clear All My Data</div><div class="opt-desc">⚠️ Permanently deletes data.</div></div>
+        </button>
+      </div>
+      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="examConfirmModal">
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-icon" style="background:var(--purple-light);">📝</div>
+      <h2 style="color:var(--purple);">⚠️ One Attempt Only</h2>
+      <p>You are about to take the Capstone Exam.</p>
+      <div class="modal-student">
+        <strong style="font-family:var(--font-head);">Exam Parameters</strong>
+        <div style="font-size:0.82rem;line-height:1.8;margin-top:0.5rem;">
+          • 30 items — NLE-aligned, competency-based<br>
+          • Includes basic dosage calculations<br>
+          • 45 minutes time limit<br>
+          • Passing: 15/30 (50%)<br>
+          • Questions randomized per student<br>
+          • <strong style="color:var(--accent);">ONE attempt only</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="closeExamConfirm()">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;">Cancel</div>
+        </button>
+        <button class="modal-btn" onclick="beginExam()" style="border-color:var(--purple);background:var(--purple-light);">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;color:var(--purple);">I'm Ready</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="drugModal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-content" style="text-align:left;" id="drugModalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ⚠️ BACKEND — REPLACE WITH YOUR APPS SCRIPT URL
+   ============================================================ */
+var BACKEND_URL = 'https://script.google.com/macros/s/REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec';
+
+var APP = {
+  version: '1.0',
+  storageKey: 'drugAdminMastery_v1',
+  savedSessionsKey: 'drugAdminMastery_savedSessions',
+  state: {
+    currentView: 'home', student: null, progress: {}, badges: {},
+    quizAttempts: {}, games: {}, exam: null, examHistory: [],
+    feedback: [], retakeAllowed: false, retakeCode: null,
+    retakeUsed: false, submissionCode: null,
+    checklists: { oral: {}, parenteral: {} },
+    instructorFeedback: []
+  },
+  authMode: 'register'
+};
+
+/* ---------- PERSISTENCE ---------- */
+function loadState() {
+  try { var s = localStorage.getItem(APP.storageKey); if (s) APP.state = Object.assign({}, APP.state, JSON.parse(s)); } catch (e) {}
+  if (!APP.state.feedback) APP.state.feedback = [];
+  if (!APP.state.examHistory) APP.state.examHistory = [];
+  if (!APP.state.games) APP.state.games = {};
+  if (!APP.state.checklists) APP.state.checklists = { oral: {}, parenteral: {} };
+  if (!APP.state.instructorFeedback) APP.state.instructorFeedback = [];
+}
+function saveState() { try { localStorage.setItem(APP.storageKey, JSON.stringify(APP.state)); } catch (e) {} }
+function clearState() { try { localStorage.removeItem(APP.storageKey); } catch (e) {} }
+function loadSavedSessions() {
+  try { var raw = localStorage.getItem(APP.savedSessionsKey); return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+}
+function saveSavedSessions(s) { try { localStorage.setItem(APP.savedSessionsKey, JSON.stringify(s)); } catch (e) {} }
+function registerSavedSession(record) {
+  var sessions = loadSavedSessions();
+  var key = record.student.studentNo || record.student.email;
+  var idx = sessions.findIndex(function(x) {
+    return (x.student.studentNo && x.student.studentNo === record.student.studentNo) ||
+           (x.student.email && x.student.email === record.student.email);
+  });
+  var entry = Object.assign({}, record, { savedAt: new Date().toISOString(), key: key });
+  if (idx >= 0) sessions[idx] = entry; else sessions.push(entry);
+  if (sessions.length > 20) sessions.splice(0, sessions.length - 20);
+  saveSavedSessions(sessions);
+}
+function removeSavedSession(key) {
+  saveSavedSessions(loadSavedSessions().filter(function(s) { return s.key !== key; }));
+}
+function toast(msg, type) {
+  type = type || '';
+  var el = document.getElementById('toast');
+  var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+  el.innerHTML = '<span style="font-size:1.2rem;">' + icon + '</span><span>' + msg + '</span>';
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove('show'); }, 3500);
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c];
+  });
+}
+function escapeJs(s) { return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+function initialsOf(name) {
+  if (!name) return '?';
+  var parts = String(name).trim().split(/\s+/);
+  return (((parts[0] || '')[0] || '') + ((parts[parts.length-1] || '')[0] || '')).toUpperCase() || '?';
+}
+function getGreeting() {
+  var h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+function switchAuthTab(tab) {
+  APP.authMode = tab;
+  document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.tab === tab); });
+  document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('backBtn').classList.add('hidden');
+  document.getElementById('authTabs').classList.remove('hidden');
+  document.getElementById('authSubtitle').textContent = tab === 'register' ? 'NCM 107 Lab — Please register to begin' : 'Welcome back! Select your profile below';
+  document.getElementById('authError').classList.remove('show');
+  if (tab === 'login') renderSavedStudents();
+}
+
+function submitRegistration(event) {
+  event.preventDefault();
+  var errEl = document.getElementById('authError');
+  errEl.classList.remove('show');
+  var firstName = document.getElementById('reg_firstName').value.trim();
+  var lastName = document.getElementById('reg_lastName').value.trim();
+  var studentNo = document.getElementById('reg_studentNo').value.trim();
+  var section = document.getElementById('reg_section').value.trim();
+  var group = document.getElementById('reg_group').value.trim();
+  var email = document.getElementById('reg_email').value.trim().toLowerCase();
+  var errors = [];
+  if (!firstName) errors.push('First Name is required');
+  if (!lastName) errors.push('Last Name is required');
+  if (!studentNo) errors.push('Student Number is required');
+  if (!section) errors.push('Section is required');
+  if (!group) errors.push('Group is required');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Valid TSU email is required');
+  if (errors.length) {
+    errEl.innerHTML = errors.map(function(e) { return '• ' + e; }).join('<br>');
+    errEl.classList.add('show');
+    return;
+  }
+  APP.state.student = {
+    firstName: firstName, lastName: lastName, fullName: firstName + ' ' + lastName,
+    studentNo: studentNo, section: section, group: group, email: email,
+    registeredAt: new Date().toISOString(), lastActive: new Date().toISOString()
+  };
+  APP.state.progress = {}; APP.state.quizAttempts = {}; APP.state.games = {};
+  APP.state.badges = {}; APP.state.exam = null; APP.state.examHistory = [];
+  APP.state.feedback = []; APP.state.retakeAllowed = false;
+  APP.state.retakeCode = null; APP.state.retakeUsed = false;
+  APP.state.submissionCode = null;
+  APP.state.checklists = { oral: {}, parenteral: {} };
+  APP.state.instructorFeedback = [];
+  saveState();
+  registerSavedSession(buildStudentRecord());
+  showApp();
+  toast('Welcome, ' + firstName + '!', 'success');
+}
+
+function renderSavedStudents() {
+  var area = document.getElementById('savedStudentsArea');
+  var sessions = loadSavedSessions();
+  if (!sessions.length) {
+    area.innerHTML = '<div class="empty-saved"><div class="icon">📭</div><strong>No saved profiles yet</strong><p style="margin-top:0.5rem;">Register first to create your profile</p></div>';
+    return;
+  }
+  var sorted = sessions.slice().sort(function(a, b) { return new Date(b.savedAt || 0) - new Date(a.savedAt || 0); });
+  var html = '<p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.75rem;">Found <strong>' + sorted.length + '</strong> saved profile(s):</p><div class="saved-list">';
+  sorted.forEach(function(s) {
+    var name = s.student.fullName || 'Unnamed';
+    var pct = calcProgressPct(s.progress);
+    var avg = calcAvg(s.quizAttempts);
+    var key = s.key || s.student.studentNo || s.student.email;
+    html += '<button class="saved-card" onclick=\'loadSessionByKey("' + escapeJs(key) + '")\'>' +
+      '<div class="avatar">' + initialsOf(name) + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+      '<div class="saved-name">' + escapeHtml(name) + '</div>' +
+      '<div class="saved-meta">' + escapeHtml(s.student.studentNo || '—') + ' • ' + escapeHtml(s.student.section || '—') + '</div>' +
+      '</div>' +
+      '<div class="saved-progress">' + pct + '%<small>' + avg + '% avg</small></div>' +
+      '</button>';
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+function loadSessionByKey(key) {
+  var session = loadSavedSessions().find(function(s) { return (s.key || s.student.studentNo || s.student.email) === key; });
+  if (!session) return toast('Profile not found', 'error');
+  loadSession(session);
+}
+function loadSession(session) {
+  APP.state = {
+    currentView: 'home', student: session.student,
+    progress: session.progress || {}, quizAttempts: session.quizAttempts || {},
+    games: session.games || {}, badges: session.badges || {},
+    exam: session.exam || null, examHistory: session.examHistory || [],
+    feedback: session.feedback || [],
+    retakeAllowed: session.retakeAllowed || false,
+    retakeCode: session.retakeCode || null,
+    retakeUsed: session.retakeUsed || false,
+    submissionCode: session.submissionCode || null,
+    checklists: session.checklists || { oral: {}, parenteral: {} },
+    instructorFeedback: session.instructorFeedback || []
+  };
+  if (APP.state.student) APP.state.student.lastActive = new Date().toISOString();
+  saveState();
+  showApp();
+  toast('Welcome back, ' + (session.student.firstName || 'Student') + '!', 'success');
+}
+function calcProgressPct(progress) {
+  var units = ['unit1','unit2','unit3','unit4','unit5','unit6','unit7','unit8','unit9','unit10','unit11','unit12'];
+  var done = units.filter(function(u) { return progress && progress[u] && progress[u].completed; }).length;
+  return Math.round((done / units.length) * 100);
+}
+function calcAvg(attempts) {
+  var all = [];
+  Object.values(attempts || {}).forEach(function(arr) { arr.forEach(function(x) { if (typeof x === 'number') all.push(x); }); });
+  if (!all.length) return 0;
+  return Math.round(all.reduce(function(a, b) { return a + b; }, 0) / all.length);
+}
+
+function openEditProfile() {
+  if (!APP.state.student) return;
+  var s = APP.state.student;
+  document.getElementById('reg_firstName').value = s.firstName || '';
+  document.getElementById('reg_lastName').value = s.lastName || '';
+  document.getElementById('reg_studentNo').value = s.studentNo || '';
+  document.getElementById('reg_section').value = s.section || '';
+  document.getElementById('reg_group').value = s.group || '';
+  document.getElementById('reg_email').value = s.email || '';
+  var form = document.getElementById('registerForm');
+  form.onsubmit = saveProfileEdit;
+  document.getElementById('regSubmitBtn').textContent = '💾 Save Changes';
+  document.getElementById('authTabs').classList.add('hidden');
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('registerForm').classList.remove('hidden');
+  document.getElementById('backBtn').classList.remove('hidden');
+  document.getElementById('authSubtitle').textContent = 'Edit your profile information';
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+}
+function closeEditProfile() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'flex';
+  var form = document.getElementById('registerForm');
+  form.onsubmit = submitRegistration;
+  document.getElementById('regSubmitBtn').textContent = '✅ Register & Start Learning';
+  form.reset();
+  document.getElementById('backBtn').classList.add('hidden');
+  document.getElementById('authTabs').classList.remove('hidden');
+  document.getElementById('authError').classList.remove('show');
+  updateStudentChip();
+}
+function saveProfileEdit(event) {
+  event.preventDefault();
+  var firstName = document.getElementById('reg_firstName').value.trim();
+  var lastName = document.getElementById('reg_lastName').value.trim();
+  APP.state.student = Object.assign({}, APP.state.student, {
+    firstName: firstName, lastName: lastName, fullName: firstName + ' ' + lastName,
+    studentNo: document.getElementById('reg_studentNo').value.trim(),
+    section: document.getElementById('reg_section').value.trim(),
+    group: document.getElementById('reg_group').value.trim(),
+    email: document.getElementById('reg_email').value.trim().toLowerCase()
+  });
+  saveState();
+  registerSavedSession(buildStudentRecord());
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'flex';
+  updateStudentChip();
+  toast('Profile updated', 'success');
+}
+
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'flex';
+  updateStudentChip();
+  navigate('home');
+}
+function updateStudentChip() {
+  var s = APP.state.student;
+  if (!s) return;
+  document.getElementById('chipAvatar').textContent = initialsOf(s.fullName);
+  document.getElementById('chipName').textContent = s.fullName;
+  document.getElementById('chipMeta').innerHTML = escapeHtml(s.studentNo) + ' — ' + escapeHtml(s.section) + '<br>' + escapeHtml(s.group || '—');
+}
+
+/* ---------- LOGOUT ---------- */
+function openLogoutModal() {
+  var s = APP.state.student;
+  if (!s) return;
+  document.getElementById('logoutStudentInfo').innerHTML =
+    '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.25rem;">' + escapeHtml(s.fullName) + '</strong>' +
+    '<small style="color:var(--gray);">' + escapeHtml(s.studentNo) + ' — ' + escapeHtml(s.section) + '<br>' +
+    'Progress: ' + getProgressPercent() + '%</small>';
+  document.getElementById('logoutModal').classList.add('show');
+}
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+function performLogout(mode) {
+  var s = APP.state.student;
+  if (mode === 'clear') {
+    if (!confirm('⚠️ Permanently delete ALL data for ' + (s ? s.fullName : 'this student') + '?')) return;
+    if (s) removeSavedSession(s.studentNo || s.email);
+    clearState();
+    APP.state = { currentView: 'home', student: null, progress: {}, badges: {}, quizAttempts: {}, games: {}, exam: null, examHistory: [], feedback: [], retakeAllowed: false, retakeCode: null, retakeUsed: false, submissionCode: null, checklists: { oral: {}, parenteral: {} }, instructorFeedback: [] };
+    closeLogoutModal();
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+    switchAuthTab('register');
+    toast('Data cleared', 'warning');
+  } else {
+    if (s) registerSavedSession(buildStudentRecord());
+    closeLogoutModal();
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+    switchAuthTab('login');
+    toast('Logged out', 'success');
+  }
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function navigate(view) {
+  APP.state.currentView = view;
+  if (APP.state.student) APP.state.student.lastActive = new Date().toISOString();
+  saveState();
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.toggle('active', n.dataset.view === view); });
+  renderView(view);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+function renderView(view) {
+  var main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  setTimeout(function() {
+    switch (view) {
+      case 'home': return renderHome(main);
+      case 'unit1': return renderUnit(main, 1);
+      case 'unit2': return renderUnit(main, 2);
+      case 'unit3': return renderUnit(main, 3);
+      case 'unit4': return renderUnit(main, 4);
+      case 'unit5': return renderUnit(main, 5);
+      case 'unit6': return renderUnit(main, 6);
+      case 'unit7': return renderUnit(main, 7);
+      case 'unit8': return renderUnit(main, 8);
+      case 'unit9': return renderUnit(main, 9);
+      case 'unit10': return renderUnit(main, 10);
+      case 'unit11': return renderUnit(main, 11);
+      case 'unit12': return renderUnit(main, 12);
+      case 'drugs': return renderDrugs(main);
+      case 'calculator': return renderCalculator(main);
+      case 'mar': return renderMAR(main);
+      case 'checklists': return renderChecklists(main);
+      case 'games': return renderGames(main);
+      case 'leaderboard': return renderLeaderboard(main);
+      case 'exam': return renderExam(main);
+      case 'certificate': return renderCertificate(main);
+      case 'handoff': return renderHandoff(main);
+      case 'inbox': return renderInbox(main);
+      case 'feedback': return renderFeedback(main);
+      default: return renderHome(main);
+    }
+  }, 120);
+}
+
+/* ---------- PROGRESS ---------- */
+var UNIT_KEYS = ['unit1','unit2','unit3','unit4','unit5','unit6','unit7','unit8','unit9','unit10','unit11','unit12'];
+function getProgressPercent() {
+  var done = UNIT_KEYS.filter(function(u) { return APP.state.progress[u] && APP.state.progress[u].completed; }).length;
+  return Math.round((done / UNIT_KEYS.length) * 100);
+}
+function isUnitComplete(id) { return !!(APP.state.progress[id] && APP.state.progress[id].completed); }
+function averageScore() {
+  var all = [];
+  Object.values(APP.state.quizAttempts).forEach(function(arr) { all = all.concat(arr); });
+  if (!all.length) return 0;
+  return Math.round(all.reduce(function(a, b) { return a + b; }, 0) / all.length);
+}
+function totalAttempts() {
+  var t = 0;
+  Object.values(APP.state.quizAttempts).forEach(function(arr) { t += arr.length; });
+  return t;
+}
+function getUnitBestScore(u) {
+  var arr = APP.state.quizAttempts[u];
+  return arr && arr.length ? Math.max.apply(null, arr) : 0;
+}
+function getGameBestScore(g) {
+  var arr = APP.state.games && APP.state.games[g];
+  return arr && arr.length ? Math.max.apply(null, arr) : 0;
+}
+function nextUnit() {
+  for (var i = 1; i <= 12; i++) if (!isUnitComplete('unit' + i)) return 'unit' + i;
+  return 'exam';
+}
+
+/* ---------- EXAM UNLOCK ---------- */
+function isExamUnlocked() {
+  var games = ['route','rights','dosage','order','safety'];
+  for (var i = 0; i < UNIT_KEYS.length; i++) {
+    if (!isUnitComplete(UNIT_KEYS[i])) return false;
+    if (getUnitBestScore(UNIT_KEYS[i]) < 90) return false;
+  }
+  for (var j = 0; j < games.length; j++) {
+    if (getGameBestScore(games[j]) < 90) return false;
+  }
+  return true;
+}
+function isCertificateUnlocked() {
+  return !!(APP.state.exam && APP.state.exam.submitted && APP.state.exam.passed);
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome(main) {
+  var pct = getProgressPercent();
+  var b = APP.state.badges;
+  var s = APP.state.student;
+  var examUnlocked = isExamUnlocked();
+  var examTaken = APP.state.exam && APP.state.exam.submitted;
+  var examPassed = APP.state.exam && APP.state.exam.passed;
+  var retakePending = APP.state.retakeAllowed && !APP.state.retakeUsed;
+  var submissionCode = APP.state.submissionCode;
+  var ringOffset = 314 - (314 * pct / 100);
+  var html = '';
+
+  html += '<div class="hero fade-in"><div class="hero-content">';
+  html += '<p class="hero-greeting">' + getGreeting() + '</p>';
+  html += '<h1>👋 Hi, ' + escapeHtml(s.firstName) + '!</h1>';
+  html += '<p class="hero-subtitle">Master safe medication administration — one right at a time.</p>';
+  html += '<div class="hero-stats">';
+  html += '<div class="hero-stat"><div class="stat-value">' + Object.keys(APP.state.progress).length + '/12</div><div class="stat-label">Units</div></div>';
+  html += '<div class="hero-stat"><div class="stat-value">' + averageScore() + '%</div><div class="stat-label">Avg Score</div></div>';
+  html += '<div class="hero-stat"><div class="stat-value">' + totalAttempts() + '</div><div class="stat-label">Attempts</div></div>';
+  html += '</div></div></div>';
+
+  if (submissionCode) {
+    html += '<div class="card fade-in" style="border:2px solid var(--secondary);">';
+    html += '<div class="card-header"><div class="card-title">✅ Submitted to Instructor</div></div>';
+    html += '<div class="code-display"><div class="code-label">Your Submission Code</div>';
+    html += '<div class="code-value">' + escapeHtml(submissionCode) + '</div>';
+    html += '<button class="btn btn-primary btn-sm" onclick="copySubmissionCode()">📋 Copy Code</button></div>';
+    html += '</div>';
+  }
+
+  if (retakePending) {
+    html += '<div class="card fade-in" style="background:var(--purple-light);border:2px solid var(--purple);">';
+    html += '<div class="card-title" style="color:var(--purple);">🔓 Retake Available!</div>';
+    html += '<p style="margin-top:0.5rem;">Your instructor has granted you a retake for the Capstone Exam.</p>';
+    html += '<button class="btn btn-primary mt-2" onclick="navigate(\'exam\')">Go to Retake Entry →</button></div>';
+  }
+
+  html += '<div class="card fade-in">';
+  html += '<div class="card-header"><div><div class="card-title">📊 Your Progress</div>';
+  html += '<div class="card-subtitle">Track your mastery across all units</div></div></div>';
+  html += '<div class="progress-ring-wrap">';
+  html += '<div class="progress-ring">';
+  html += '<svg width="120" height="120">';
+  html += '<defs><linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">';
+  html += '<stop offset="0%" stop-color="#2E7D32"/><stop offset="100%" stop-color="#1A5276"/></linearGradient></defs>';
+  html += '<circle class="ring-bg" cx="60" cy="60" r="50"/>';
+  html += '<circle class="ring-fill" cx="60" cy="60" r="50" style="stroke-dashoffset:' + ringOffset + '"/>';
+  html += '</svg>';
+  html += '<div class="ring-text"><div class="ring-value">' + pct + '%</div><div class="ring-label">Complete</div></div></div>';
+  html += '<div class="progress-details">';
+  html += '<h3>' + (pct === 100 ? '🎉 All Units Complete!' : 'Keep Going!') + '</h3>';
+  html += '<div class="progress-info">';
+  html += '<div>📚 <strong>' + Object.keys(APP.state.progress).length + '/12</strong> Units</div>';
+  html += '<div>🎯 <strong>' + averageScore() + '%</strong> Average</div>';
+  html += '</div></div></div></div>';
+
+  html += '<div class="card fade-in">';
+  html += '<div class="card-header"><div class="card-title">🏆 Achievement Badges</div></div>';
+  html += '<div class="badge-grid">' +
+    badgeTile('🥉', 'Foundations', b.foundations) +
+    badgeTile('🥈', 'Route Expert', b.routeExpert) +
+    badgeTile('🥇', 'Calculation Pro', b.calculationPro) +
+    badgeTile('💎', 'Safety Champion', b.safetyChampion) +
+    badgeTile('🏆', 'Drug Master', b.drugMaster) +
+    '</div></div>';
+
+  html += '<div class="card fade-in">';
+  html += '<div class="card-header"><div><div class="card-title">📚 Learning Units</div>';
+  html += '<div class="card-subtitle">Complete all units to unlock the Capstone Exam</div></div></div>';
+  html += '<div class="unit-grid">';
+  UNITS.forEach(function(u) {
+    var isComplete = isUnitComplete('unit' + u.n);
+    var best = getUnitBestScore('unit' + u.n);
+    var status = isComplete ? 'complete' : (best > 0 ? 'progress' : 'pending');
+    var statusText = isComplete ? 'Mastered • ' + best + '%' : (best > 0 ? 'In Progress • ' + best + '%' : 'Not Started');
+    html += '<div class="unit-card ' + (isComplete ? 'completed' : '') + '" onclick="navigate(\'unit' + u.n + '\')">';
+    html += '<div class="unit-icon">' + u.icon + '</div>';
+    html += '<div class="unit-num">Unit ' + u.n + '</div>';
+    html += '<div class="unit-title">' + u.title + '</div>';
+    html += '<div class="unit-desc">' + u.desc + '</div>';
+    html += '<div class="unit-status"><span><span class="status-dot status-' + status + '"></span>' + statusText + '</span></div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  var examClass = 'locked';
+  if (examTaken) examClass = examPassed ? 'passed' : 'failed';
+  else if (examUnlocked) examClass = '';
+  html += '<div class="exam-hero ' + examClass + ' fade-in"><div class="exam-hero-content">';
+  html += '<h3>📝 Capstone Exam</h3>';
+  if (examTaken) {
+    html += '<p>Score: <strong>' + APP.state.exam.score + '/' + APP.state.exam.total + '</strong> (' + APP.state.exam.percentage + '%)</p>';
+    if (examPassed) html += '<p>🎉 Congratulations! You passed!</p>';
+    else html += '<p>⚠️ You did not pass. Contact your instructor if you have a valid reason.</p>';
+    html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'exam\')" style="background:rgba(255,255,255,0.2);color:#fff;border-color:rgba(255,255,255,0.3);">View Details</button>';
+  } else if (examUnlocked) {
+    html += '<p>You have completed all requirements. You may now take the exam.</p>';
+    html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'exam\')" style="background:#fff;color:var(--purple);border-color:#fff;">📝 Start Exam →</button>';
+  } else {
+    html += '<p>Complete all 12 units and 5 mastery games (≥90% each) to unlock.</p>';
+    html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'exam\')" style="background:rgba(255,255,255,0.2);color:#fff;border-color:rgba(255,255,255,0.3);">View Checklist</button>';
+  }
+  html += '</div></div>';
+
+  html += '<div class="card fade-in">';
+  html += '<div class="card-header"><div class="card-title">⚡ Quick Actions</div></div>';
+  html += '<div class="flex flex-wrap gap-1">';
+  html += '<button class="btn btn-primary" onclick="navigate(\'' + nextUnit() + '\')">📚 Continue Learning</button>';
+  html += '<button class="btn btn-secondary" onclick="navigate(\'calculator\')">🧮 Dosage Calculator</button>';
+  html += '<button class="btn btn-outline" onclick="navigate(\'drugs\')">🔍 Drug Database</button>';
+  html += '<button class="btn btn-outline" onclick="navigate(\'handoff\')">📤 Submit Progress</button>';
+  html += '</div></div>';
+
+  html += '<div class="card" style="text-align:center;background:linear-gradient(135deg,var(--primary-light),var(--secondary-light));border:2px solid var(--primary);">';
+  html += '<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);font-weight:700;margin-bottom:0.5rem;">Developed by</div>';
+  html += '<div style="font-family:var(--font-head);font-weight:700;font-size:1.1rem;color:var(--primary);margin-bottom:0.35rem;">JEMUEL C. MARI, MAN, RN, LPT</div>';
+  html += '<div style="font-size:0.82rem;line-height:1.7;">Clinical Instructor<br>Teacher II — Department of Education<br><strong>Tarlac State University</strong><br>College of Science — Nursing Department</div>';
+  html += '<p style="margin-top:0.75rem;font-size:0.7rem;color:var(--gray);">Version ' + APP.version + ' — © ' + new Date().getFullYear() + '</p>';
+  html += '</div>';
+
+  main.innerHTML = html;
+}
+
+function badgeTile(icon, name, unlocked) {
+  return '<div class="badge-tile ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+    '<span class="badge-icon">' + icon + '</span>' +
+    '<div class="badge-name">' + name + '</div></div>';
+}
+
+/* ============================================================
+   UNIT DEFINITIONS
+   ============================================================ */
+var UNITS = [
+  { n: 1, title: 'Foundations of Drug Administration', desc: 'Definition, importance, nurse\'s legal role', icon: '📖' },
+  { n: 2, title: 'Ethics & Legal Framework', desc: 'Autonomy, beneficence, veracity, fidelity', icon: '⚖️' },
+  { n: 3, title: 'The Nursing Process', desc: 'ADPIE applied to drug administration', icon: '🔄' },
+  { n: 4, title: 'The 10 Rights & 3 Checks', desc: 'Core safety principles for every dose', icon: '1️⃣0️⃣' },
+  { n: 5, title: 'Types of Drug Orders', desc: 'Standing, PRN, STAT, single, now', icon: '📋' },
+  { n: 6, title: 'Oral & Topical Routes', desc: 'PO medications, creams, patches', icon: '💊' },
+  { n: 7, title: 'Ophthalmic & Otic Routes', desc: 'Eye and ear medication administration', icon: '👁️' },
+  { n: 8, title: 'Parenteral — ID, SC, IM', desc: 'Injection sites, angles, needles', icon: '💉' },
+  { n: 9, title: 'Parenteral — IV Route', desc: 'IV push, piggyback, complications', icon: '🩸' },
+  { n: 10, title: 'Drug Preparation', desc: 'Ampules, vials, reconstitution', icon: '🧪' },
+  { n: 11, title: 'Medication Calculations', desc: 'Dosage formula, tablet & liquid', icon: '🧮' },
+  { n: 12, title: 'Documentation & Safety Systems', desc: 'MAR, SOAPIE, FDAR, BCMA, smart pumps', icon: '📊' }
+];
+
+/* ============================================================
+   UNIT CONTENT
+   ============================================================ */
+var UNIT_CONTENT = {
+  unit1: {
+    intro: 'Drug administration is the preparation, delivery, and evaluation of medications prescribed to patients. It is a core nursing responsibility that demands knowledge, skill, and accountability.',
+    sections: [
+      { heading: '📌 Definition', type: 'callout', variant: 'info',
+        html: '<strong>Drug Administration</strong> refers to the preparation, delivery, and evaluation of medications prescribed to patients.' },
+      { heading: '✨ Importance', type: 'table', headers: ['Area', 'Impact'],
+        rows: [
+          ['Safety', 'Prevents medication errors'],
+          ['Outcomes', 'Promotes therapeutic effect'],
+          ['Patient care', 'Supports patient safety'],
+          ['Quality', 'Enhances quality nursing care']
+        ] },
+      { heading: '⚖️ Nurse\'s Legal Responsibilities', type: 'list',
+        items: ['Follow doctor\'s orders accurately', 'Verify medications before giving', 'Document accurately and promptly', 'Monitor patient responses', 'Report adverse reactions'] },
+      { heading: '🩺 Ethical Principles', type: 'table', headers: ['Principle', 'Meaning'],
+        rows: [
+          ['Autonomy', 'Respect patient\'s right to decide'],
+          ['Beneficence', 'Act in patient\'s best interest'],
+          ['Nonmaleficence', 'Do no harm'],
+          ['Justice', 'Fair and equitable care'],
+          ['Veracity', 'Truthfulness'],
+          ['Fidelity', 'Keep promises and commitments']
+        ] },
+      { heading: '📚 Key Terms', type: 'table', headers: ['Term', 'Definition'],
+        rows: [
+          ['Medication Error', 'Any preventable mistake involving medication use'],
+          ['Adverse Drug Reaction (ADR)', 'Unexpected harmful response to a drug'],
+          ['Near Miss', 'Error detected before reaching the patient']
+        ] },
+      { heading: '🌐 WHO Medication Without Harm', type: 'callout', variant: 'warning',
+        html: '<strong>Focus Areas:</strong><br>• High-risk medications<br>• Polypharmacy<br>• Transitions of care' },
+      { heading: '🚀 Current Trends (2021–2026)', type: 'list',
+        items: ['Barcode Medication Administration (BCMA)', 'Smart Pumps', 'eMAR', 'Clinical Decision Support Systems (CDSS)', 'Artificial Intelligence Alerts'] }
+    ]
+  },
+  unit2: {
+    intro: 'Ethical and legal frameworks guide every medication decision. Nurses are personally accountable for their actions.',
+    sections: [
+      { heading: '⚖️ Ethical Principles in Medication', type: 'table', headers: ['Principle', 'Application'],
+        rows: [
+          ['Autonomy', 'Patient may refuse medication'],
+          ['Beneficence', 'Choose safest administration route'],
+          ['Nonmaleficence', 'Prevent medication errors'],
+          ['Justice', 'Equal care regardless of background'],
+          ['Veracity', 'Honest about side effects'],
+          ['Fidelity', 'Follow through on scheduled doses']
+        ] },
+      { heading: '🚫 Common Legal Violations', type: 'list',
+        items: ['Failure to verify order', 'Administering wrong drug or dose', 'Failure to document', 'Failure to report adverse reactions', 'Ignoring patient\'s right to refuse'] },
+      { heading: '🛡️ Nurse\'s Responsibilities', type: 'callout', variant: 'success',
+        html: 'Follow orders, verify medications, document accurately, monitor responses, and report adverse reactions. Any deviation from safe practice carries legal consequences.' }
+    ]
+  },
+  unit3: {
+    intro: 'The nursing process (ADPIE) is applied to every medication administration episode.',
+    sections: [
+      { heading: 'A — Assessment', type: 'list',
+        items: ['Allergies', 'Medication history', 'Vital signs', 'Laboratory results', 'Contraindications', 'Patient readiness'] },
+      { heading: '🔍 Assessment Examples', type: 'table', headers: ['Before giving...', 'Check...'],
+        rows: [
+          ['Antihypertensives', 'Blood pressure'],
+          ['Digoxin', 'Apical pulse'],
+          ['Insulin', 'Blood glucose'],
+          ['Anticoagulants', 'Coagulation profile / bleeding'],
+          ['Opioids', 'Respiratory rate']
+        ] },
+      { heading: 'B — Nursing Diagnosis', type: 'list',
+        items: ['Deficient Knowledge', 'Risk for Injury', 'Risk for Adverse Drug Reaction', 'Ineffective Health Management'] },
+      { heading: 'C — Planning', type: 'callout', variant: 'info',
+        html: '<strong>Expected Outcomes:</strong><br>• Medication administered safely<br>• Desired therapeutic effect achieved<br>• Patient verbalizes understanding' },
+      { heading: 'D — Implementation', type: 'list',
+        items: ['Verify order', 'Prepare medication', 'Apply the 10 Rights', 'Educate patient', 'Administer medication'] },
+      { heading: 'E — Evaluation', type: 'list',
+        items: ['Therapeutic effect', 'Side effects', 'Adverse reactions', 'Patient understanding'] }
+    ]
+  },
+  unit4: {
+    intro: 'The 10 Rights and 3 Checks are the safety backbone of medication administration.',
+    sections: [
+      { heading: '🔟 The 10 Rights', type: 'table', headers: ['Right', 'Nursing Consideration'],
+        rows: [
+          ['Right Patient', 'Use two identifiers'],
+          ['Right Medication', 'Compare order with label'],
+          ['Right Dose', 'Perform calculations accurately'],
+          ['Right Route', 'Verify prescribed route'],
+          ['Right Time', 'Follow schedule'],
+          ['Right Documentation', 'Record immediately'],
+          ['Right Assessment', 'Assess before giving drug'],
+          ['Right Education', 'Explain medication'],
+          ['Right Evaluation', 'Assess response'],
+          ['Right to Refuse', 'Respect patient\'s decision']
+        ] },
+      { heading: '✅ The 3 Checks', type: 'table', headers: ['Check', 'When', 'Purpose'],
+        rows: [
+          ['First Check', 'When removing from storage', 'Verify correct medication'],
+          ['Second Check', 'During preparation', 'Prevent preparation errors'],
+          ['Third Check', 'At bedside before administration', 'Ensure patient safety']
+        ] },
+      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger',
+        html: '• Wrong patient<br>• Wrong drug<br>• Wrong dose<br>• Omitted dose<br>• Wrong documentation' },
+      { heading: '🚫 Common Mistakes', type: 'list',
+        items: ['Failure to read label', 'Failure to identify patient', 'Distractions during preparation'] }
+    ]
+  },
+  unit5: {
+    intro: 'Physician orders come in different forms — each with its own timing rules.',
+    sections: [
+      { heading: '📋 Order Types', type: 'table', headers: ['Type', 'Description', 'Example'],
+        rows: [
+          ['Standing', 'Remains in effect until discontinued', 'Metformin 500 mg PO BID'],
+          ['Routine', 'Regularly scheduled medication', 'Amlodipine 5 mg PO OD'],
+          ['PRN', 'Given as needed', 'Paracetamol 500 mg PO PRN pain'],
+          ['Single', 'Administered once', 'One-time dose'],
+          ['STAT', 'Immediately', 'Epinephrine 0.3 mg IM STAT'],
+          ['Now', 'Within a short specified time', 'Within 30 minutes']
+        ] },
+      { heading: '⚠️ Key Points', type: 'callout', variant: 'warning',
+        html: '• Never assume an illegible order<br>• Clarify with the prescriber<br>• Follow agency policy for verbal orders<br>• Document the prescriber\'s name and time received' }
+    ]
+  },
+  unit6: {
+    intro: 'The oral route is the most common and safest. Topical medications act locally or systemically through the skin.',
+    sections: [
+      { heading: '💊 Oral Route (PO)', type: 'list',
+        items: ['Administered through the mouth', 'Absorbed in the GI tract', 'Convenient, economical, non-invasive', 'Slow onset of action'] },
+      { heading: '📋 Common Forms', type: 'list',
+        items: ['Tablets, capsules, caplets', 'Syrups, suspensions, powders', 'Sublingual and buccal tablets'] },
+      { heading: '⚠️ Nursing Considerations (Oral)', type: 'callout', variant: 'warning',
+        html: '• Never crush enteric-coated or sustained-release meds<br>• Assess NPO status<br>• Verify swallowing ability<br>• Monitor for aspiration risk<br>• Position patient upright' },
+      { heading: '🧴 Topical Route', type: 'table', headers: ['Type', 'Example'],
+        rows: [
+          ['Creams (water-based)', 'Hydrocortisone cream'],
+          ['Ointments (oil-based)', 'Mupirocin ointment'],
+          ['Lotions', 'Calamine lotion'],
+          ['Transdermal patches', 'Nitroglycerin, Nicotine, Fentanyl']
+        ] },
+      { heading: '🚫 Topical Considerations', type: 'callout', variant: 'warning',
+        html: '• Do not apply over broken skin unless ordered<br>• Remove previous patch before applying new one<br>• Rotate patch sites<br>• Avoid heating pads over patches' }
+    ]
+  },
+  unit7: {
+    intro: 'Ophthalmic and otic routes require precise technique to ensure medication reaches its target without contamination.',
+    sections: [
+      { heading: '👁️ Ophthalmic Route', type: 'list',
+        items: ['Medication into the conjunctival sac', 'Treats infection, inflammation, glaucoma', 'Use eye drops and ointments'] },
+      { heading: '👁️ Eye Drop Procedure', type: 'list',
+        items: ['Verify order, identify patient', 'Ask patient to look up', 'Pull lower eyelid downward to expose conjunctival sac', 'Instill drops into the sac, avoid touching eye', 'Ask patient to close eyes gently', 'Press nasolacrimal duct 30 seconds'] },
+      { heading: '👂 Otic Route', type: 'list',
+        items: ['Medication into external auditory canal', 'Treats infection, wax impaction, inflammation', 'Warm drops to room temperature'] },
+      { heading: '👂 Technique by Age', type: 'table', headers: ['Age', 'Pinna Direction'],
+        rows: [
+          ['Adult', 'Up and back'],
+          ['Child <3 yrs', 'Down and back']
+        ] },
+      { heading: '⚠️ Key Considerations', type: 'callout', variant: 'warning',
+        html: '• Administer drops before ointments<br>• Wait 5 minutes between medications<br>• Never touch dropper tip<br>• Use separate containers per patient<br>• Keep patient side-lying 2-5 minutes (otic)' }
+    ]
+  },
+  unit8: {
+    intro: 'Parenteral routes bypass the GI tract for rapid, precise delivery. Each has distinct needle, angle, and site requirements.',
+    sections: [
+      { heading: '💉 Intradermal (ID)', type: 'table', headers: ['Attribute', 'Specification'],
+        rows: [
+          ['Purpose', 'Allergy testing, TB testing'],
+          ['Sites', 'Inner forearm, upper back'],
+          ['Needle gauge', '25–27 G'],
+          ['Needle length', '¼–⅝ inch'],
+          ['Angle', '5–15 degrees'],
+          ['Volume', '0.01–0.1 mL'],
+          ['Key sign', 'Wheal or bleb forms']
+        ] },
+      { heading: '💉 Subcutaneous (SC)', type: 'table', headers: ['Attribute', 'Specification'],
+        rows: [
+          ['Purpose', 'Insulin, anticoagulants, hormones'],
+          ['Sites', 'Abdomen, upper arm, thigh, upper buttock'],
+          ['Needle gauge', '25–31 G'],
+          ['Needle length', '⅜–⅝ inch'],
+          ['Angle', '45–90 degrees'],
+          ['Volume', '≤1 mL']
+        ] },
+      { heading: '💉 Intramuscular (IM)', type: 'table', headers: ['Site', 'Use', 'Max Volume'],
+        rows: [
+          ['Deltoid', 'Vaccines', '1 mL'],
+          ['Vastus Lateralis', 'Infants', '2–3 mL'],
+          ['Ventrogluteal', 'Adults (safest)', '3–5 mL']
+        ] },
+      { heading: '💉 IM Needle Specs', type: 'callout', variant: 'info',
+        html: '<strong>Gauge:</strong> 20–25 G<br><strong>Length:</strong> 1–1.5 inches<br><strong>Angle:</strong> 90 degrees<br><strong>Volume:</strong> 1–5 mL' },
+      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning',
+        html: '• Rotate insulin sites<br>• Avoid bruised tissue<br>• Do not massage heparin sites<br>• Use ventrogluteal for adults<br>• Aspirate only for IM (per agency policy)' }
+    ]
+  },
+  unit9: {
+    intro: 'The IV route delivers medication directly into the bloodstream for immediate effect — with higher risk requiring precise technique.',
+    sections: [
+      { heading: '🩸 IV Purpose', type: 'list',
+        items: ['Immediate therapeutic effect', 'Emergency medication delivery', 'Fluid therapy', 'Blood products'] },
+      { heading: '🩸 Common Sites', type: 'list',
+        items: ['Dorsal hand veins', 'Cephalic vein', 'Basilic vein', 'Median cubital vein'] },
+      { heading: '🩸 Catheter Sizes', type: 'table', headers: ['Gauge', 'Use'],
+        rows: [
+          ['18 G', 'Trauma / blood transfusion'],
+          ['20 G', 'General adult therapy'],
+          ['22 G', 'Older adults'],
+          ['24 G', 'Pediatric patients']
+        ] },
+      { heading: '🩸 Angle of Insertion', type: 'callout', variant: 'info', html: '<strong>10–30 degrees</strong>, bevel up, until flashback of blood.' },
+      { heading: '🚨 IV Complications', type: 'table', headers: ['Complication', 'Description'],
+        rows: [
+          ['Infiltration', 'IV fluid enters surrounding tissue'],
+          ['Extravasation', 'Vesicant medication leaks into tissue'],
+          ['Phlebitis', 'Vein inflammation'],
+          ['Infection', 'Catheter-related infection']
+        ] },
+      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning',
+        html: '• Follow "slow IV push" recommendation<br>• Monitor for infiltration, phlebitis, extravasation<br>• Assess compatibility before mixing<br>• Use infusion pumps for high-alert meds<br>• Observe for immediate adverse reactions' }
+    ]
+  },
+  unit10: {
+    intro: 'Correct technique in preparing medication from ampules and vials prevents contamination and dosing errors.',
+    sections: [
+      { heading: '🧪 Ampule Preparation', type: 'list',
+        items: ['Verify order', 'Hand hygiene', 'Tap ampule neck to move fluid down', 'Clean neck with alcohol', 'Break ampule away from body (dot facing you)', 'Use filter needle to withdraw', 'Remove air bubbles', 'Replace with regular needle before injection'] },
+      { heading: '🧪 Vial Preparation', type: 'table', headers: ['Type', 'Characteristic'],
+        rows: [
+          ['Single-dose', 'Discard after use'],
+          ['Multi-dose', 'Contains preservative; multiple withdrawals']
+        ] },
+      { heading: '🧪 Vial Steps', type: 'list',
+        items: ['Verify order', 'Hand hygiene', 'Disinfect rubber stopper', 'Inject air equal to dose', 'Withdraw medication', 'Remove air bubbles', 'Label if necessary'] },
+      { heading: '🧪 Reconstitution', type: 'callout', variant: 'info',
+        html: '<strong>Powder + Diluent = Solution</strong><br><br><strong>Common diluents:</strong><br>• Sterile water<br>• Normal saline (0.9% NaCl)' },
+      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger',
+        html: '• Contamination of needle<br>• Glass particle aspiration<br>• Incorrect dosage<br>• Using wrong diluent' }
+    ]
+  },
+  unit11: {
+    intro: 'Accurate dosage calculation is non-negotiable. Use the standard formula every time.',
+    sections: [
+      { heading: '🧮 Standard Formula', type: 'callout', variant: 'info',
+        html: '<div style="text-align:center;font-size:1.3rem;font-family:var(--font-head);font-weight:800;color:var(--primary);padding:1rem;background:#fff;border-radius:10px;">Desired Dose ÷ Stock Dose × Volume Available</div>' },
+      { heading: '💊 Example 1 — Tablet', type: 'callout', variant: 'success',
+        html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/tablet<br><strong>Calculate:</strong> 500 ÷ 250 = <strong>2 tablets</strong>' },
+      { heading: '💧 Example 2 — Liquid', type: 'callout', variant: 'success',
+        html: '<strong>Order:</strong> 250 mg<br><strong>Available:</strong> 125 mg/5 mL<br><strong>Calculate:</strong> 250 ÷ 125 × 5 = <strong>10 mL</strong>' },
+      { heading: '💉 Example 3 — IM Injection', type: 'callout', variant: 'success',
+        html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/mL<br><strong>Calculate:</strong> 500 ÷ 250 × 1 = <strong>2 mL</strong>' },
+      { heading: '⚠️ Safety Reminders', type: 'callout', variant: 'warning',
+        html: '• Always double-check calculations<br>• Have a second nurse verify high-alert doses<br>• Round only at the end<br>• Verify units match (mg vs mcg vs g)' }
+    ]
+  },
+  unit12: {
+    intro: 'Documentation and safety systems are the final safeguards against medication errors.',
+    sections: [
+      { heading: '📋 Documentation Formats', type: 'table', headers: ['Format', 'Purpose'],
+        rows: [
+          ['MAR', 'Medication Administration Record'],
+          ['SOAPIE', 'Subjective, Objective, Assessment, Plan, Intervention, Evaluation'],
+          ['FDAR', 'Focus, Data, Action, Response']
+        ] },
+      { heading: '📝 Sample SOAPIE', type: 'callout', variant: 'info',
+        html: '<strong>S:</strong> Patient reports headache.<br><strong>O:</strong> Pain score 7/10.<br><strong>A:</strong> Acute pain.<br><strong>P:</strong> Administer Paracetamol.<br><strong>I:</strong> Paracetamol 500 mg given PO.<br><strong>E:</strong> Pain score reduced to 2/10.' },
+      { heading: '📝 Sample FDAR', type: 'callout', variant: 'info',
+        html: '<strong>Focus:</strong> Pain<br><strong>Data:</strong> Pain score 7/10<br><strong>Action:</strong> Paracetamol administered<br><strong>Response:</strong> Pain decreased to 2/10' },
+      { heading: '🚀 Modern Safety Systems', type: 'table', headers: ['System', 'Function'],
+        rows: [
+          ['BCMA', 'Barcode scanning before administration'],
+          ['Smart Pumps', 'Automatic dose error reduction'],
+          ['eMAR', 'Electronic medication charting'],
+          ['CDSS', 'Provides clinical alerts'],
+          ['AI Alerts', 'Predicts medication error risks'],
+          ['Needleless Systems', 'Reduces needlestick injuries']
+        ] },
+      { heading: '🚨 High-Alert Medications', type: 'callout', variant: 'danger',
+        html: '<strong>ISMP High-Alert List (Examples):</strong><br>• Insulin<br>• Heparin<br>• Opioids (morphine, fentanyl)<br>• Digoxin<br>• Concentrated electrolytes (KCl)<br>• Chemotherapy agents<br><br><strong>Require double-check by 2 nurses.</strong>' }
+    ]
+  }
+};
+
+/* ============================================================
+   UNIT RENDER
+   ============================================================ */
+function renderUnit(main, num) {
+  var unitKey = 'unit' + num;
+  var content = UNIT_CONTENT[unitKey];
+  var unitDef = UNITS.find(function(u) { return u.n === num; });
+  var titles = unitDef ? unitDef.title : 'Unit ' + num;
+  var icons = unitDef ? unitDef.icon : '📖';
+
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Unit ' + num + ' of 12</p>';
+  html += '<h1>' + icons + ' ' + titles + '</h1>';
+  html += '<p class="hero-subtitle">' + (unitDef ? unitDef.desc : '') + '</p>';
+  html += '</div></div>';
+
+  if (content && content.intro) {
+    html += '<div class="card fade-in"><p style="font-size:0.95rem;line-height:1.7;margin:0;">' + escapeHtml(content.intro) + '</p></div>';
+  }
+  if (content && content.sections) {
+    content.sections.forEach(function(sec) { html += renderUnitSection(sec); });
+  }
+
+  var isComplete = isUnitComplete(unitKey);
+  var best = getUnitBestScore(unitKey);
+  html += '<div class="card fade-in" id="quiz-unit' + num + '">';
+  html += '<div class="card-header"><div><div class="card-title">📝 Mastery Check</div>';
+  html += '<div class="card-subtitle">Passing score: 90%' + (isComplete ? ' — ✅ Mastered (' + best + '%)' : '') + '</div></div></div>';
+  html += '<div id="quizBody-unit' + num + '"></div>';
+  html += '<button class="btn btn-primary btn-lg btn-block mt-2" onclick="submitQuiz(' + num + ')">Submit Quiz</button>';
+  html += '<div id="quizResult-unit' + num + '" class="mt-2"></div></div>';
+
+  html += '<div class="card fade-in" style="display:flex;gap:0.75rem;flex-wrap:wrap;">';
+  if (num > 1) html += '<button class="btn btn-outline" onclick="navigate(\'unit' + (num-1) + '\')">← Unit ' + (num-1) + '</button>';
+  if (num < 12) html += '<button class="btn btn-primary" style="margin-left:auto;" onclick="navigate(\'unit' + (num+1) + '\')">Unit ' + (num+1) + ' →</button>';
+  else html += '<button class="btn btn-primary" style="margin-left:auto;" onclick="navigate(\'exam\')">Capstone Exam →</button>';
+  html += '</div>';
+
+  main.innerHTML = html;
+  initQuiz(num);
+}
+
+function renderUnitSection(sec) {
+  var html = '';
+  switch (sec.type) {
+    case 'table':
+      html += '<div class="card fade-in"><div class="card-header"><div class="card-title">' + sec.heading + '</div></div>';
+      html += '<div class="table-wrap"><table><thead><tr>';
+      sec.headers.forEach(function(h) { html += '<th>' + h + '</th>'; });
+      html += '</tr></thead><tbody>';
+      sec.rows.forEach(function(row) {
+        html += '<tr>';
+        row.forEach(function(cell) { html += '<td>' + cell + '</td>'; });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+      break;
+    case 'callout':
+      html += '<div class="card fade-in"><div class="card-header"><div class="card-title">' + sec.heading + '</div></div>';
+      html += '<div class="callout callout-' + (sec.variant || 'info') + '">' + sec.html + '</div></div>';
+      break;
+    case 'list':
+      html += '<div class="card fade-in"><div class="card-header"><div class="card-title">' + sec.heading + '</div></div>';
+      html += '<ul style="margin-left:1.5rem;font-size:0.9rem;line-height:1.9;">';
+      sec.items.forEach(function(i) { html += '<li>' + i + '</li>'; });
+      html += '</ul></div>';
+      break;
+    default:
+      html += '<div class="card fade-in"><div class="card-header"><div class="card-title">' + sec.heading + '</div></div></div>';
+  }
+  return html;
+}
+
+function initQuiz(num) {
+  var container = document.getElementById('quizBody-unit' + num);
+  if (!container) return;
+  var qs = QUIZZES['unit' + num] || [];
+  container.innerHTML = qs.map(function(q, i) {
+    return '<div class="quiz-question" data-q="' + i + '" style="margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--gray-light);">' +
+      '<p style="font-weight:600;margin-bottom:0.75rem;font-size:0.95rem;">' + (i+1) + '. ' + escapeHtml(q.q) + '</p>' +
+      '<div class="quiz-options">' +
+      q.options.map(function(o) {
+        return '<button class="quiz-opt" onclick="selectOption(this)" data-q="' + i + '" data-selected="0">' + escapeHtml(o) + '</button>';
+      }).join('') +
+      '</div></div>';
+  }).join('');
+}
+
+function selectOption(btn) {
+  var siblings = btn.parentElement.querySelectorAll('.quiz-opt');
+  siblings.forEach(function(s) {
+    s.dataset.selected = '0';
+    s.classList.remove('selected');
+  });
+  btn.dataset.selected = '1';
+  btn.classList.add('selected');
+}
+
+function submitQuiz(num) {
+  var qs = QUIZZES['unit' + num] || [];
+  var correct = 0;
+  var total = qs.length;
+  qs.forEach(function(q, i) {
+    var qEl = document.querySelector('#quizBody-unit' + num + ' .quiz-question[data-q="' + i + '"]');
+    if (!qEl) return;
+    var allOpts = qEl.querySelectorAll('.quiz-opt');
+    var userChoice = null;
+    allOpts.forEach(function(o) { if (o.dataset.selected === '1') userChoice = o; });
+    if (userChoice) {
+      var choice = userChoice.textContent.trim();
+      if (choice === q.answer) {
+        correct++;
+        userChoice.classList.add('correct');
+        userChoice.classList.remove('selected');
+      } else {
+        userChoice.classList.add('wrong');
+        userChoice.classList.remove('selected');
+      }
+      allOpts.forEach(function(o) {
+        if (o.textContent.trim() === q.answer && o !== userChoice) {
+          o.classList.add('correct');
+        }
+      });
+    }
+  });
+  var pct = Math.round((correct / total) * 100);
+  var pass = pct >= 90;
+  var resultEl = document.getElementById('quizResult-unit' + num);
+  resultEl.innerHTML = '<div class="callout callout-' + (pass ? 'success' : 'warning') + '">' +
+    '<strong>Score: ' + correct + '/' + total + ' (' + pct + '%)</strong><br>' +
+    (pass ? '🎉 Mastery achieved!' : '⚠️ You need 90% to master this unit.') + '</div>' +
+    '<button class="btn btn-outline mt-1" onclick="navigate(\'unit' + num + '\')">🔄 Retry Unit</button>';
+  if (!APP.state.quizAttempts['unit' + num]) APP.state.quizAttempts['unit' + num] = [];
+  APP.state.quizAttempts['unit' + num].push(pct);
+  if (pass) {
+    APP.state.progress['unit' + num] = { completed: true, score: pct, date: new Date().toISOString() };
+    toast('Unit mastered!', 'success');
+  } else {
+    toast('Score: ' + pct + '% — need 90% to master', 'warning');
+  }
+  saveState();
+  if (APP.state.student) registerSavedSession(buildStudentRecord());
+}
+
+/* ============================================================
+   QUIZZES
+   ============================================================ */
+var QUIZZES = {
+  unit1: [
+    { q: 'Drug administration refers to:', options: ['Ordering meds','Preparing, delivering, evaluating','Only giving pills','Storing meds'], answer: 'Preparing, delivering, evaluating' },
+    { q: 'Which is a nurse\'s legal responsibility?', options: ['Prescribe meds','Follow doctor\'s orders','Discontinue meds','Alter dose'], answer: 'Follow doctor\'s orders' },
+    { q: 'Which ethical principle means "do no harm"?', options: ['Autonomy','Beneficence','Nonmaleficence','Justice'], answer: 'Nonmaleficence' },
+    { q: 'A near miss is:', options: ['Error reached patient','Error detected before reaching patient','ADR','Side effect'], answer: 'Error detected before reaching patient' },
+    { q: 'An unexpected harmful response to a drug is:', options: ['Side effect','ADR','Near miss','Allergy'], answer: 'ADR' },
+    { q: 'WHO "Medication Without Harm" focuses on:', options: ['Herbal meds','High-risk meds, polypharmacy, transitions','Only IV meds','Only pedia'], answer: 'High-risk meds, polypharmacy, transitions' },
+    { q: 'Which is a current trend (2021-2026)?', options: ['BCMA','Handwritten MAR','Paper charts','Manual pumps'], answer: 'BCMA' },
+    { q: 'Fidelity means:', options: ['Do no harm','Keep promises','Fair care','Truthfulness'], answer: 'Keep promises' },
+    { q: 'Veracity means:', options: ['Do no harm','Keep promises','Fair care','Truthfulness'], answer: 'Truthfulness' },
+    { q: 'Autonomy means:', options: ['Do no harm','Respect patient\'s right to decide','Fair care','Truthfulness'], answer: 'Respect patient\'s right to decide' }
+  ],
+  unit2: [
+    { q: 'A patient refuses medication. Which principle applies?', options: ['Autonomy','Beneficence','Justice','Veracity'], answer: 'Autonomy' },
+    { q: 'Choosing the safest route is:', options: ['Autonomy','Beneficence','Justice','Fidelity'], answer: 'Beneficence' },
+    { q: 'Preventing med errors is:', options: ['Autonomy','Nonmaleficence','Justice','Veracity'], answer: 'Nonmaleficence' },
+    { q: 'Equal care regardless of background:', options: ['Autonomy','Beneficence','Justice','Fidelity'], answer: 'Justice' },
+    { q: 'Being honest about side effects:', options: ['Autonomy','Veracity','Justice','Fidelity'], answer: 'Veracity' },
+    { q: 'Following through on scheduled doses:', options: ['Autonomy','Veracity','Fidelity','Justice'], answer: 'Fidelity' },
+    { q: 'Which is a legal violation?', options: ['Verifying order','Documenting','Failure to verify order','Assessing'], answer: 'Failure to verify order' },
+    { q: 'Nurse\'s responsibility includes:', options: ['Prescribing','Monitoring response','Discontinuing','Changing dose'], answer: 'Monitoring response' },
+    { q: 'Ignoring patient\'s right to refuse is:', options: ['Ethical','Legal','A violation','Required'], answer: 'A violation' },
+    { q: 'Which report must the nurse make?', options: ['Routine vitals','Adverse reactions','Dietary','Visitors'], answer: 'Adverse reactions' }
+  ],
+  unit3: [
+    { q: 'A in ADPIE stands for:', options: ['Assess','Administer','Advise','Analyze'], answer: 'Assess' },
+    { q: 'Which is assessed BEFORE giving antihypertensives?', options: ['Pulse','BP','RR','Temp'], answer: 'BP' },
+    { q: 'Which is checked BEFORE Digoxin?', options: ['BP','Apical pulse','RR','Temp'], answer: 'Apical pulse' },
+    { q: 'Which is checked BEFORE insulin?', options: ['BP','Pulse','Blood glucose','RR'], answer: 'Blood glucose' },
+    { q: 'Which is checked BEFORE opioids?', options: ['BP','Pulse','RR','Temp'], answer: 'RR' },
+    { q: 'Which is a nursing diagnosis example?', options: ['Pneumonia','Risk for Injury','Hypertension','Diabetes'], answer: 'Risk for Injury' },
+    { q: 'In planning, expected outcome includes:', options: ['Diagnosis','Safe administration','Prescription','Surgery'], answer: 'Safe administration' },
+    { q: 'In implementation, the nurse:', options: ['Prescribes','Administers','Diagnoses','Orders labs'], answer: 'Administers' },
+    { q: 'In evaluation, the nurse assesses:', options: ['Order','Therapeutic effect','MAR','Consent'], answer: 'Therapeutic effect' },
+    { q: 'ADPIE stands for:', options: ['Assess, Diagnose, Plan, Implement, Evaluate','Assess, Document, Prescribe, Intervene, Evaluate','Administer, Diagnose, Plan, Intervene, Evaluate','Assess, Diagnose, Prescribe, Implement, Evaluate'], answer: 'Assess, Diagnose, Plan, Implement, Evaluate' }
+  ],
+  unit4: [
+    { q: 'How many Rights are there?', options: ['5','7','10','12'], answer: '10' },
+    { q: 'Right Patient uses:', options: ['One identifier','Two identifiers','Room number','Bed number'], answer: 'Two identifiers' },
+    { q: 'Right Medication means:', options: ['Guess','Compare order to label','Ask family','Skip check'], answer: 'Compare order to label' },
+    { q: 'Right Dose requires:', options: ['Estimation','Accurate calculation','Guess','Trial'], answer: 'Accurate calculation' },
+    { q: 'Right Documentation means:', options: ['Later','Immediately','Tomorrow','Skip'], answer: 'Immediately' },
+    { q: 'The first check is done:', options: ['At bedside','Removing from storage','During prep','After'], answer: 'Removing from storage' },
+    { q: 'The second check is done:', options: ['At bedside','During preparation','Before storage','After'], answer: 'During preparation' },
+    { q: 'The third check is done:', options: ['At bedside','During prep','Before storage','Never'], answer: 'At bedside' },
+    { q: 'Which is a common error?', options: ['Right patient','Wrong dose','Right route','Right time'], answer: 'Wrong dose' },
+    { q: 'Right to Refuse means:', options: ['Force meds','Respect decision','Ignore','Report'], answer: 'Respect decision' }
+  ],
+  unit5: [
+    { q: 'Standing order:', options: ['Once','Until discontinued','PRN','STAT'], answer: 'Until discontinued' },
+    { q: 'Routine order:', options: ['Regularly scheduled','Once','STAT','PRN'], answer: 'Regularly scheduled' },
+    { q: 'PRN means:', options: ['Every day','As needed','Immediately','Once'], answer: 'As needed' },
+    { q: 'STAT means:', options: ['As needed','Immediately','Routine','Once'], answer: 'Immediately' },
+    { q: 'Single order is given:', options: ['Daily','Once','PRN','STAT'], answer: 'Once' },
+    { q: 'Now order is given:', options: ['Never','Within a short specified time','Only at night','PRN'], answer: 'Within a short specified time' },
+    { q: 'Metformin 500 mg PO BID is:', options: ['Standing','PRN','Single','STAT'], answer: 'Standing' },
+    { q: 'Amlodipine 5 mg PO OD is:', options: ['Routine','PRN','STAT','Now'], answer: 'Routine' },
+    { q: 'Paracetamol PRN pain is:', options: ['Routine','PRN','STAT','Standing'], answer: 'PRN' },
+    { q: 'Illegible order — nurse should:', options: ['Guess','Clarify with prescriber','Give anyway','Skip'], answer: 'Clarify with prescriber' }
+  ],
+  unit6: [
+    { q: 'Oral route administers through:', options: ['Skin','Mouth','Eye','Ear'], answer: 'Mouth' },
+    { q: 'Which is NOT an oral form?', options: ['Tablet','Capsule','Syrup','Patch'], answer: 'Patch' },
+    { q: 'Oral route advantage:', options: ['Fast','Convenient','Invasive','Painful'], answer: 'Convenient' },
+    { q: 'Never crush:', options: ['Scored tablets','Enteric-coated tablets','Chewables','Capsules'], answer: 'Enteric-coated tablets' },
+    { q: 'Position for oral meds:', options: ['Flat','High Fowler\'s','Trendelenburg','Prone'], answer: 'High Fowler\'s' },
+    { q: 'Creams are:', options: ['Oil-based','Water-based','Powder','Gel'], answer: 'Water-based' },
+    { q: 'Ointments are:', options: ['Water-based','Oil-based','Liquid','Powder'], answer: 'Oil-based' },
+    { q: 'Transdermal patch examples:', options: ['Paracetamol','Nitroglycerin','Metformin','Insulin'], answer: 'Nitroglycerin' },
+    { q: 'Patch consideration:', options: ['Leave old on','Remove old patch first','Reuse','Double'], answer: 'Remove old patch first' },
+    { q: 'Avoid what over patches?', options: ['Water','Heating pads','Ice','Fan'], answer: 'Heating pads' }
+  ],
+  unit7: [
+    { q: 'Ophthalmic meds are given into:', options: ['Cornea','Conjunctival sac','Pupil','Sclera'], answer: 'Conjunctival sac' },
+    { q: 'Eye drops instilled at:', options: ['Center','Outer third of sac','Inner corner','Pupil'], answer: 'Outer third of sac' },
+    { q: 'Dropper distance from eye:', options: ['0 cm','1-2 cm','5 cm','10 cm'], answer: '1-2 cm' },
+    { q: 'Press nasolacrimal duct for:', options: ['5 sec','15 sec','30 sec','60 sec'], answer: '30 sec' },
+    { q: 'Ointment strip length:', options: ['0.5 cm','1 cm','2 cm','5 cm'], answer: '2 cm' },
+    { q: 'Drops before ointments?', options: ['No','Yes','Same time','Either'], answer: 'Yes' },
+    { q: 'Wait between eye meds:', options: ['1 min','5 min','10 min','30 min'], answer: '5 min' },
+    { q: 'Adult pinna direction for otic:', options: ['Down and back','Up and back','Straight','Forward'], answer: 'Up and back' },
+    { q: 'Child <3 pinna direction:', options: ['Down and back','Up and back','Straight','Forward'], answer: 'Down and back' },
+    { q: 'Otic side-lying duration:', options: ['30 sec','1 min','2-5 min','10 min'], answer: '2-5 min' }
+  ],
+  unit8: [
+    { q: 'ID injection site:', options: ['Abdomen','Inner forearm','Deltoid','Thigh'], answer: 'Inner forearm' },
+    { q: 'ID needle angle:', options: ['5-15°','45°','90°','30°'], answer: '5-15°' },
+    { q: 'ID needle gauge:', options: ['18-20 G','25-27 G','30-31 G','14 G'], answer: '25-27 G' },
+    { q: 'ID volume:', options: ['0.01-0.1 mL','0.5 mL','1 mL','2 mL'], answer: '0.01-0.1 mL' },
+    { q: 'SC needle angle:', options: ['5-15°','45-90°','90° only','30°'], answer: '45-90°' },
+    { q: 'SC common site:', options: ['Deltoid','Abdomen','Forearm','Back'], answer: 'Abdomen' },
+    { q: 'IM site for adults (safest):', options: ['Deltoid','Vastus lateralis','Ventrogluteal','Dorsogluteal'], answer: 'Ventrogluteal' },
+    { q: 'IM site for infants:', options: ['Deltoid','Vastus lateralis','Ventrogluteal','Dorsogluteal'], answer: 'Vastus lateralis' },
+    { q: 'IM needle gauge:', options: ['18 G','20-25 G','25-27 G','30 G'], answer: '20-25 G' },
+    { q: 'IM injection angle:', options: ['5-15°','45°','90°','30°'], answer: '90°' }
+  ],
+  unit9: [
+    { q: 'IV route gives medication:', options: ['Slow','Directly into bloodstream','Topically','Orally'], answer: 'Directly into bloodstream' },
+    { q: 'IV catheter for trauma:', options: ['24 G','22 G','20 G','18 G'], answer: '18 G' },
+    { q: 'IV catheter for pediatric:', options: ['18 G','20 G','22 G','24 G'], answer: '24 G' },
+    { q: 'IV insertion angle:', options: ['5-15°','10-30°','45°','90°'], answer: '10-30°' },
+    { q: 'Infiltration means:', options: ['Infection','IV fluid into tissue','Vein inflammation','Clot'], answer: 'IV fluid into tissue' },
+    { q: 'Extravasation means:', options: ['Blood loss','Vesicant leaks into tissue','Air embolism','Clot'], answer: 'Vesicant leaks into tissue' },
+    { q: 'Phlebitis is:', options: ['Vein inflammation','Bone infection','Lung issue','Clot'], answer: 'Vein inflammation' },
+    { q: 'High-alert IV meds require:', options: ['Gravity','Infusion pump','Push','Fast flow'], answer: 'Infusion pump' },
+    { q: 'Slow IV push recommendation is for:', options: ['All meds','Indicated meds','None','Only water'], answer: 'Indicated meds' },
+    { q: 'Check before mixing IV meds:', options: ['Temperature','Compatibility','Color','Odor'], answer: 'Compatibility' }
+  ],
+  unit10: [
+    { q: 'Ampule: break with dot facing:', options: ['Away','Toward you','Up','Down'], answer: 'Toward you' },
+    { q: 'Ampule needle for withdrawal:', options: ['Regular','Filter','Large','Blunt'], answer: 'Filter' },
+    { q: 'Vial rubber stopper must be:', options: ['Not cleaned','Disinfected','Warmed','Cooled'], answer: 'Disinfected' },
+    { q: 'Before withdrawing from vial, inject:', options: ['Water','Air','Saline','Nothing'], answer: 'Air' },
+    { q: 'Multi-dose vial contains:', options: ['No preservative','Preservative','Only water','Only powder'], answer: 'Preservative' },
+    { q: 'Reconstitution formula:', options: ['Powder + Diluent = Solution','Liquid + Liquid','Air + Water','Powder only'], answer: 'Powder + Diluent = Solution' },
+    { q: 'Common diluent:', options: ['Alcohol','Normal saline','Vinegar','Juice'], answer: 'Normal saline' },
+    { q: 'Ampule common error:', options: ['Clean','Glass particles','Regular needle','Big volume'], answer: 'Glass particles' },
+    { q: 'Vial roll between palms to:', options: ['Warm','Mix','Dissolve','Open'], answer: 'Mix' },
+    { q: 'Filter needle is replaced with:', options: ['Bigger needle','Regular needle','Blunt','No needle'], answer: 'Regular needle' }
+  ],
+  unit11: [
+    { q: 'Formula:', options: ['D/H × V','H/D × V','D × H','D + V'], answer: 'D/H × V' },
+    { q: 'Order 500 mg, stock 250 mg/tab:', options: ['1 tab','2 tab','3 tab','0.5 tab'], answer: '2 tab' },
+    { q: 'Order 250 mg, stock 125 mg/5 mL:', options: ['5 mL','10 mL','15 mL','20 mL'], answer: '10 mL' },
+    { q: 'Order 500 mg, stock 250 mg/mL:', options: ['1 mL','2 mL','3 mL','0.5 mL'], answer: '2 mL' },
+    { q: 'Order 1000 mg, stock 500 mg/tab:', options: ['1 tab','2 tab','3 tab','4 tab'], answer: '2 tab' },
+    { q: 'Order 100 mg, stock 50 mg/mL:', options: ['1 mL','2 mL','3 mL','0.5 mL'], answer: '2 mL' },
+    { q: 'Order 300 mg, stock 100 mg/5 mL:', options: ['5 mL','10 mL','15 mL','20 mL'], answer: '15 mL' },
+    { q: 'Order 0.5 mg, stock 0.25 mg/tab:', options: ['1 tab','2 tab','3 tab','4 tab'], answer: '2 tab' },
+    { q: 'Round only at:', options: ['Start','End','Middle','Never'], answer: 'End' },
+    { q: 'Have a second nurse verify:', options: ['All meds','High-alert meds','Water','None'], answer: 'High-alert meds' }
+  ],
+  unit12: [
+    { q: 'MAR stands for:', options: ['Medication Administration Record','Medical Aid Report','Major Adverse Reaction','None'], answer: 'Medication Administration Record' },
+    { q: 'SOAPIE includes:', options: ['Subjective, Objective','Only objective','Only subjective','None'], answer: 'Subjective, Objective' },
+    { q: 'FDAR stands for:', options: ['Focus, Data, Action, Response','Fast, Data, Assess, Report','Focus, Document, Assess, Review','None'], answer: 'Focus, Data, Action, Response' },
+    { q: 'BCMA is:', options: ['Paper-based','Barcode scanning','Verbal','Phone'], answer: 'Barcode scanning' },
+    { q: 'Smart pumps:', options: ['Manual','Dose error reduction','No alarms','Slow'], answer: 'Dose error reduction' },
+    { q: 'eMAR is:', options: ['Paper','Electronic charting','Phone app','None'], answer: 'Electronic charting' },
+    { q: 'CDSS provides:', options: ['Music','Clinical alerts','Games','Recipes'], answer: 'Clinical alerts' },
+    { q: 'High-alert meds include:', options: ['Paracetamol','Insulin','Vitamin C','Water'], answer: 'Insulin' },
+    { q: 'High-alert meds require:', options: ['1 nurse','Double-check by 2 nurses','No check','Patient check'], answer: 'Double-check by 2 nurses' },
+    { q: 'Needleless systems reduce:', options: ['Cost','Needlestick injuries','Dose','Time'], answer: 'Needlestick injuries' }
+  ]
+};
+
+/* ============================================================
+   DRUG DATABASE — 50 DRUGS
+   ============================================================ */
+var DRUGS = [
+  { name: 'Paracetamol', brand: 'Biogesic, Tylenol', cls: 'Analgesic / Antipyretic', route: 'PO, PRN', alert: false, action: 'Relieves pain and fever', side: 'Hepatotoxicity in overdose, rash', note: 'Max 4 g/day in adults' },
+  { name: 'Mefenamic Acid', brand: 'Dolfenal, Ponstan', cls: 'NSAID', route: 'PO', alert: false, action: 'Anti-inflammatory and analgesic', side: 'GI upset, bleeding', note: 'Take with food' },
+  { name: 'Ibuprofen', brand: 'Advil, Motrin', cls: 'NSAID', route: 'PO', alert: false, action: 'Anti-inflammatory, analgesic', side: 'GI upset, renal impairment', note: 'Avoid in 3rd trimester' },
+  { name: 'Aspirin', brand: 'Bayer', cls: 'Antiplatelet / NSAID', route: 'PO', alert: false, action: 'Antiplatelet, analgesic', side: 'GI bleeding, Reye syndrome', note: 'Avoid in children with viral illness' },
+  { name: 'Metformin', brand: 'Glucophage', cls: 'Antidiabetic (Biguanide)', route: 'PO', alert: false, action: 'Decreases hepatic glucose production', side: 'GI upset, lactic acidosis', note: 'Take with meals' },
+  { name: 'Glibenclamide', brand: 'Daonil', cls: 'Antidiabetic (Sulfonylurea)', route: 'PO', alert: true, action: 'Stimulates insulin release', side: 'Hypoglycemia', note: 'High-alert: monitor glucose' },
+  { name: 'Insulin', brand: 'Humulin, Novolin', cls: 'Antidiabetic', route: 'SC, IV', alert: true, action: 'Lowers blood glucose', side: 'Hypoglycemia, lipodystrophy', note: 'High-alert: double-check dose. Rotate sites.' },
+  { name: 'Amlodipine', brand: 'Norvasc', cls: 'Calcium Channel Blocker', route: 'PO', alert: false, action: 'Vasodilation, lowers BP', side: 'Edema, headache, dizziness', note: 'Check BP before giving' },
+  { name: 'Losartan', brand: 'Cozaar', cls: 'ARB', route: 'PO', alert: false, action: 'Blocks angiotensin II', side: 'Dizziness, hyperkalemia', note: 'Monitor K+ and renal function' },
+  { name: 'Enalapril', brand: 'Vasotec', cls: 'ACE Inhibitor', route: 'PO', alert: false, action: 'Vasodilation, lowers BP', side: 'Dry cough, hyperkalemia, angioedema', note: 'Watch for cough' },
+  { name: 'Metoprolol', brand: 'Betaloc, Lopressor', cls: 'Beta-blocker', route: 'PO, IV', alert: false, action: 'Lowers HR and BP', side: 'Bradycardia, fatigue', note: 'Hold if HR <60' },
+  { name: 'Digoxin', brand: 'Lanoxin', cls: 'Cardiac glycoside', route: 'PO, IV', alert: true, action: 'Increases contractility', side: 'Bradycardia, arrhythmia, nausea', note: 'High-alert: check apical pulse for 1 min. Hold if <60.' },
+  { name: 'Furosemide', brand: 'Lasix', cls: 'Loop diuretic', route: 'PO, IV', alert: false, action: 'Increases urine output', side: 'Hypokalemia, dehydration', note: 'Monitor K+ and I&O' },
+  { name: 'Hydrochlorothiazide', brand: 'HCTZ', cls: 'Thiazide diuretic', route: 'PO', alert: false, action: 'Increases urine output', side: 'Hypokalemia, hyperglycemia', note: 'Monitor electrolytes' },
+  { name: 'Spironolactone', brand: 'Aldactone', cls: 'Potassium-sparing diuretic', route: 'PO', alert: false, action: 'Diuresis without K+ loss', side: 'Hyperkalemia', note: 'Avoid K+ supplements' },
+  { name: 'Atorvastatin', brand: 'Lipitor', cls: 'Statin', route: 'PO', alert: false, action: 'Lowers cholesterol', side: 'Myalgia, hepatotoxicity', note: 'Take at night' },
+  { name: 'Simvastatin', brand: 'Zocor', cls: 'Statin', route: 'PO', alert: false, action: 'Lowers cholesterol', side: 'Myalgia, rhabdomyolysis', note: 'Avoid grapefruit juice' },
+  { name: 'Warfarin', brand: 'Coumadin', cls: 'Anticoagulant', route: 'PO', alert: true, action: 'Blocks vitamin K-dependent clotting factors', side: 'Bleeding, bruising', note: 'High-alert: monitor INR. Avoid NSAIDs.' },
+  { name: 'Heparin', brand: 'Various', cls: 'Anticoagulant', route: 'SC, IV', alert: true, action: 'Prevents clot formation', side: 'Bleeding, HIT', note: 'High-alert: double-check. Do NOT massage SC site.' },
+  { name: 'Enoxaparin', brand: 'Lovenox', cls: 'LMWH', route: 'SC', alert: true, action: 'Anticoagulant', side: 'Bleeding', note: 'High-alert: do not expel air bubble' },
+  { name: 'Clopidogrel', brand: 'Plavix', cls: 'Antiplatelet', route: 'PO', alert: false, action: 'Prevents platelet aggregation', side: 'Bleeding', note: 'Monitor for bleeding' },
+  { name: 'Amoxicillin', brand: 'Amoxil', cls: 'Penicillin antibiotic', route: 'PO', alert: false, action: 'Bactericidal', side: 'Rash, diarrhea, allergy', note: 'Ask about penicillin allergy' },
+  { name: 'Ceftriaxone', brand: 'Rocephin', cls: 'Cephalosporin', route: 'IM, IV', alert: false, action: 'Bactericidal', side: 'Rash, diarrhea, injection site pain', note: 'Reconstitute per protocol' },
+  { name: 'Azithromycin', brand: 'Zithromax', cls: 'Macrolide', route: 'PO, IV', alert: false, action: 'Bacteriostatic', side: 'GI upset, QT prolongation', note: 'Take 1 hr before or 2 hr after meals' },
+  { name: 'Ciprofloxacin', brand: 'Cipro', cls: 'Fluoroquinolone', route: 'PO, IV', alert: false, action: 'Bactericidal', side: 'Tendon rupture, photosensitivity', note: 'Avoid dairy' },
+  { name: 'Metronidazole', brand: 'Flagyl', cls: 'Antiprotozoal / Antibiotic', route: 'PO, IV', alert: false, action: 'Bactericidal (anaerobes)', side: 'Metallic taste, disulfiram reaction', note: 'No alcohol' },
+  { name: 'Doxycycline', brand: 'Vibramycin', cls: 'Tetracycline', route: 'PO, IV', alert: false, action: 'Bacteriostatic', side: 'Photosensitivity, teeth discoloration', note: 'Avoid in children <8 yrs' },
+  { name: 'Isoniazid (INH)', brand: 'Various', cls: 'Antitubercular', route: 'PO', alert: false, action: 'Bactericidal for TB', side: 'Hepatotoxicity, neuropathy', note: 'Take with pyridoxine' },
+  { name: 'Rifampicin', brand: 'Rifadin', cls: 'Antitubercular', route: 'PO, IV', alert: false, action: 'Bactericidal', side: 'Orange secretions, hepatotoxicity', note: 'Warn about orange urine' },
+  { name: 'Pyrazinamide', brand: 'Various', cls: 'Antitubercular', route: 'PO', alert: false, action: 'Bactericidal', side: 'Hepatotoxicity, hyperuricemia', note: 'Monitor LFTs' },
+  { name: 'Ethambutol', brand: 'Myambutol', cls: 'Antitubercular', route: 'PO', alert: false, action: 'Bacteriostatic', side: 'Optic neuritis', note: 'Report vision changes' },
+  { name: 'Salbutamol', brand: 'Ventolin', cls: 'Beta-2 agonist', route: 'Inhaled, PO, IV', alert: false, action: 'Bronchodilation', side: 'Tachycardia, tremor', note: 'Rinse mouth after use' },
+  { name: 'Montelukast', brand: 'Singulair', cls: 'Leukotriene inhibitor', route: 'PO', alert: false, action: 'Prevents bronchoconstriction', side: 'Headache, mood changes', note: 'Take in the evening' },
+  { name: 'Prednisone', brand: 'Deltasone', cls: 'Corticosteroid', route: 'PO', alert: false, action: 'Anti-inflammatory, immunosuppressant', side: 'Hyperglycemia, osteoporosis', note: 'Taper dose; do not stop abruptly' },
+  { name: 'Dexamethasone', brand: 'Decadron', cls: 'Corticosteroid', route: 'PO, IV, IM', alert: false, action: 'Anti-inflammatory', side: 'Hyperglycemia, infection risk', note: 'Monitor glucose' },
+  { name: 'Diphenhydramine', brand: 'Benadryl', cls: 'Antihistamine', route: 'PO, IV, IM', alert: false, action: 'Blocks histamine', side: 'Drowsiness, dry mouth', note: 'Caution when driving' },
+  { name: 'Cetirizine', brand: 'Zyrtec', cls: 'Antihistamine', route: 'PO', alert: false, action: 'Blocks histamine', side: 'Drowsiness', note: 'Take at night if drowsy' },
+  { name: 'Ondansetron', brand: 'Zofran', cls: 'Antiemetic', route: 'PO, IV, IM', alert: false, action: 'Blocks serotonin (5-HT3)', side: 'Headache, constipation, QT prolongation', note: 'Slow IV push' },
+  { name: 'Metoclopramide', brand: 'Reglan', cls: 'Prokinetic / Antiemetic', route: 'PO, IV, IM', alert: false, action: 'Increases GI motility', side: 'Extrapyramidal symptoms', note: 'Short-term use' },
+  { name: 'Omeprazole', brand: 'Losec', cls: 'Proton pump inhibitor', route: 'PO, IV', alert: false, action: 'Suppresses gastric acid', side: 'Headache, B12 deficiency', note: 'Take before breakfast' },
+  { name: 'Famotidine', brand: 'Pepcid', cls: 'H2 blocker', route: 'PO, IV', alert: false, action: 'Reduces gastric acid', side: 'Headache, dizziness', note: 'Take at bedtime' },
+  { name: 'Loperamide', brand: 'Imodium', cls: 'Antidiarrheal', route: 'PO', alert: false, action: 'Slows gut motility', side: 'Constipation, drowsiness', note: 'Avoid in bloody diarrhea' },
+  { name: 'Bisacodyl', brand: 'Dulcolax', cls: 'Stimulant laxative', route: 'PO, PR', alert: false, action: 'Stimulates bowel movement', side: 'Cramps, diarrhea', note: 'Do not crush enteric-coated' },
+  { name: 'Morphine', brand: 'Various', cls: 'Opioid analgesic', route: 'PO, IV, SC, IM', alert: true, action: 'Binds opioid receptors', side: 'Respiratory depression, sedation, hypotension', note: 'High-alert: double-check. Monitor RR.' },
+  { name: 'Fentanyl', brand: 'Sublimaze', cls: 'Opioid analgesic', route: 'IV, transdermal', alert: true, action: 'Potent opioid agonist', side: 'Respiratory depression, bradycardia', note: 'High-alert: patch rotation' },
+  { name: 'Tramadol', brand: 'Ultram', cls: 'Opioid-like analgesic', route: 'PO', alert: false, action: 'Weak opioid + SNRI', side: 'Dizziness, seizure risk', note: 'Avoid in epilepsy' },
+  { name: 'Diazepam', brand: 'Valium', cls: 'Benzodiazepine', route: 'PO, IV, IM, PR', alert: false, action: 'CNS depressant, anxiolytic', side: 'Sedation, respiratory depression', note: 'Taper; do not stop abruptly' },
+  { name: 'Phenytoin', brand: 'Dilantin', cls: 'Anticonvulsant', route: 'PO, IV', alert: true, action: 'Controls seizures', side: 'Gingival hyperplasia, arrhythmia', note: 'High-alert: slow IV push, NS only' },
+  { name: 'Epinephrine', brand: 'Adrenaline', cls: 'Sympathomimetic', route: 'IM, IV, SC', alert: true, action: 'Vasoconstriction, bronchodilation', side: 'Tachycardia, hypertension', note: 'High-alert: for anaphylaxis' },
+  { name: 'Oxytocin', brand: 'Pitocin', cls: 'Oxytocic', route: 'IV', alert: true, action: 'Uterine contraction', side: 'Hyperstimulation, fetal distress', note: 'High-alert: use infusion pump' },
+  { name: 'Potassium Chloride', brand: 'KCl', cls: 'Electrolyte', route: 'IV', alert: true, action: 'Replaces potassium', side: 'Cardiac arrest if IV push', note: 'High-alert: NEVER IV push. Always dilute.' }
+];
+
+function renderDrugs(main) {
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Reference</p>';
+  html += '<h1>🔍 Drug Database</h1>';
+  html += '<p class="hero-subtitle">' + DRUGS.length + ' drugs with actions, routes, side effects, and high-alert flags.</p>';
+  html += '</div></div>';
+  html += '<div class="card"><div class="form-group" style="margin-bottom:0;">';
+  html += '<input type="text" id="drugSearch" placeholder="🔍 Search by name, class, or brand..." oninput="filterDrugs()" />';
+  html += '</div></div>';
+  html += '<div id="drugResults">' + renderDrugCards(DRUGS) + '</div>';
+  main.innerHTML = html;
+}
+
+function renderDrugCards(list) {
+  if (!list.length) return '<div class="card text-center" style="color:var(--gray);">No matches found.</div>';
+  var html = '<div class="drug-grid">';
+  list.forEach(function(d, i) {
+    html += '<div class="drug-card" onclick="openDrug(' + DRUGS.indexOf(d) + ')">';
+    html += '<div class="drug-name">' + escapeHtml(d.name);
+    if (d.alert) html += '<span class="high-alert-flag">HIGH ALERT</span>';
+    html += '</div>';
+    html += '<div class="drug-brand">' + escapeHtml(d.brand) + '</div>';
+    html += '<span class="drug-class">' + escapeHtml(d.cls) + '</span>';
+    html += '<div style="font-size:0.78rem;color:var(--gray);margin-top:0.5rem;">Route: ' + escapeHtml(d.route) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function filterDrugs() {
+  var q = (document.getElementById('drugSearch').value || '').toLowerCase();
+  var filtered = DRUGS.filter(function(d) {
+    return d.name.toLowerCase().indexOf(q) >= 0 ||
+           d.brand.toLowerCase().indexOf(q) >= 0 ||
+           d.cls.toLowerCase().indexOf(q) >= 0;
+  });
+  document.getElementById('drugResults').innerHTML = renderDrugCards(filtered);
+}
+
+function openDrug(idx) {
+  var d = DRUGS[idx];
+  if (!d) return;
+  var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:1rem;">';
+  html += '<div><div style="font-family:var(--font-head);font-weight:800;font-size:1.4rem;color:var(--primary);">' + escapeHtml(d.name);
+  if (d.alert) html += '<span class="high-alert-flag">HIGH ALERT</span>';
+  html += '</div><div style="font-size:0.85rem;color:var(--gray);">' + escapeHtml(d.brand) + '</div></div>';
+  html += '<button class="btn btn-sm btn-outline" onclick="closeDrugModal()">✕</button></div>';
+  html += '<div style="margin-bottom:1rem;"><span class="drug-class">' + escapeHtml(d.cls) + '</span></div>';
+  html += '<table style="font-size:0.85rem;"><tbody>';
+  html += '<tr><td style="color:var(--gray);width:35%;font-weight:600;">Route</td><td>' + escapeHtml(d.route) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);font-weight:600;">Action</td><td>' + escapeHtml(d.action) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);font-weight:600;">Side Effects</td><td>' + escapeHtml(d.side) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);font-weight:600;">Notes</td><td>' + escapeHtml(d.note) + '</td></tr>';
+  html += '</tbody></table>';
+  if (d.alert) {
+    html += '<div class="callout callout-danger" style="margin-top:1rem;"><strong>🚨 HIGH-ALERT MEDICATION</strong><br>Requires double-check by 2 nurses before administration. Follow ISMP guidelines.</div>';
+  }
+  document.getElementById('drugModalBody').innerHTML = html;
+  document.getElementById('drugModal').classList.add('show');
+}
+function closeDrugModal() { document.getElementById('drugModal').classList.remove('show'); }
+
+/* ============================================================
+   DOSAGE CALCULATOR
+   ============================================================ */
+function renderCalculator(main) {
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Tool</p>';
+  html += '<h1>🧮 Dosage Calculator</h1>';
+  html += '<p class="hero-subtitle">Desired ÷ Stock × Volume = Amount to give</p>';
+  html += '</div></div>';
+  html += '<div class="card">';
+  html += '<div class="form-row">';
+  html += '<div class="form-group"><label>Desired Dose *</label><input type="number" id="calc_desired" placeholder="500" step="any" /></div>';
+  html += '<div class="form-group"><label>Stock Dose *</label><input type="number" id="calc_stock" placeholder="250" step="any" /></div>';
+  html += '</div>';
+  html += '<div class="form-row">';
+  html += '<div class="form-group"><label>Volume Available *</label><input type="number" id="calc_volume" placeholder="1" step="any" /></div>';
+  html += '<div class="form-group"><label>Unit (optional)</label><input type="text" id="calc_unit" placeholder="mL" /></div>';
+  html += '</div>';
+  html += '<button class="btn btn-primary btn-lg btn-block" onclick="calculateDose()">🧮 Calculate</button>';
+  html += '<div id="calcResultArea"></div></div>';
+  html += '<div class="card"><div class="card-header"><div class="card-title">📖 Example Problems</div></div>';
+  html += '<div class="callout callout-info"><strong>Tablet:</strong> Order 500 mg; stock 250 mg/tab. → 500 ÷ 250 = <strong>2 tablets</strong></div>';
+  html += '<div class="callout callout-info"><strong>Liquid:</strong> Order 250 mg; stock 125 mg/5 mL. → 250 ÷ 125 × 5 = <strong>10 mL</strong></div>';
+  html += '<div class="callout callout-info"><strong>Injection:</strong> Order 500 mg; stock 250 mg/mL. → 500 ÷ 250 × 1 = <strong>2 mL</strong></div>';
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+function calculateDose() {
+  var d = parseFloat(document.getElementById('calc_desired').value);
+  var s = parseFloat(document.getElementById('calc_stock').value);
+  var v = parseFloat(document.getElementById('calc_volume').value);
+  var u = document.getElementById('calc_unit').value || 'unit(s)';
+  var resultEl = document.getElementById('calcResultArea');
+  if (!d || !s || !v || s === 0) {
+    resultEl.innerHTML = '<div class="callout callout-warning" style="margin-top:1rem;">Please enter all values.</div>';
+    return;
+  }
+  var answer = (d / s) * v;
+  var working = d + ' ÷ ' + s + ' × ' + v + ' = ' + answer.toFixed(2);
+  resultEl.innerHTML = '<div class="calc-result" style="margin-top:1.25rem;">' +
+    '<div class="calc-label">Amount to Administer</div>' +
+    '<div class="calc-value">' + answer.toFixed(2) + ' ' + escapeHtml(u) + '</div>' +
+    '<div style="font-size:0.8rem;color:var(--primary-dark);margin-top:0.5rem;">Formula: ' + escapeHtml(working) + '</div>' +
+    '</div>' +
+    '<div class="callout callout-info" style="margin-top:1rem;"><strong>🧠 Always double-check</strong> calculations before administration. Have a second nurse verify high-alert medications.</div>';
+}
+
+/* ============================================================
+   MAR PRACTICE
+   ============================================================ */
+var MAR_CASES = [
+  {
+    id: 1,
+    doctorOrder: 'Metformin 500 mg PO BID',
+    patient: 'Juan Dela Cruz, 55 y/o M',
+    correct: { med: 'Metformin', dose: '500 mg', route: 'PO', freq: 'BID' }
+  },
+  {
+    id: 2,
+    doctorOrder: 'Ceftriaxone 1 g IM q24h',
+    patient: 'Maria Santos, 30 y/o F',
+    correct: { med: 'Ceftriaxone', dose: '1 g', route: 'IM', freq: 'q24h' }
+  },
+  {
+    id: 3,
+    doctorOrder: 'Omeprazole 40 mg IV OD',
+    patient: 'Pedro Reyes, 60 y/o M',
+    correct: { med: 'Omeprazole', dose: '40 mg', route: 'IV', freq: 'OD' }
+  },
+  {
+    id: 4,
+    doctorOrder: 'Paracetamol 500 mg PO PRN Fever',
+    patient: 'Ana Lopez, 28 y/o F',
+    correct: { med: 'Paracetamol', dose: '500 mg', route: 'PO', freq: 'PRN' }
+  },
+  {
+    id: 5,
+    doctorOrder: 'Epinephrine 0.3 mg IM STAT',
+    patient: 'Carlos Tan, 40 y/o M',
+    correct: { med: 'Epinephrine', dose: '0.3 mg', route: 'IM', freq: 'STAT' }
+  }
+];
+
+function renderMAR(main) {
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Practice</p>';
+  html += '<h1>📋 MAR Practice Simulator</h1>';
+  html += '<p class="hero-subtitle">Read the physician order and transcribe it to the MAR.</p>';
+  html += '</div></div>';
+  MAR_CASES.forEach(function(c) {
+    html += '<div class="card"><div class="card-header"><div class="card-title">Case ' + c.id + '</div></div>';
+    html += '<p><strong>Patient:</strong> ' + escapeHtml(c.patient) + '</p>';
+    html += '<div class="callout callout-info"><strong>Physician Order:</strong> ' + escapeHtml(c.doctorOrder) + '</div>';
+    html += '<div class="table-wrap" style="margin-top:1rem;"><table>';
+    html += '<thead><tr><th>Medication</th><th>Dose</th><th>Route</th><th>Frequency</th></tr></thead><tbody><tr>';
+    html += '<td><input type="text" id="mar' + c.id + '_med" style="width:100%;padding:0.4rem;border:1px solid var(--gray-light);border-radius:6px;" /></td>';
+    html += '<td><input type="text" id="mar' + c.id + '_dose" style="width:100%;padding:0.4rem;border:1px solid var(--gray-light);border-radius:6px;" /></td>';
+    html += '<td><input type="text" id="mar' + c.id + '_route" style="width:100%;padding:0.4rem;border:1px solid var(--gray-light);border-radius:6px;" /></td>';
+    html += '<td><input type="text" id="mar' + c.id + '_freq" style="width:100%;padding:0.4rem;border:1px solid var(--gray-light);border-radius:6px;" /></td>';
+    html += '</tr></tbody></table></div>';
+    html += '<button class="btn btn-primary btn-sm mt-1" onclick="checkMAR(' + c.id + ')">✓ Check</button>';
+    html += '<div id="marResult' + c.id + '" class="mt-1"></div>';
+    html += '</div>';
+  });
+  main.innerHTML = html;
+}
+
+function checkMAR(id) {
+  var c = MAR_CASES.find(function(x) { return x.id === id; });
+  if (!c) return;
+  var med = (document.getElementById('mar' + id + '_med').value || '').trim();
+  var dose = (document.getElementById('mar' + id + '_dose').value || '').trim();
+  var route = (document.getElementById('mar' + id + '_route').value || '').trim().toUpperCase();
+  var freq = (document.getElementById('mar' + id + '_freq').value || '').trim().toUpperCase();
+  var corrects = [];
+  if (med.toLowerCase() === c.correct.med.toLowerCase()) corrects.push('Medication');
+  if (dose.toLowerCase() === c.correct.dose.toLowerCase()) corrects.push('Dose');
+  if (route === c.correct.route.toUpperCase()) corrects.push('Route');
+  if (freq === c.correct.freq.toUpperCase()) corrects.push('Frequency');
+  var allCorrect = corrects.length === 4;
+  var html = '<div class="callout callout-' + (allCorrect ? 'success' : 'warning') + '">';
+  html += '<strong>' + (allCorrect ? '🎉 Perfect!' : '⚠️ ' + corrects.length + '/4 correct') + '</strong><br>';
+  html += 'Correct answers: <strong>' + c.correct.med + ' • ' + c.correct.dose + ' • ' + c.correct.route + ' • ' + c.correct.freq + '</strong>';
+  html += '</div>';
+  document.getElementById('marResult' + id).innerHTML = html;
+}
+
+/* ============================================================
+   CHECKLISTS (Return Demo)
+   ============================================================ */
+var CHECKLIST_ORAL = {
+  title: 'Return Demonstration — Oral, Ophthalmic & Otic Medication',
+  sections: [
+    { title: 'Preparation', steps: [
+      'Verify allergies to medications.',
+      'Assess client\'s ability to swallow (for oral meds).',
+      'Check for vomiting, diarrhea, or conditions affecting absorption.',
+      'Assess eye for lesions, discharge, swelling, redness (ophthalmic).',
+      'Assess ear for redness, abrasions, discharge (otic).',
+      'Review client\'s knowledge of medication and learning needs.',
+      'Perform specific assessments required for the medication (e.g., vital signs).',
+      'Determine if assessment data affect medication administration.',
+      'Verify MAR (client name, drug, dose, route, time, allergies).',
+      'Review drug action, side effects, interactions, normal dose, expiration date.',
+      'Check vital signs and laboratory results when relevant.'
+    ]},
+    { title: 'Planning & Equipment', steps: [
+      'Gather and assemble equipment (MAR, dispensing system, cups, droppers, gloves, sponges, applicators, water, pill crusher).',
+      'Read the medication label three times (from storage, before withdrawing, after withdrawing).',
+      'Check expiration date.'
+    ]},
+    { title: 'Implementation — Introduction', steps: [
+      'Introduce yourself and identify client using agency protocol.',
+      'Explain procedure, purpose, and what client should expect.',
+      'Perform hand hygiene. Follow infection control procedures. Provide privacy.'
+    ]},
+    { title: 'Drug Preparation — Oral (Tablets/Capsules)', steps: [
+      'Place unit-dose tablets or capsules in a medicine cup without removing wrapper until at bedside.',
+      'If using stock bottles, pour the required number into bottle cap, then into cup without touching medication.',
+      'Break scored tablets only if necessary using a tablet cutter.',
+      'Crush tablets only if allowed and mix with small amount of soft food.'
+    ]},
+    { title: 'Drug Preparation — Oral (Liquids)', steps: [
+      'Shake bottle well before pouring.',
+      'Hold bottle with label facing palm and pour away from label.',
+      'Place medication cup at eye level and measure at bottom of meniscus.',
+      'Wipe lip of bottle before recapping.',
+      'For doses <5 mL, use an oral syringe labeled "PO".'
+    ]},
+    { title: 'Drug Preparation — Ophthalmic', steps: [
+      'Verify medication name, strength, and number of drops.',
+      'If using a dropper, draw the correct number of drops into shaft.',
+      'If using ointment, discard the first bead before application.'
+    ]},
+    { title: 'Drug Preparation — Otic', steps: [
+      'Warm medication container by holding in hand or placing in warm water briefly.',
+      'Partially fill dropper with the prescribed amount.'
+    ]},
+    { title: 'Patient Preparation — Oral', steps: [
+      'Assist client to a sitting position or side-lying if unable to sit.',
+      'Check identification and explain medication purpose and effects.'
+    ]},
+    { title: 'Patient Preparation — Ophthalmic', steps: [
+      'Position client sitting or lying with head tilted back.',
+      'Give a sterile absorbent sponge to hold under the eye.'
+    ]},
+    { title: 'Patient Preparation — Otic', steps: [
+      'Position client side-lying with affected ear facing up.',
+      'Explain that they may feel warmth or fullness when drops are instilled.'
+    ]},
+    { title: 'Clean the Area — Ophthalmic', steps: [
+      'Put on clean gloves.',
+      'Use sterile cotton balls moistened with sterile saline to wipe from inner canthus to outer canthus.'
+    ]},
+    { title: 'Clean the Area — Otic', steps: [
+      'If infection is suspected, wear gloves.',
+      'Use cotton-tipped applicators to clean pinna and meatus.'
+    ]},
+    { title: 'Drug Administration — Oral', steps: [
+      'Administer medication at correct time (within 30 min before or after scheduled).',
+      'Give water or preferred juice to swallow medication.',
+      'Check for food–drug incompatibilities before using juice.',
+      'If client cannot hold pill cup, place medication in mouth one tablet/capsule at a time.',
+      'For clients with swallowing difficulty, place medication on the back of the tongue before drinking water.',
+      'If medication tastes unpleasant, offer ice chips first or mix with juice, applesauce, or bread if allowed.',
+      'If client questions medication, verify original order before giving.',
+      'Stay with client until all medications are swallowed.'
+    ]},
+    { title: 'Drug Administration — Ophthalmic', steps: [
+      'Check ophthalmic medication for name, strength, and number of drops.',
+      'Draw correct amount into dropper; if using ointment, discard first bead.',
+      'Ask client to look up and give a sterile sponge.',
+      'Expose lower conjunctival sac by gently pulling down the cheek.',
+      'Stabilize hand on client\'s forehead and instill drops onto outer third of sac, holding dropper 1–2 cm above.',
+      'For ointment, apply 2 cm strip from inner to outer canthus.',
+      'Instruct client to close eyes gently without squeezing.',
+      'For liquid meds, press nasolacrimal duct for 30 seconds.'
+    ]},
+    { title: 'Drug Administration — Otic', steps: [
+      'Warm medication container in hand or warm water briefly.',
+      'Fill dropper with prescribed amount.',
+      'Straighten ear canal by pulling pinna upward and backward.',
+      'Instill drops along side of canal, not directly on eardrum.',
+      'Press tragus gently a few times.',
+      'Keep client side-lying for about 5 minutes.',
+      'Insert small piece of cotton loosely at meatus for 15–20 minutes. Do not push inside.'
+    ]},
+    { title: 'Evaluation', steps: [
+      'Ensure client comfort and safety after administration.',
+      'Document medication, dose, time, route, and client response.',
+      'Record any refusal or omission with reason and action taken.',
+      'Discard used supplies properly.',
+      'Evaluate effects of medication at appropriate time.',
+      'Observe for adverse reactions or side effects and report promptly.'
+    ]}
+  ]
+};
+
+var CHECKLIST_PARENTERAL = {
+  title: 'Return Demonstration — Parenteral Medication (ID, SC, IM)',
+  sections: [
+    { title: 'Preparation', steps: [
+      'Verify allergies to medications.',
+      'Verify MAR (client name, drug, dose, route, time, allergies).',
+      'Review drug action, side effects, interactions, normal dose, expiration date.',
+      'Check vital signs and laboratory results when relevant.',
+      'Gather and assemble equipment (syringes, needles, alcohol swabs, sharps container, gloves).',
+      'Read medication label three times (from storage, before withdrawing, after withdrawing).',
+      'Check expiration date.'
+    ]},
+    { title: 'Implementation — Introduction', steps: [
+      'Perform hand hygiene. Follow infection control procedures. Provide privacy.',
+      'Introduce yourself and identify client using agency protocol.',
+      'Explain procedure and expected sensation (expected pain, appearance of wheal for ID route).'
+    ]},
+    { title: 'Drug Preparation — Ampule', steps: [
+      'Flick the ampule\'s upper stem or shake it like a mercury thermometer.',
+      'Place sterile gauze on ampule neck and break top with dot facing toward you, breaking away from you.',
+      'Dispose of ampule top in sharps container.',
+      'Attach a filter needle to the syringe.',
+      'Remove filter needle cap and insert into ampule center without touching rim.',
+      'Withdraw required dose, holding ampule slightly on its side.',
+      'Replace filter needle with a regular needle and secure cap before injection.'
+    ]},
+    { title: 'Drug Preparation — Vial', steps: [
+      'Prepare the medication vial.',
+      'Mix solution by rolling the vial between palms, not shaking.',
+      'Remove protective cap or clean rubber stopper with antiseptic in circular motion.',
+      'Attach a filter needle to the syringe and ensure it is secure.',
+      'Draw air into syringe equal to medication volume.',
+      'Insert needle into upright vial through center of stopper without contaminating it.',
+      'Inject air with bevel above liquid surface.',
+      'Invert vial at eye level, keep needle tip below fluid, and withdraw prescribed dose.',
+      'Remove needle and recap using scoop method.',
+      'Tap syringe to remove air bubbles.',
+      'Replace filter needle with regular needle of correct gauge and length before injection.'
+    ]},
+    { title: 'Intradermal (ID)', steps: [
+      'Provide privacy and wear clean gloves.',
+      'Select an inner forearm area free of heavy hair or pigmentation.',
+      'Cleanse site with alcohol swab using circular motion outward.',
+      'Allow skin to dry.',
+      'Remove needle cap with non-dominant hand.',
+      'Stretch skin taut with non-dominant hand.',
+      'Hold needle almost flat, bevel up.',
+      'Insert about 1/8 inch so tip is visible under skin.',
+      'Stabilize syringe and inject slowly to form a small wheal.',
+      'Withdraw needle at same angle.',
+      'Do not massage site.',
+      'Discard needle and syringe in sharps container without recapping.',
+      'Remove gloves and perform hand hygiene.',
+      'Circle site with ink for observation.',
+      'Label tape with medication and time for reaction check (usually 30 min).'
+    ]},
+    { title: 'Subcutaneous (SC)', steps: [
+      'Select site free of tenderness, swelling, scarring, or inflammation. Avoid frequently used areas.',
+      'Clean site with antiseptic swab in circular motion outward about 5 cm.',
+      'Hold swab between fingers or place above site.',
+      'Remove needle cap by pulling straight off.',
+      'For 45° angle: hold syringe with palm sideways or upward. For 90° angle: hold syringe with palm downward.',
+      'Pinch skin if less adipose tissue; spread skin if more than ½ inch adipose.',
+      'Insert needle firmly at chosen angle.',
+      'After insertion, stabilize syringe and inject slowly with steady pressure.',
+      'Keep needle in place for 5 seconds.',
+      'Withdraw needle smoothly along insertion line while pressing skin with non-dominant hand.',
+      'If bleeding occurs, apply pressure with sterile swab or gauze.'
+    ]},
+    { title: 'Intramuscular (IM)', steps: [
+      'Assist client into position for chosen site (ventrogluteal, vastus lateralis, deltoid, dorsogluteal).',
+      'Locate site, ensure no tenderness, lumps, or nodules.',
+      'Wear disposable gloves.',
+      'Clean site with antiseptic swab in circular motion outward about 5 cm.',
+      'Remove needle cap by pulling straight off.',
+      'Displace skin using Z-track or spread skin with non-dominant hand.',
+      'Hold syringe in dominant hand, pierce skin quickly at 90° angle.',
+      'Stabilize syringe, aspirate slowly. If blood appears, discard and restart with new setup at another site. If no blood, inject slowly (10 sec per mL).',
+      'Withdraw needle steadily, release displaced tissue if Z-track used.',
+      'Apply gentle pressure with dry cotton ball.',
+      'Do not recap needle. Discard in sharps container.',
+      'Remove gloves and perform hand hygiene.'
+    ]},
+    { title: 'Evaluation', steps: [
+      'Document medication, dose, route, site, time, and assessments.',
+      'Observe for reaction and expected effect at expected time of action.'
+    ]}
+  ]
+};
+
+function renderChecklists(main) {
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Return Demonstration</p>';
+  html += '<h1>✅ Skills Checklists</h1>';
+  html += '<p class="hero-subtitle">Track your return demonstration progress. Your instructor can verify steps in class.</p>';
+  html += '</div></div>';
+  html += '<div class="card"><div class="card-header"><div><div class="card-title">' + CHECKLIST_ORAL.title + '</div>';
+  var oralPct = checklistPct('oral', CHECKLIST_ORAL);
+  html += '<div class="card-subtitle">Self-check: ' + oralPct.self + '% • Instructor: ' + oralPct.inst + '%</div></div></div>';
+  html += renderChecklist(CHECKLIST_ORAL, 'oral');
+  html += '</div>';
+  html += '<div class="card"><div class="card-header"><div><div class="card-title">' + CHECKLIST_PARENTERAL.title + '</div>';
+  var parPct = checklistPct('parenteral', CHECKLIST_PARENTERAL);
+  html += '<div class="card-subtitle">Self-check: ' + parPct.self + '% • Instructor: ' + parPct.inst + '%</div></div></div>';
+  html += renderChecklist(CHECKLIST_PARENTERAL, 'parenteral');
+  html += '</div>';
+  html += '<div class="card"><div class="callout callout-info"><strong>📋 How it works:</strong> Check off steps as you perform them (self-check). Your instructor can also verify steps during your return demonstration. Both checkmarks are saved to your progress.</div></div>';
+  main.innerHTML = html;
+}
+
+function checklistPct(key, checklist) {
+  var total = 0;
+  checklist.sections.forEach(function(sec) { total += sec.steps.length; });
+  var state = APP.state.checklists[key] || {};
+  var selfCount = Object.values(state).filter(function(v) { return v && v.self; }).length;
+  var instCount = Object.values(state).filter(function(v) { return v && v.instructor; }).length;
+  return {
+    self: total ? Math.round((selfCount / total) * 100) : 0,
+    inst: total ? Math.round((instCount / total) * 100) : 0
+  };
+}
+
+function renderChecklist(checklist, key) {
+  var html = '';
+  var stepIdx = 0;
+  checklist.sections.forEach(function(sec, si) {
+    html += '<div class="checklist-section-title">' + escapeHtml(sec.title) + '</div>';
+    sec.steps.forEach(function(step) {
+      var id = key + '_' + stepIdx;
+      var state = (APP.state.checklists[key] && APP.state.checklists[key][id]) || {};
+      var selfCls = state.self ? 'checked' : '';
+      var instCls = state.instructor ? 'instructor-checked' : '';
+      html += '<div class="checklist-item ' + (state.instructor ? instCls : selfCls) + '">';
+      html += '<input type="checkbox" ' + (state.self ? 'checked' : '') + ' onchange="toggleChecklist(\'' + key + '\',\'' + id + '\',\'self\')" title="Self-check" />';
+      html += '<input type="checkbox" ' + (state.instructor ? 'checked' : '') + ' onchange="toggleChecklist(\'' + key + '\',\'' + id + '\',\'instructor\')" title="Instructor verification" style="accent-color:var(--primary);" />';
+      html += '<span class="step-num">' + (++stepIdx) + '.</span>';
+      html += '<span style="flex:1;">' + escapeHtml(step) + '</span>';
+      html += '</div>';
+    });
+  });
+  return html;
+}
+
+function toggleChecklist(key, id, who) {
+  if (!APP.state.checklists[key]) APP.state.checklists[key] = {};
+  if (!APP.state.checklists[key][id]) APP.state.checklists[key][id] = {};
+  APP.state.checklists[key][id][who] = !APP.state.checklists[key][id][who];
+  saveState();
+  if (APP.state.student) registerSavedSession(buildStudentRecord());
+  renderChecklists(document.getElementById('mainContent'));
+}
+
+/* ============================================================
+   GAMES
+   ============================================================ */
+var GAME_DATA = {
+  route: {
+    name: 'Route Racer', icon: '🏁',
+    desc: 'Match each drug to its correct route of administration.',
+    rounds: [
+      { item: 'Metformin', answer: 'PO', options: ['PO','IM','IV','SC'] },
+      { item: 'Ceftriaxone', answer: 'IM / IV', options: ['PO','IM / IV','SC','Topical'] },
+      { item: 'Insulin', answer: 'SC', options: ['PO','IM','SC','IV'] },
+      { item: 'Nitroglycerin patch', answer: 'Transdermal', options: ['PO','Transdermal','SC','IM'] },
+      { item: 'Epinephrine (anaphylaxis)', answer: 'IM', options: ['PO','IM','Topical','Otic'] },
+      { item: 'Timolol eye drops', answer: 'Ophthalmic', options: ['PO','Ophthalmic','Otic','Topical'] },
+      { item: 'Ear drops for otitis externa', answer: 'Otic', options: ['PO','Ophthalmic','Otic','IV'] },
+      { item: 'Hydrocortisone cream', answer: 'Topical', options: ['PO','Topical','SC','IV'] },
+      { item: 'Morphine (severe pain, ER)', answer: 'IV', options: ['PO','IM','IV','Topical'] },
+      { item: 'TB skin test', answer: 'Intradermal', options: ['IM','Intradermal','SC','IV'] }
+    ]
+  },
+  rights: {
+    name: 'Right or Wrong', icon: '⚠️',
+    desc: 'Identify which of the 10 Rights is being violated.',
+    rounds: [
+      { scenario: 'Nurse gives Paracetamol to Bed 12 instead of Bed 21.', answer: 'Right Patient', options: ['Right Patient','Right Drug','Right Dose','Right Time'] },
+      { scenario: 'Nurse gives Amlodipine instead of Losartan.', answer: 'Right Medication', options: ['Right Patient','Right Medication','Right Dose','Right Route'] },
+      { scenario: 'Nurse gives 2 tablets instead of 1.', answer: 'Right Dose', options: ['Right Dose','Right Drug','Right Time','Right Route'] },
+      { scenario: 'Nurse gives oral meds IV.', answer: 'Right Route', options: ['Right Route','Right Dose','Right Drug','Right Time'] },
+      { scenario: 'Nurse gives 8 AM dose at 10 AM without reason.', answer: 'Right Time', options: ['Right Time','Right Dose','Right Drug','Right Patient'] },
+      { scenario: 'Nurse forgets to chart the dose.', answer: 'Right Documentation', options: ['Right Documentation','Right Dose','Right Time','Right Evaluation'] },
+      { scenario: 'Nurse gives Digoxin without checking apical pulse.', answer: 'Right Assessment', options: ['Right Assessment','Right Dose','Right Drug','Right Time'] },
+      { scenario: 'Nurse gives a medication the patient refused.', answer: 'Right to Refuse', options: ['Right to Refuse','Right Patient','Right Dose','Right Route'] },
+      { scenario: 'Nurse doesn\'t explain how to take the medication.', answer: 'Right Education', options: ['Right Education','Right Documentation','Right Evaluation','Right Time'] },
+      { scenario: 'Nurse doesn\'t assess response after giving PRN analgesic.', answer: 'Right Evaluation', options: ['Right Evaluation','Right Time','Right Dose','Right Documentation'] }
+    ]
+  },
+  dosage: {
+    name: 'Dosage Duel', icon: '🧮',
+    desc: 'Solve each dosage calculation quickly and accurately.',
+    rounds: [
+      { q: 'Order 500 mg; stock 250 mg/tab.', answer: '2 tablets', options: ['1 tablet','2 tablets','3 tablets','0.5 tablet'] },
+      { q: 'Order 250 mg; stock 125 mg/5 mL.', answer: '10 mL', options: ['5 mL','10 mL','15 mL','20 mL'] },
+      { q: 'Order 500 mg; stock 250 mg/mL.', answer: '2 mL', options: ['1 mL','2 mL','2.5 mL','3 mL'] },
+      { q: 'Order 1000 mg; stock 500 mg/tab.', answer: '2 tablets', options: ['1 tablet','2 tablets','3 tablets','4 tablets'] },
+      { q: 'Order 0.5 mg; stock 0.25 mg/tab.', answer: '2 tablets', options: ['1 tablet','2 tablets','3 tablets','4 tablets'] },
+      { q: 'Order 300 mg; stock 100 mg/5 mL.', answer: '15 mL', options: ['5 mL','10 mL','15 mL','20 mL'] },
+      { q: 'Order 100 mg; stock 50 mg/mL.', answer: '2 mL', options: ['0.5 mL','1 mL','2 mL','3 mL'] },
+      { q: 'Order 750 mg; stock 250 mg/tab.', answer: '3 tablets', options: ['1 tablet','2 tablets','3 tablets','4 tablets'] }
+    ]
+  },
+  order: {
+    name: 'Order Interpreter', icon: '📋',
+    desc: 'Interpret the physician order correctly.',
+    rounds: [
+      { q: '"Metformin 500 mg PO BID" — How many times per day?', answer: 'Twice a day', options: ['Once a day','Twice a day','Three times a day','Four times a day'] },
+      { q: '"Amlodipine 5 mg PO OD" — Frequency?', answer: 'Once a day', options: ['Once a day','Twice a day','Every other day','PRN'] },
+      { q: '"Ceftriaxone 1 g IM q24h" — Frequency?', answer: 'Every 24 hours', options: ['Every 8 hours','Every 12 hours','Every 24 hours','Once only'] },
+      { q: '"Paracetamol 500 mg PO PRN fever" — When given?', answer: 'As needed for fever', options: ['Every day','As needed for fever','Once','STAT'] },
+      { q: '"Epinephrine 0.3 mg IM STAT" — When given?', answer: 'Immediately', options: ['Once daily','Immediately','PRN','Within 30 min'] },
+      { q: '"TID" means:', answer: 'Three times a day', options: ['Once a day','Twice a day','Three times a day','Four times a day'] },
+      { q: '"QID" means:', answer: 'Four times a day', options: ['Once a day','Twice a day','Three times a day','Four times a day'] },
+      { q: '"q4h" means:', answer: 'Every 4 hours', options: ['Every 2 hours','Every 4 hours','Every 6 hours','Every 8 hours'] }
+    ]
+  },
+  safety: {
+    name: 'Safety Scanner', icon: '🚨',
+    desc: 'Identify the safest action for each scenario.',
+    rounds: [
+      { q: 'Physician order is illegible.', answer: 'Clarify with prescriber', options: ['Guess','Clarify with prescriber','Skip dose','Ask family'] },
+      { q: 'Client refuses medication.', answer: 'Respect decision and document', options: ['Force meds','Respect decision and document','Report to family','Skip documentation'] },
+      { q: 'Two medications look alike.', answer: 'Read label 3 times & double-check', options: ['Give anyway','Read label 3 times & double-check','Administer IV','Skip'] },
+      { q: 'High-alert medication ordered.', answer: 'Double-check with 2nd nurse', options: ['Give alone','Double-check with 2nd nurse','Fast IV push','Skip'] },
+      { q: 'Wrong dose already given.', answer: 'Monitor and report immediately', options: ['Hide it','Monitor and report immediately','Wait 1 hour','Give antidote'] },
+      { q: 'Client has penicillin allergy; order is Amoxicillin.', answer: 'Hold and notify prescriber', options: ['Give anyway','Hold and notify prescriber','Ask family','Give half dose'] },
+      { q: 'Client questions a medication.', answer: 'Verify order before giving', options: ['Reassure','Verify order before giving','Give anyway','Skip'] },
+      { q: 'Sudden SOB after IV med.', answer: 'Stop infusion and assess', options: ['Continue','Stop infusion and assess','Increase rate','Document'] }
+    ]
+  }
+};
+
+function renderGames(main) {
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Mastery</p>';
+  html += '<h1>🎮 Mastery Games</h1>';
+  html += '<p class="hero-subtitle">Score ≥90% on all 5 games to unlock the Capstone Exam.</p>';
+  html += '</div></div>';
+  html += '<div class="unit-grid">';
+  Object.keys(GAME_DATA).forEach(function(key) {
+    var g = GAME_DATA[key];
+    var best = getGameBestScore(key);
+    var done = best >= 90;
+    html += '<div class="unit-card ' + (done ? 'completed' : '') + '" onclick="startGame(\'' + key + '\')">';
+    html += '<div class="unit-icon" style="background:var(--purple-light);font-size:1.5rem;">' + g.icon + '</div>';
+    html += '<div class="unit-num">Mastery Game</div>';
+    html += '<div class="unit-title">' + g.name + '</div>';
+    html += '<div class="unit-desc">' + g.desc + '</div>';
+    html += '<div class="unit-status"><span><span class="status-dot status-' + (done ? 'complete' : best > 0 ? 'progress' : 'pending') + '"></span>' + (done ? 'Mastered • ' + best + '%' : best > 0 ? 'In Progress • ' + best + '%' : 'Not played') + '</span></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+var activeGame = null;
+function startGame(key) {
+  activeGame = { key: key, round: 0, correct: 0, total: 0 };
+  renderGameRound();
+}
+
+function renderGameRound() {
+  var main = document.getElementById('mainContent');
+  var key = activeGame.key;
+  var g = GAME_DATA[key];
+  var data = g.rounds;
+  var item = data[activeGame.round];
+  var prompt = item.item || item.scenario || item.q;
+  var options = item.options;
+
+  var html = '<div class="card fade-in">';
+  html += '<div class="card-header"><div><div class="card-title">' + g.icon + ' ' + g.name + '</div>';
+  html += '<div class="card-subtitle">Round ' + (activeGame.round + 1) + ' of ' + data.length + '</div></div></div>';
+  html += '<div class="callout callout-info" style="font-size:1rem;font-weight:600;">' + escapeHtml(prompt) + '</div>';
+  html += '<div id="gameOpts">';
+  options.forEach(function(o, idx) {
+    html += '<button class="quiz-opt" onclick="answerGame(' + idx + ')" data-idx="' + idx + '">' + escapeHtml(o) + '</button>';
+  });
+  html += '</div>';
+  html += '<div id="gameFeedback"></div>';
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+function answerGame(idx) {
+  var key = activeGame.key;
+  var g = GAME_DATA[key];
+  var data = g.rounds;
+  var item = data[activeGame.round];
+  var choice = item.options[idx];
+  var correct = choice === item.answer;
+  activeGame.total++;
+  if (correct) activeGame.correct++;
+
+  var container = document.getElementById('gameOpts');
+  var siblings = container.querySelectorAll('.quiz-opt');
+  siblings.forEach(function(s) { s.disabled = true; });
+  var btn = container.querySelector('.quiz-opt[data-idx="' + idx + '"]');
+  if (btn) {
+    if (correct) btn.classList.add('correct');
+    else btn.classList.add('wrong');
+  }
+  siblings.forEach(function(s) {
+    if (s.textContent.trim() === item.answer && s !== btn) {
+      s.classList.add('correct');
+    }
+  });
+
+  var fb = document.getElementById('gameFeedback');
+  fb.innerHTML = '<div class="callout callout-' + (correct ? 'success' : 'danger') + '" style="margin-top:0.75rem;">' +
+    (correct ? '✅ Correct!' : '❌ Incorrect. Correct answer: <strong>' + escapeHtml(item.answer) + '</strong>') + '</div>';
+
+  setTimeout(function() {
+    activeGame.round++;
+    if (activeGame.round >= data.length) {
+      finishGame();
+    } else {
+      renderGameRound();
+    }
+  }, 1100);
+}
+
+function finishGame() {
+  var main = document.getElementById('mainContent');
+  var key = activeGame.key;
+  var pct = Math.round((activeGame.correct / activeGame.total) * 100);
+  var pass = pct >= 90;
+
+  if (!APP.state.games[key]) APP.state.games[key] = [];
+  APP.state.games[key].push(pct);
+  saveState();
+  if (APP.state.student) registerSavedSession(buildStudentRecord());
+
+  var html = '<div class="card fade-in text-center" style="padding:2.5rem 1.5rem;">';
+  html += '<div style="font-size:5rem;margin-bottom:1rem;">' + (pass ? '🏆' : '📋') + '</div>';
+  html += '<h1 style="color:' + (pass ? 'var(--secondary)' : 'var(--accent)') + ';margin-bottom:0.5rem;">';
+  html += (pass ? 'Game Mastered!' : 'Keep Practicing') + '</h1>';
+  html += '<p style="font-size:1.75rem;font-weight:800;color:var(--primary);margin:1rem 0;">' + activeGame.correct + '/' + activeGame.total + '</p>';
+  html += '<p style="color:var(--gray);">(' + pct + '%)</p>';
+  html += '<div class="callout callout-' + (pass ? 'success' : 'warning') + '" style="margin-top:1rem;">';
+  html += pass ? '✅ You reached 90%!' : '⚠️ You need 90% to master this game.';
+  html += '</div>';
+  html += '<div style="display:flex;gap:0.75rem;margin-top:1rem;justify-content:center;flex-wrap:wrap;">';
+  html += '<button class="btn btn-primary" onclick="startGame(\'' + key + '\')">🔄 Retry</button>';
+  html += '<button class="btn btn-outline" onclick="navigate(\'games\')">← All Games</button>';
+  html += '</div></div>';
+  main.innerHTML = html;
+  activeGame = null;
+}
+
+/* ============================================================
+   LEADERBOARD
+   ============================================================ */
+function renderLeaderboard(main) {
+  var sessions = loadSavedSessions();
+  var rows = sessions.map(function(s) {
+    var pct = calcProgressPct(s.progress || {});
+    var avg = calcAvg(s.quizAttempts || {});
+    var gamesTotal = 0, gamesCount = 0;
+    Object.keys(s.games || {}).forEach(function(k) {
+      var arr = s.games[k];
+      if (arr && arr.length) { gamesTotal += Math.max.apply(null, arr); gamesCount++; }
+    });
+    var gamesAvg = gamesCount ? Math.round(gamesTotal / gamesCount) : 0;
+    var examPct = (s.exam && s.exam.percentage) || 0;
+    var composite = Math.round(pct * 0.35 + avg * 0.25 + gamesAvg * 0.2 + examPct * 0.2);
+    return { name: s.student.fullName, section: s.student.section, composite: composite, pct: pct, avg: avg, gamesAvg: gamesAvg, examPct: examPct };
+  });
+  rows.sort(function(a, b) { return b.composite - a.composite; });
+  // Anonymize: show initials + section only
+  rows = rows.slice(0, 20);
+
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Friendly Competition</p>';
+  html += '<h1>🏆 Leaderboard</h1>';
+  html += '<p class="hero-subtitle">Anonymous ranking — only initials and section are shown.</p>';
+  html += '</div></div>';
+  if (!rows.length) {
+    html += '<div class="card text-center" style="padding:2rem;color:var(--gray);">No data yet. Start learning to appear here!</div>';
+  } else {
+    html += '<div class="card">';
+    rows.forEach(function(r, i) {
+      var rank = i + 1;
+      var cls = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+      var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
+      var initials = initialsOf(r.name);
+      html += '<div class="leader-row ' + cls + '">';
+      html += '<div class="leader-rank">' + medal + '</div>';
+      html += '<div class="leader-name">' + escapeHtml(initials) + ' <small>' + escapeHtml(r.section || '') + '</small></div>';
+      html += '<div class="leader-score">' + r.composite + '%</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="callout callout-info" style="margin-top:1rem;"><strong>Note:</strong> Scores are computed from unit progress (35%), quiz average (25%), game average (20%), and exam % (20%).</div>';
+  }
+  main.innerHTML = html;
+}
+
+/* ============================================================
+   EXAM — 30 ITEMS
+   ============================================================ */
+var EXAM_BANK = [
+  // Safety & Rights (10 items)
+  { q: 'A nurse is about to administer a medication and notices the order is illegible. What is the PRIORITY action?',
+    options: ['Guess the medication from context','Clarify the order with the prescriber','Administer the closest match','Skip the dose'],
+    answer: 'Clarify the order with the prescriber' },
+  { q: 'Which action demonstrates the "Right Patient" principle?',
+    options: ['Ask the roommate','Use two identifiers','Check the bed number','Assume identity'],
+    answer: 'Use two identifiers' },
+  { q: 'A client refuses to take their medication. The nurse should:',
+    options: ['Force the medication','Respect the decision and document','Hide it in food','Report to the family only'],
+    answer: 'Respect the decision and document' },
+  { q: 'A nurse is preparing a high-alert medication. What safety action is REQUIRED?',
+    options: ['Give as fast as possible','Double-check with a second nurse','Administer alone','Skip documentation'],
+    answer: 'Double-check with a second nurse' },
+  { q: 'The nurse is checking the apical pulse before administering Digoxin. Which Right is this?',
+    options: ['Right Dose','Right Assessment','Right Time','Right Patient'],
+    answer: 'Right Assessment' },
+  { q: 'When should the third medication check be performed?',
+    options: ['Before leaving the storage area','During preparation','At the bedside before administration','After documentation'],
+    answer: 'At the bedside before administration' },
+  { q: 'Which statement about the 10 Rights is CORRECT?',
+    options: ['Only 5 Rights matter','10 Rights include Right to Refuse','Right Time is optional','Right Documentation can be delayed'],
+    answer: '10 Rights include Right to Refuse' },
+  { q: 'A client questions a medication the nurse is about to give. The nurse should:',
+    options: ['Reassure and give the medication','Verify the original order before giving','Skip the dose','Call the family'],
+    answer: 'Verify the original order before giving' },
+  { q: 'Which is the FIRST step in safe medication administration?',
+    options: ['Prepare the medication','Verify the order','Administer quickly','Document'],
+    answer: 'Verify the order' },
+  { q: 'What does the "Right Evaluation" mean?',
+    options: ['Assessing before giving','Assessing the response after giving','Documenting dose','Verifying route'],
+    answer: 'Assessing the response after giving' },
+  // Routes (8 items)
+  { q: 'A nurse is to administer an intradermal injection. What angle should the needle be inserted?',
+    options: ['5–15 degrees','45 degrees','90 degrees','30 degrees'],
+    answer: '5–15 degrees' },
+  { q: 'Which needle gauge is appropriate for a subcutaneous insulin injection?',
+    options: ['18 G','20–22 G','25–31 G','16 G'],
+    answer: '25–31 G' },
+  { q: 'A nurse is giving an IM injection to an adult. Which site is SAFEST?',
+    options: ['Deltoid','Dorsogluteal','Ventrogluteal','Vastus lateralis'],
+    answer: 'Ventrogluteal' },
+  { q: 'When administering ear drops to an adult, the nurse should pull the pinna:',
+    options: ['Down and back','Up and back','Straight up','Forward'],
+    answer: 'Up and back' },
+  { q: 'A client is receiving eye drops AND eye ointment. The nurse should:',
+    options: ['Give ointment first','Give drops first then ointment','Give them together','Give only one'],
+    answer: 'Give drops first then ointment' },
+  { q: 'Which site is PREFERRED for IM injection in an infant?',
+    options: ['Deltoid','Vastus lateralis','Ventrogluteal','Dorsogluteal'],
+    answer: 'Vastus lateralis' },
+  { q: 'A nurse must NEVER crush which type of medication?',
+    options: ['Scored tablet','Enteric-coated tablet','Chewable tablet','Capsule'],
+    answer: 'Enteric-coated tablet' },
+  { q: 'After administering otic drops, the client should remain side-lying for:',
+    options: ['30 seconds','1 minute','2–5 minutes','15 minutes'],
+    answer: '2–5 minutes' },
+  // Calculations (6 items)
+  { q: 'Order: Paracetamol 500 mg PO. Available: 250 mg/tablet. How many tablets?',
+    options: ['1','2','3','4'],
+    answer: '2' },
+  { q: 'Order: Amoxicillin 250 mg PO. Available: 125 mg/5 mL. How many mL?',
+    options: ['5 mL','10 mL','15 mL','20 mL'],
+    answer: '10 mL' },
+  { q: 'Order: Ceftriaxone 500 mg IM. Available: 250 mg/mL. How many mL?',
+    options: ['0.5 mL','1 mL','2 mL','3 mL'],
+    answer: '2 mL' },
+  { q: 'Order: Digoxin 0.25 mg PO. Available: 0.125 mg/tablet. How many tablets?',
+    options: ['1','1.5','2','3'],
+    answer: '2' },
+  { q: 'Which formula correctly computes drug dosage?',
+    options: ['Desired ÷ Stock × Volume','Stock ÷ Desired × Volume','Desired × Stock','Desired + Volume'],
+    answer: 'Desired ÷ Stock × Volume' },
+  { q: 'Order: 750 mg. Available: 250 mg/tablet. How many tablets?',
+    options: ['2','2.5','3','4'],
+    answer: '3' },
+  // Documentation & Legal (4 items)
+  { q: 'When should the nurse document a medication administration?',
+    options: ['At the end of the shift','Immediately after giving','Before giving','The next day'],
+    answer: 'Immediately after giving' },
+  { q: 'Which principle requires the nurse to be truthful about medication side effects?',
+    options: ['Autonomy','Veracity','Justice','Fidelity'],
+    answer: 'Veracity' },
+  { q: 'Which documentation format uses Focus, Data, Action, Response?',
+    options: ['SOAPIE','FDAR','PIE','DAR'],
+    answer: 'FDAR' },
+  { q: 'A "near miss" in medication administration is:',
+    options: ['Harm reached the patient','Error detected before reaching the patient','Adverse reaction','Side effect'],
+    answer: 'Error detected before reaching the patient' },
+  // Technology & Trends (2 items)
+  { q: 'Which technology scans medications and patient wristbands before administration?',
+    options: ['Smart pump','BCMA','eMAR','CDSS'],
+    answer: 'BCMA' },
+  { q: 'A nurse is preparing a high-alert IV medication. Which is BEST practice?',
+    options: ['Manual drip','Infusion pump with drug library','Fast IV push','Gravity'],
+    answer: 'Infusion pump with drug library' }
+];
+
+function renderExam(main) {
+  if (APP.state.exam && APP.state.exam.submitted && APP.state.retakeAllowed && !APP.state.retakeUsed) {
+    return renderRetakeEntry(main);
+  }
+  if (APP.state.exam && APP.state.exam.submitted) return renderExamResult(main);
+  if (!isExamUnlocked()) return renderExamLocked(main);
+  return renderExamStart(main);
+}
+
+function renderRetakeEntry(main) {
+  main.innerHTML = '<div class="card fade-in text-center"><div style="font-size:4rem;margin-bottom:1rem;">🔓</div>' +
+    '<h2 style="color:var(--purple);">Retake Available</h2>' +
+    '<p>Enter your 8-character retake code below.</p></div>' +
+    '<div class="card"><div class="form-group"><label>Retake Code</label>' +
+    '<input type="text" id="retakeCodeInput" placeholder="XXXXXXXX" maxlength="8" style="text-transform:uppercase;font-size:1.5rem;letter-spacing:5px;text-align:center;font-weight:700;font-family:monospace;" /></div>' +
+    '<div id="retakeCodeMessage"></div>' +
+    '<button class="btn btn-primary btn-lg btn-block" onclick="submitRetakeCode()">🔓 Unlock Retake</button>' +
+    '<button class="btn btn-outline btn-block mt-2" onclick="navigate(\'home\')">← Cancel</button></div>';
+}
+function submitRetakeCode() {
+  var code = (document.getElementById('retakeCodeInput').value || '').trim().toUpperCase();
+  var msgEl = document.getElementById('retakeCodeMessage');
+  if (code !== APP.state.retakeCode) {
+    msgEl.innerHTML = '<div class="callout callout-danger">❌ Invalid retake code</div>';
+    return;
+  }
+  APP.state.examHistory = APP.state.examHistory || [];
+  if (APP.state.exam) APP.state.examHistory.push(Object.assign({}, APP.state.exam, { archivedAt: new Date().toISOString() }));
+  APP.state.exam = null;
+  APP.state.retakeUsed = true;
+  saveState();
+  toast('Retake unlocked!', 'success');
+  setTimeout(function() { navigate('exam'); }, 500);
+}
+
+function renderExamLocked(main) {
+  var games = ['route','rights','dosage','order','safety'];
+  var html = '<div class="card fade-in text-center" style="padding:3rem 1.5rem;">';
+  html += '<div style="font-size:5rem;margin-bottom:1rem;">🔒</div>';
+  html += '<h2>Capstone Exam — Locked</h2>';
+  html += '<p>Complete all requirements to unlock the exam</p></div>';
+  html += '<div class="card"><div class="card-header"><div class="card-title">📋 Requirements Checklist</div></div>';
+  UNIT_KEYS.forEach(function(u, i) {
+    var done = isUnitComplete(u);
+    var best = getUnitBestScore(u);
+    var pass = done && best >= 90;
+    html += '<div style="display:flex;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--gray-light);font-size:0.88rem;">';
+    html += '<span>' + (pass ? '✅' : done ? '⚠️' : '⬜') + ' Unit ' + (i+1) + '</span>';
+    html += '<span style="color:' + (pass ? 'var(--secondary)' : 'var(--gray)') + ';font-weight:600;">' + (done ? best + '%' : 'Not taken') + '</span></div>';
+  });
+  games.forEach(function(g, i) {
+    var best = getGameBestScore(g);
+    var pass = best >= 90;
+    html += '<div style="display:flex;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--gray-light);font-size:0.88rem;">';
+    html += '<span>' + (pass ? '✅' : best > 0 ? '⚠️' : '⬜') + ' Game ' + (i+1) + ' (' + GAME_DATA[g].name + ')</span>';
+    html += '<span style="color:' + (pass ? 'var(--secondary)' : 'var(--gray)') + ';font-weight:600;">' + (best > 0 ? best + '%' : 'Not played') + '</span></div>';
+  });
+  html += '</div>';
+  html += '<button class="btn btn-primary btn-lg btn-block" onclick="navigate(\'home\')">← Back to Home</button>';
+  main.innerHTML = html;
+}
+
+function renderExamStart(main) {
+  main.innerHTML = '<div class="exam-hero fade-in" style="padding:2rem;">' +
+    '<div class="exam-hero-content">' +
+    '<h3>📝 Capstone Comprehensive Exam — NLE-Aligned</h3>' +
+    '<p>This exam tests clinical judgment and competency-based application of drug administration principles.</p></div></div>' +
+    '<div class="card"><div class="stat-grid" style="margin-bottom:0;">' +
+    '<div class="stat-tile"><div class="stat-icon green">📝</div><div class="stat-value">30</div><div class="stat-label">Total Items</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon orange">⏱️</div><div class="stat-value">45</div><div class="stat-label">Minutes</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">15</div><div class="stat-label">Passing Score</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon red">🔢</div><div class="stat-value">1</div><div class="stat-label">Attempt Only</div></div>' +
+    '</div></div>' +
+    '<div class="card"><div class="callout callout-danger"><strong>🔴 ONE ATTEMPT ONLY</strong><br>You may take this exam only once. After submission, it will be locked permanently.</div>' +
+    '<div class="callout callout-warning"><strong>📱 Recommendations:</strong><br>Use a stable internet connection, a fully charged device, and find a quiet place without distractions.</div>' +
+    '<button class="btn btn-primary btn-lg btn-block mt-2" onclick="openExamConfirm()">📝 Start Capstone Exam</button>' +
+    '<button class="btn btn-outline btn-block mt-2" onclick="navigate(\'home\')">Cancel</button></div>';
+}
+
+function openExamConfirm() { document.getElementById('examConfirmModal').classList.add('show'); }
+function closeExamConfirm() { document.getElementById('examConfirmModal').classList.remove('show'); }
+
+function beginExam() {
+  closeExamConfirm();
+  var shuffled = EXAM_BANK.slice().sort(function() { return Math.random() - 0.5; });
+  APP.state.exam = {
+    score: 0, total: shuffled.length, percentage: 0, passed: false, submitted: false,
+    takenAt: new Date().toISOString(),
+    questions: shuffled.map(function(q) {
+      var opts = q.options.slice().sort(function() { return Math.random() - 0.5; });
+      return { q: q.q, options: opts, answer: q.answer };
+    }),
+    answers: {}, current: 0
+  };
+  saveState();
+  renderExamQuestion();
+}
+
+function renderExamQuestion() {
+  var exam = APP.state.exam;
+  if (!exam || !exam.questions) {
+    toast('Exam session lost. Please start again.', 'error');
+    navigate('exam');
+    return;
+  }
+  var main = document.getElementById('mainContent');
+  var q = exam.questions[exam.current];
+  var total = exam.questions.length;
+
+  var html = '<div class="card fade-in">';
+  html += '<div class="card-header"><div><div class="card-title">📝 Capstone Exam</div>';
+  html += '<div class="card-subtitle">Question ' + (exam.current + 1) + ' of ' + total + '</div></div></div>';
+
+  var pct = Math.round((exam.current / total) * 100);
+  html += '<div style="height:8px;background:var(--gray-light);border-radius:99px;overflow:hidden;margin-bottom:1.25rem;">';
+  html += '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.3s;"></div></div>';
+
+  html += '<p style="font-weight:600;font-size:1rem;line-height:1.6;margin-bottom:1.25rem;">' + (exam.current + 1) + '. ' + escapeHtml(q.q) + '</p>';
+  html += '<div id="examOpts">';
+
+  q.options.forEach(function(o, idx) {
+    var selected = exam.answers[exam.current] === idx;
+    html += '<button class="quiz-opt ' + (selected ? 'selected' : '') + '" onclick="selectExamOption(' + idx + ')" data-idx="' + idx + '">' + escapeHtml(o) + '</button>';
+  });
+
+  html += '</div>';
+  html += '<div style="display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;">';
+  if (exam.current > 0) html += '<button class="btn btn-outline" onclick="prevExamQuestion()">← Previous</button>';
+  if (exam.current < total - 1) {
+    html += '<button class="btn btn-primary" style="margin-left:auto;" onclick="nextExamQuestion()">Next →</button>';
+  } else {
+    html += '<button class="btn btn-success" style="margin-left:auto;" onclick="finishExam()">✅ Submit Exam</button>';
+  }
+  html += '</div></div>';
+
+  main.innerHTML = html;
+}
+
+function selectExamOption(idx) {
+  var exam = APP.state.exam;
+  if (!exam) return;
+  exam.answers[exam.current] = idx;
+  var container = document.getElementById('examOpts');
+  if (!container) return;
+  var siblings = container.querySelectorAll('.quiz-opt');
+  siblings.forEach(function(s) { s.classList.remove('selected'); });
+  var btn = container.querySelector('.quiz-opt[data-idx="' + idx + '"]');
+  if (btn) btn.classList.add('selected');
+  saveState();
+}
+
+function nextExamQuestion() {
+  var exam = APP.state.exam;
+  if (exam.answers[exam.current] === undefined) return toast('Please select an answer', 'warning');
+  exam.current++;
+  saveState();
+  renderExamQuestion();
+}
+
+function prevExamQuestion() {
+  var exam = APP.state.exam;
+  if (exam.current > 0) { exam.current--; saveState(); renderExamQuestion(); }
+}
+
+function finishExam() {
+  var exam = APP.state.exam;
+  if (exam.answers[exam.current] === undefined) return toast('Please select an answer', 'warning');
+  var unanswered = exam.questions.length - Object.keys(exam.answers).length;
+  if (unanswered > 0 && !confirm('You have ' + unanswered + ' unanswered question(s). Submit anyway?')) return;
+
+  var correct = 0;
+  var review = [];
+  exam.questions.forEach(function(q, i) {
+    var userIdx = exam.answers[i];
+    var userAns = (userIdx !== undefined && q.options[userIdx]) ? q.options[userIdx] : '(no answer)';
+    var isCorrect = userAns === q.answer;
+    if (isCorrect) correct++;
+    review.push({ q: q.q, userAnswer: userAns, correctAnswer: q.answer, correct: isCorrect });
+  });
+  var pct = Math.round((correct / exam.questions.length) * 100);
+  exam.score = correct;
+  exam.percentage = pct;
+  exam.passed = pct >= 50;
+  exam.submitted = true;
+  exam.review = review;
+  exam.submittedAt = new Date().toISOString();
+  if (!APP.state.examHistory) APP.state.examHistory = [];
+  saveState();
+  if (APP.state.student) registerSavedSession(buildStudentRecord());
+  toast(exam.passed ? '🎉 Exam passed!' : 'Exam submitted', exam.passed ? 'success' : 'warning');
+  renderExamResult(document.getElementById('mainContent'));
+}
+
+function renderExamResult(main) {
+  var exam = APP.state.exam;
+  var retakePending = APP.state.retakeAllowed && !APP.state.retakeUsed;
+  var html = '<div class="card fade-in" style="text-align:center;padding:2.5rem 1.5rem;">';
+  html += '<div style="font-size:5rem;margin-bottom:1rem;">' + (exam.passed ? '🏆' : '📋') + '</div>';
+  html += '<h1 style="color:' + (exam.passed ? 'var(--secondary)' : 'var(--accent)') + ';margin-bottom:0.5rem;">';
+  html += (exam.passed ? 'Exam PASSED!' : 'Exam NOT PASSED') + '</h1>';
+  html += '<p style="font-size:1.5rem;font-weight:800;color:var(--primary);margin:1rem 0;">' + exam.score + '/' + exam.total + '</p>';
+  html += '<p style="color:var(--gray);">(' + exam.percentage + '%)</p>';
+  if (!exam.passed && !retakePending) {
+    html += '<div class="callout callout-danger mt-2"><strong>⚠️ This was your one attempt.</strong><br>Contact your instructor if you have a valid reason for a retake.</div>';
+  }
+  if (retakePending) {
+    html += '<div class="callout callout-warning mt-2"><strong>🔓 Retake granted!</strong></div>';
+  }
+  html += '</div>';
+  if (retakePending) {
+    html += '<div class="card"><button class="btn btn-primary btn-block" onclick="navigate(\'exam\')">🔓 Go to Retake Entry</button></div>';
+  }
+  html += '<div class="card"><button class="btn btn-primary btn-block" onclick="navigate(\'handoff\')">📤 Submit to Instructor</button></div>';
+  main.innerHTML = html;
+}
+
+/* ============================================================
+   CERTIFICATE
+   ============================================================ */
+function renderCertificate(main) {
+  if (!isCertificateUnlocked()) {
+    main.innerHTML = '<div class="card fade-in text-center" style="padding:3rem 1.5rem;">' +
+      '<div style="font-size:5rem;margin-bottom:1rem;">🔒</div>' +
+      '<h2>Certificate — Locked</h2>' +
+      '<p>Pass the Capstone Exam to unlock your Certificate.</p>' +
+      '<button class="btn btn-primary mt-2" onclick="navigate(\'home\')">← Back</button></div>';
+    return;
+  }
+  var s = APP.state.student;
+  var exam = APP.state.exam;
+  main.innerHTML = '<div class="card fade-in"><div class="certificate">' +
+    '<h2>🏅 CERTIFICATE OF COMPLETION 🏅</h2>' +
+    '<p>This certifies that</p>' +
+    '<div class="name">' + escapeHtml(s.fullName) + '</div>' +
+    '<p style="font-size:0.85rem;color:var(--gray);">' + escapeHtml(s.studentNo) + ' — ' + escapeHtml(s.section) + ' — ' + escapeHtml(s.group || '') + '</p>' +
+    '<p>has successfully completed the</p>' +
+    '<h3 style="color:var(--primary);margin:0.75rem 0;">DRUG ADMINISTRATION MASTERY MODULE</h3>' +
+    '<p class="score">Comprehensive Score: ' + averageScore() + '%</p>' +
+    '<p>Capstone Exam: ' + exam.score + '/' + exam.total + ' (' + exam.percentage + '%)</p>' +
+    '<p style="margin-top:1.5rem;">Date: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + '</p>' +
+    '<p style="margin-top:2rem;"><strong>JEMUEL C. MARI, MAN, RN, LPT</strong></p>' +
+    '<p style="font-size:0.82rem;color:var(--gray);">Clinical Instructor | Tarlac State University</p>' +
+    '</div>' +
+    '<button class="btn btn-primary btn-block mt-2" onclick="window.print()">📥 Print / Save as PDF</button></div>';
+}
+
+/* ============================================================
+   HANDOFF (Submit to Instructor)
+   ============================================================ */
+function renderHandoff(main) {
+  var s = APP.state.student;
+  var pct = getProgressPercent();
+  var avg = averageScore();
+  var exam = APP.state.exam;
+  var existingCode = APP.state.submissionCode;
+  var html = '<div class="card fade-in"><div class="card-header"><div>';
+  html += '<div class="card-title">📤 Submit Progress to Instructor</div>';
+  html += '<div class="card-subtitle">Send your progress and receive a unique code</div></div></div></div>';
+  if (existingCode) {
+    html += '<div class="card fade-in" style="background:linear-gradient(135deg,var(--secondary-light),#A5D6A7);border:2px solid var(--secondary);">';
+    html += '<h3 style="text-align:center;color:var(--secondary);margin-bottom:0.75rem;">Already Submitted</h3>';
+    html += '<div class="code-display"><div class="code-label">Your Submission Code</div>';
+    html += '<div class="code-value">' + escapeHtml(existingCode) + '</div>';
+    html += '<button class="btn btn-primary" onclick="copySubmissionCode()">📋 Copy Code</button></div>';
+    html += '<button class="btn btn-outline btn-block mt-2" onclick="submitToBackend()">🔄 Resubmit</button></div>';
+  }
+  html += '<div class="card fade-in"><div class="card-header"><div class="card-title">👤 Your Profile</div></div>';
+  html += '<table style="font-size:0.88rem;"><tbody>';
+  html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Name</td><td style="font-weight:600;">' + escapeHtml(s.fullName) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Student No</td><td style="font-weight:600;">' + escapeHtml(s.studentNo) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Section</td><td style="font-weight:600;">' + escapeHtml(s.section) + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Group</td><td style="font-weight:600;">' + escapeHtml(s.group || '—') + '</td></tr>';
+  html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Email</td><td style="font-weight:600;">' + escapeHtml(s.email) + '</td></tr>';
+  html += '</tbody></table></div>';
+  html += '<div class="stat-grid fade-in">' +
+    '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + pct + '%</div><div class="stat-label">Units Complete</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon blue">🎯</div><div class="stat-value">' + avg + '%</div><div class="stat-label">Unit Average</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon purple">📝</div><div class="stat-value">' + (exam ? exam.score + '/' + exam.total : '—') + '</div><div class="stat-label">Capstone Exam</div></div>' +
+    '</div>';
+  html += '<div class="card fade-in">';
+  html += '<button class="btn btn-primary btn-lg btn-block" onclick="submitToBackend()" id="submitBtn">';
+  html += '🚀 ' + (existingCode ? 'Update Submission' : 'Submit to Instructor') + '</button>';
+  html += '<div id="submitStatus" class="mt-2"></div></div>';
+  main.innerHTML = html;
+}
+
+async function submitToBackend() {
+  var statusEl = document.getElementById('submitStatus');
+  var btn = document.getElementById('submitBtn');
+  if (btn) btn.disabled = true;
+  statusEl.innerHTML = '<div class="callout callout-info">⏳ Submitting...</div>';
+  var s = APP.state.student;
+  var exam = APP.state.exam;
+  var fullData = buildStudentRecord();
+  var params = new URLSearchParams();
+  params.append('action', 'submit');
+  params.append('fullName', s.fullName || '');
+  params.append('studentNo', s.studentNo || '');
+  params.append('section', s.section || '');
+  params.append('group', s.group || '');
+  params.append('email', s.email || '');
+  params.append('unitsCompleted', getProgressPercent());
+  params.append('unitAvg', averageScore());
+  params.append('examScore', exam ? exam.score : '');
+  params.append('examTotal', exam ? exam.total : '');
+  params.append('examPercentage', exam ? exam.percentage : '');
+  params.append('examPassed', exam ? (exam.passed ? 'PASSED' : 'FAILED') : '');
+  params.append('integrityFlags', 0);
+  params.append('appVersion', APP.version);
+  params.append('dataJson', JSON.stringify(fullData));
+  try {
+    var response = await fetch(BACKEND_URL, { method: 'POST', body: params });
+    var result = await response.json();
+    if (result.success) {
+      APP.state.submissionCode = result.code;
+      saveState();
+      if (APP.state.student) registerSavedSession(buildStudentRecord());
+      statusEl.innerHTML = '<div class="callout callout-success"><strong>✅ ' + (result.isUpdate ? 'Updated!' : 'Submitted!') + '</strong>' +
+        '<div class="code-display" style="margin-top:0.75rem;"><div class="code-label">Your Code</div>' +
+        '<div class="code-value">' + escapeHtml(result.code) + '</div>' +
+        '<button class="btn btn-primary btn-sm" onclick="copySubmissionCode()">📋 Copy</button></div></div>';
+      toast('Submitted! Code: ' + result.code, 'success');
+    } else {
+      statusEl.innerHTML = '<div class="callout callout-danger">❌ ' + escapeHtml(result.error || 'Submission failed') + '</div>';
+    }
+  } catch (err) {
+    statusEl.innerHTML = '<div class="callout callout-danger">❌ Connection error: ' + escapeHtml(err.message) + '</div>';
+  }
+  if (btn) btn.disabled = false;
+}
+
+function copySubmissionCode() {
+  var code = APP.state.submissionCode;
+  if (!code) return toast('No code yet', 'warning');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(function() { toast('Code copied!', 'success'); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = code; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Code copied!', 'success'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+}
+
+function buildStudentRecord() {
+  var s = APP.state.student;
+  return {
+    schema: 'drug-admin-mastery-v1',
+    appVersion: APP.version,
+    exportedAt: new Date().toISOString(),
+    student: {
+      firstName: s.firstName, lastName: s.lastName, fullName: s.fullName,
+      studentNo: s.studentNo, section: s.section, group: s.group, email: s.email,
+      registeredAt: s.registeredAt, lastActive: s.lastActive
+    },
+    progress: APP.state.progress,
+    quizAttempts: APP.state.quizAttempts,
+    games: APP.state.games || {},
+    badges: APP.state.badges,
+    exam: APP.state.exam || null,
+    examHistory: APP.state.examHistory || [],
+    feedback: APP.state.feedback || [],
+    checklists: APP.state.checklists || { oral: {}, parenteral: {} },
+    instructorFeedback: APP.state.instructorFeedback || [],
+    retakeAllowed: APP.state.retakeAllowed || false,
+    retakeCode: APP.state.retakeCode || null,
+    retakeUsed: APP.state.retakeUsed || false,
+    submissionCode: APP.state.submissionCode || null
+  };
+}
+
+/* ============================================================
+   INBOX (Instructor Feedback)
+   ============================================================ */
+function renderInbox(main) {
+  var feedback = APP.state.instructorFeedback || [];
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Messages</p>';
+  html += '<h1>📬 Instructor Feedback</h1>';
+  html += '<p class="hero-subtitle">Feedback from your clinical instructor.</p>';
+  html += '</div></div>';
+  if (!feedback.length) {
+    html += '<div class="card text-center" style="padding:3rem 1.5rem;color:var(--gray);">';
+    html += '<div style="font-size:3rem;margin-bottom:0.75rem;">📭</div>';
+    html += '<h3>No messages yet</h3>';
+    html += '<p>Your instructor\'s feedback will appear here after you submit.</p>';
+    html += '<button class="btn btn-outline mt-1" onclick="refreshInbox()">🔄 Refresh</button></div>';
+  } else {
+    feedback.forEach(function(fb) {
+      html += '<div class="card"><div class="card-header"><div><div class="card-title">' + escapeHtml(fb.from || 'Instructor') + '</div>';
+      html += '<div class="card-subtitle">' + new Date(fb.date).toLocaleString() + '</div></div></div>';
+      html += '<p>' + escapeHtml(fb.message) + '</p></div>';
+    });
+  }
+  main.innerHTML = html;
+}
+
+async function refreshInbox() {
+  if (!APP.state.submissionCode) return toast('Submit your progress first.', 'warning');
+  try {
+    var r = await fetch(BACKEND_URL + '?action=getFeedback&code=' + encodeURIComponent(APP.state.submissionCode));
+    var d = await r.json();
+    if (d.success) {
+      APP.state.instructorFeedback = d.feedback || [];
+      saveState();
+      toast('Inbox refreshed', 'success');
+      renderInbox(document.getElementById('mainContent'));
+    } else toast('No feedback yet', 'info');
+  } catch (e) { toast('Unable to fetch feedback', 'error'); }
+}
+
+/* ============================================================
+   FEEDBACK
+   ============================================================ */
+var currentRating = 0;
+function renderFeedback(main) {
+  main.innerHTML = '<div class="card fade-in"><div class="card-header"><div>';
+  main.innerHTML += '<div class="card-title">💬 Send Feedback</div>';
+  main.innerHTML += '<div class="card-subtitle">Help us improve this app</div></div></div></div>';
+  main.innerHTML += '<div class="card"><div style="text-align:center;padding:0.5rem 0;">';
+  main.innerHTML += '<p style="font-weight:600;margin-bottom:1rem;">How would you rate this app?</p>';
+  main.innerHTML += '<div style="display:flex;gap:0.5rem;justify-content:center;font-size:2.5rem;margin-bottom:1rem;" id="starRow">';
+  [1,2,3,4,5].forEach(function(n) {
+    main.innerHTML += '<span data-rating="' + n + '" onclick="setRating(' + n + ')" style="cursor:pointer;transition:transform 0.15s;">⭐</span>';
+  });
+  main.innerHTML += '</div>';
+  main.innerHTML += '<p style="color:var(--gray);font-size:0.85rem;" id="ratingText">Tap to rate</p></div></div>';
+  main.innerHTML += '<div class="card"><div class="form-group"><label>Category</label>';
+  main.innerHTML += '<select id="feedbackCategory"><option value="suggestion">💡 Suggestion / Idea</option>';
+  main.innerHTML += '<option value="bug">🐛 Bug Report</option>';
+  main.innerHTML += '<option value="content">📚 Content Feedback</option>';
+  main.innerHTML += '<option value="design">🎨 Design / UX</option>';
+  main.innerHTML += '<option value="other">📝 Other</option></select></div>';
+  main.innerHTML += '<div class="form-group"><label>Message</label>';
+  main.innerHTML += '<textarea id="feedbackMessage" rows="5" placeholder="Share your thoughts..."></textarea></div>';
+  main.innerHTML += '<button class="btn btn-primary btn-lg btn-block" onclick="submitFeedback()">📤 Submit Feedback</button></div>';
+}
+function setRating(n) {
+  currentRating = n;
+  document.querySelectorAll('#starRow span').forEach(function(el) {
+    el.style.opacity = parseInt(el.dataset.rating, 10) <= n ? '1' : '0.3';
+    el.style.transform = parseInt(el.dataset.rating, 10) <= n ? 'scale(1.15)' : 'scale(1)';
+  });
+  var labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+  document.getElementById('ratingText').textContent = labels[n];
+}
+async function submitFeedback() {
+  var msg = document.getElementById('feedbackMessage').value.trim();
+  var cat = document.getElementById('feedbackCategory').value;
+  if (!msg) return toast('Please enter a message', 'warning');
+  if (currentRating === 0) return toast('Please rate the app first', 'warning');
+  var s = APP.state.student;
+  try {
+    var params = new URLSearchParams();
+    params.append('action', 'submitFeedback');
+    params.append('studentName', s.fullName);
+    params.append('section', s.section);
+    params.append('group', s.group);
+    params.append('anonymous', 'false');
+    params.append('rating', currentRating);
+    params.append('category', cat);
+    params.append('message', msg);
+    params.append('appVersion', APP.version);
+    await fetch(BACKEND_URL, { method: 'POST', body: params });
+    toast('Feedback sent! Thank you.', 'success');
+    document.getElementById('feedbackMessage').value = '';
+    currentRating = 0;
+    document.querySelectorAll('#starRow span').forEach(function(el) { el.style.opacity = '1'; el.style.transform = 'scale(1)'; });
+    document.getElementById('ratingText').textContent = 'Tap to rate';
+  } catch (err) {
+    toast('Failed: ' + err.message, 'error');
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  loadState();
+  document.querySelectorAll('.nav-item').forEach(function(n) {
+    n.addEventListener('click', function() { navigate(n.dataset.view); });
+  });
+  document.getElementById('menuToggle').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').style.display = 'block';
+  });
+  document.getElementById('logoutModal').addEventListener('click', function(e) {
+    if (e.target.id === 'logoutModal') closeLogoutModal();
+  });
+  document.getElementById('examConfirmModal').addEventListener('click', function(e) {
+    if (e.target.id === 'examConfirmModal') closeExamConfirm();
+  });
+  document.getElementById('drugModal').addEventListener('click', function(e) {
+    if (e.target.id === 'drugModal') closeDrugModal();
+  });
+  if (APP.state.student && APP.state.student.fullName) {
+    showApp();
+  } else {
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
+    switchAuthTab('register');
+  }
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
