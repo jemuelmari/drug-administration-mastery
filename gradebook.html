@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1A5276" />
-  <meta name="description" content="Gradebook v1.0 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
+  <meta name="description" content="Gradebook v1.1 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <title>Gradebook — Drug Administration Mastery v1.0</title>
+  <title>Gradebook — Drug Administration Mastery v1.1</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -60,6 +60,53 @@
     .toolbar-left h1 { font-size: 1.15rem; color: var(--dark); line-height: 1.2; }
     .toolbar-left small { display: block; font-size: 0.75rem; color: var(--gray); font-weight: 400; margin-top: 0.15rem; }
     .toolbar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+    /* ============ FILTER BAR ============ */
+    .filter-bar {
+      background: var(--white); border-radius: var(--radius);
+      padding: 0.85rem 1.35rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-light);
+      border-left: 5px solid var(--secondary);
+      margin-bottom: 1.25rem;
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      align-items: center;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.25rem; min-width: 180px; }
+    .filter-label {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--gray); font-weight: 700;
+    }
+    .filter-select {
+      padding: 0.5rem 0.75rem; border: 1.5px solid var(--gray-light);
+      border-radius: var(--radius-sm); font-size: 0.85rem;
+      font-family: var(--font-body); background: var(--white);
+      color: var(--dark); cursor: pointer; transition: all 0.15s;
+    }
+    .filter-select:hover { border-color: var(--primary); }
+    .filter-select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,82,118,0.1);
+    }
+    .filter-active {
+      margin-left: auto; padding: 0.5rem 0.9rem;
+      background: var(--secondary-light); border-radius: var(--radius-sm);
+      font-size: 0.82rem; color: var(--primary-dark); font-weight: 600;
+      display: flex; align-items: center; gap: 0.65rem;
+    }
+    .filter-clear {
+      background: var(--white); border: 1px solid var(--secondary);
+      color: var(--secondary); padding: 0.25rem 0.6rem;
+      border-radius: 6px; cursor: pointer;
+      font-size: 0.75rem; font-weight: 700;
+      font-family: var(--font-head); transition: all 0.15s;
+    }
+    .filter-clear:hover { background: var(--secondary); color: var(--white); }
+
+    @media (max-width: 768px) {
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-group { min-width: 100%; }
+      .filter-active { margin-left: 0; justify-content: center; }
+    }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
@@ -345,7 +392,7 @@
     @media print {
       @page { size: legal landscape; margin: 0.5cm; }
       body { background: white; padding: 0; font-size: 9pt; }
-      .toolbar, .no-print, .info-banner, .stats-row, .legend, .developer-footer { display: none !important; }
+      .toolbar, .filter-bar, .no-print, .info-banner, .stats-row, .legend, .developer-footer { display: none !important; }
       .sheet {
         box-shadow: none; border: none; border-radius: 0;
         padding: 0; margin: 0; page-break-inside: avoid;
@@ -414,7 +461,8 @@
 
 <script>
 /* ============================================================
-   GRADEBOOK — Drug Administration Mastery v1.0
+   GRADEBOOK — Drug Administration Mastery v1.1
+   NEW: Section & Group filters
    ============================================================ */
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
 
@@ -422,6 +470,8 @@ var GB = {
   localKey: 'drugAdminMastery_instructor_v1',
   state: {
     students: [],
+    filterSection: '',
+    filterGroup: '',
     settings: {
       courseName: 'NCM 107 Lab — Drug Administration',
       instructorName: 'JEMUEL C. MARI, MAN, RN, LPT',
@@ -458,6 +508,8 @@ function loadLocal() {
     if (raw) {
       var parsed = JSON.parse(raw);
       GB.state.students = parsed.students || [];
+      GB.state.filterSection = parsed.filterSection || '';
+      GB.state.filterGroup = parsed.filterGroup || '';
       GB.state.settings = Object.assign({}, GB.state.settings, parsed.settings || {});
       GB.state.lastSync = parsed.lastSync || null;
     }
@@ -580,6 +632,34 @@ function showError(msg) {
     '<button class="btn btn-primary" onclick="init()">🔄 Retry</button></div>';
 }
 
+/* ============ FILTER HELPERS ============ */
+function getUniqueValues(field) {
+  var values = GB.state.students.map(function(s) { return s[field]; }).filter(function(v) { return v && String(v).trim(); });
+  return Array.from(new Set(values)).sort();
+}
+function getFilteredStudents() {
+  var section = GB.state.filterSection || '';
+  var group = GB.state.filterGroup || '';
+  return GB.state.students.filter(function(s) {
+    if (section && s.section !== section) return false;
+    if (group && s.group !== group) return false;
+    return true;
+  });
+}
+function setFilter(field, value) {
+  if (field === 'section') GB.state.filterSection = value;
+  if (field === 'group') GB.state.filterGroup = value;
+  saveLocal();
+  render();
+}
+function clearFilters() {
+  GB.state.filterSection = '';
+  GB.state.filterGroup = '';
+  saveLocal();
+  render();
+}
+
+/* ---------- HELPERS ---------- */
 function getUnitBestScore(s, unit) {
   if (s.progress && s.progress[unit] && typeof s.progress[unit].score === 'number') {
     return s.progress[unit].score;
@@ -705,6 +785,7 @@ function render() {
 
   if (!students.length) {
     app.innerHTML = renderToolbar() +
+      renderFilterBar() +
       '<div class="empty-state">' +
       '<div class="icon">📋</div>' +
       '<h2>No students in the gradebook yet</h2>' +
@@ -718,6 +799,7 @@ function render() {
   }
 
   app.innerHTML = renderToolbar() +
+    renderFilterBar() +
     renderInfoBanner() +
     '<div class="sheet" id="sheet">' +
       renderSheetHeader() +
@@ -735,7 +817,7 @@ function renderToolbar() {
     '<div class="toolbar-left">' +
     '<div class="logo">📊</div>' +
     '<div><h1>Class Record — Gradebook</h1>' +
-    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.0</small></div>' +
+    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.1</small></div>' +
     '</div>' +
     '<div class="toolbar-right">' +
     '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'index.html\'">💊 Student App</button>' +
@@ -747,15 +829,58 @@ function renderToolbar() {
     '</div></div>';
 }
 
+function renderFilterBar() {
+  var sections = getUniqueValues('section');
+  var groups = getUniqueValues('group');
+  var activeSection = GB.state.filterSection || '';
+  var activeGroup = GB.state.filterGroup || '';
+  var totalCount = GB.state.students.length;
+  var visibleCount = getFilteredStudents().length;
+
+  return '<div class="filter-bar no-print">' +
+    '<div class="filter-group">' +
+    '<label class="filter-label">🏫 Section</label>' +
+    '<select class="filter-select" onchange="setFilter(\'section\', this.value)">' +
+    '<option value="">All Sections (' + totalCount + ')</option>' +
+    sections.map(function(s) {
+      return '<option value="' + escapeHtml(s) + '"' + (activeSection === s ? ' selected' : '') + '>' + escapeHtml(s) + '</option>';
+    }).join('') +
+    '</select></div>' +
+    '<div class="filter-group">' +
+    '<label class="filter-label">👥 Group</label>' +
+    '<select class="filter-select" onchange="setFilter(\'group\', this.value)">' +
+    '<option value="">All Groups</option>' +
+    groups.map(function(g) {
+      return '<option value="' + escapeHtml(g) + '"' + (activeGroup === g ? ' selected' : '') + '>' + escapeHtml(g) + '</option>';
+    }).join('') +
+    '</select></div>' +
+    ((activeSection || activeGroup) ?
+      '<div class="filter-active">' +
+      '🔎 Showing <strong>' + visibleCount + '</strong> of <strong>' + totalCount + '</strong> students' +
+      '<button class="filter-clear" onclick="clearFilters()">✕ Clear</button>' +
+      '</div>'
+      : '') +
+    '</div>';
+}
+
 function renderInfoBanner() {
   var s = GB.state.settings;
+  var isFiltered = GB.state.filterSection || GB.state.filterGroup;
+  var filterText = '';
+  if (isFiltered) {
+    var parts = [];
+    if (GB.state.filterSection) parts.push('Section: ' + GB.state.filterSection);
+    if (GB.state.filterGroup) parts.push('Group: ' + GB.state.filterGroup);
+    filterText = parts.join(' • ');
+  }
   return '<div class="info-banner no-print">' +
     '<div class="info-grid">' +
     infoItem('Course', s.courseName) +
     infoItem('Instructor', s.instructorName) +
     infoItem('School Year', s.schoolYear) +
     infoItem('Semester', s.semester) +
-    infoItem('Total Students', GB.state.students.length) +
+    infoItem('Total Students', isFiltered ? getFilteredStudents().length + ' (filtered)' : GB.state.students.length) +
+    infoItem('Filter', filterText || 'None') +
     infoItem('Generated', todayLong()) +
     '</div></div>';
 }
@@ -767,17 +892,33 @@ function infoItem(label, value) {
 
 function renderSheetHeader() {
   var s = GB.state.settings;
+  var isFiltered = GB.state.filterSection || GB.state.filterGroup;
+  var filterLine = '';
+  if (isFiltered) {
+    var parts = [];
+    if (GB.state.filterSection) parts.push('Section: ' + GB.state.filterSection);
+    if (GB.state.filterGroup) parts.push('Group: ' + GB.state.filterGroup);
+    filterLine = '<p style="color:var(--secondary);font-weight:700;">' + escapeHtml(parts.join(' • ')) + '</p>';
+  }
   return '<div class="sheet-header">' +
     '<h1>' + escapeHtml(s.courseName) + '</h1>' +
     '<h2>Class Record — Drug Administration Mastery</h2>' +
     '<p>School Year ' + escapeHtml(s.schoolYear) + ' &nbsp;|&nbsp; ' + escapeHtml(s.semester) + ' &nbsp;|&nbsp; Instructor: ' + escapeHtml(s.instructorName) + '</p>' +
+    filterLine +
     '<p>' + todayLong() + '</p>' +
-    '<span class="version-tag">App Version 1.0</span>' +
+    '<span class="version-tag">App Version 1.1</span>' +
     '</div>';
 }
 
 function renderTable() {
-  var students = GB.state.students;
+  var students = getFilteredStudents();
+  if (!students.length) {
+    return '<div class="empty-state" style="padding:2rem;text-align:center;color:var(--gray);">' +
+      '<div style="font-size:2.5rem;margin-bottom:0.5rem;">🔍</div>' +
+      '<strong>No students match the current filter</strong>' +
+      '<p style="margin-top:0.5rem;">Try clearing the Section or Group filter.</p>' +
+      '<button class="btn btn-outline btn-sm mt-1" onclick="clearFilters()">Clear Filters</button></div>';
+  }
   var html = '<table class="gradebook"><thead><tr>';
   html += '<th rowspan="2" style="min-width:170px;">STUDENT NAME</th>';
   html += '<th rowspan="2" style="min-width:95px;">STUDENT NO.</th>';
@@ -804,7 +945,7 @@ function renderTable() {
   html += '</tr></thead><tbody>';
 
   students.forEach(function(s) { html += renderStudentRow(s); });
-  html += renderClassAverageRow();
+  html += renderClassAverageRow(students);
   html += '</tbody></table>';
   return html;
 }
@@ -859,8 +1000,8 @@ function renderStudentRow(s) {
   return html;
 }
 
-function renderClassAverageRow() {
-  var students = GB.state.students;
+function renderClassAverageRow(studentsArg) {
+  var students = studentsArg || GB.state.students;
   var w = GB.state.settings;
   var n = students.length;
   if (!n) return '';
@@ -931,7 +1072,7 @@ function renderSignatureBlock() {
 }
 
 function renderStatsSummary() {
-  var students = GB.state.students;
+  var students = getFilteredStudents();
   var w = GB.state.settings;
   var n = students.length;
   var finals = students.map(function(s) { return transmute(computeWeightedFinal(s, w)); }).filter(function(x) { return x !== null; });
@@ -946,8 +1087,10 @@ function renderStatsSummary() {
   var lowest = finals.length ? Math.max.apply(null, finals) : null;
   var passRate = finals.length ? Math.round((passed / finals.length) * 100) : 0;
 
+  var filterLabel = (GB.state.filterSection || GB.state.filterGroup) ? 'Filtered' : 'Enrolled';
+
   var html = '<div class="stats-row no-print">';
-  html += statPill('Students', n, '', 'Enrolled');
+  html += statPill('Students', n, '', filterLabel);
   html += statPill('Passed', passed, 'success', passRate + '% pass rate');
   html += statPill('Failed', failed, 'alert', (100 - passRate) + '% fail rate');
   html += statPill('Mastered', mastered, 'purple', '≥' + w.masteryThreshold + '% final');
@@ -972,7 +1115,7 @@ function renderDeveloperFooter() {
     '<div class="dev-name">JEMUEL C. MARI, MAN, RN, LPT</div>' +
     '<div>Clinical Instructor | Teacher II — Department of Education</div>' +
     '<div><strong>Tarlac State University</strong> — College of Science — Nursing Department</div>' +
-    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.0 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
+    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.1 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
     '</div>';
 }
 
@@ -1039,9 +1182,13 @@ function resetWeights() {
 }
 
 function exportCSV() {
-  var students = GB.state.students;
+  var students = getFilteredStudents();
   var w = GB.state.settings;
   if (!students.length) return toast('No data to export.', 'warning');
+  var isFiltered = GB.state.filterSection || GB.state.filterGroup;
+  if (isFiltered && !confirm('Export only the ' + students.length + ' filtered student(s)?\n\nClick Cancel to export ALL students instead.')) {
+    students = GB.state.students;
+  }
 
   var headers = [
     'Student Name','Student No.','Section','Group','Email',
@@ -1093,7 +1240,8 @@ function exportCSV() {
     return r.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
   }).join('\n');
 
-  downloadFile(csv, 'class-record-' + todayISO() + '.csv', 'text/csv');
+  var filterSuffix = isFiltered ? '-filtered' : '';
+  downloadFile(csv, 'class-record-' + todayISO() + filterSuffix + '.csv', 'text/csv');
   toast('✅ CSV exported.', 'success');
 }
 
