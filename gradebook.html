@@ -1338,20 +1338,113 @@ function closeModal() {
   document.getElementById('modalOverlay').classList.remove('show');
 }
 
+/* ============================================================
+   AUTO-SYNC POLLING — v1.3
+   Silently checks backend for new data every N seconds.
+   Shows a banner + toast when new submissions arrive.
+   ============================================================ */
+var AUTO_SYNC_INTERVAL_MS = 30000;   // 30 seconds (change to 15000 for 15s)
+var autoSyncTimer = null;
+var autoSyncEnabled = true;
+var lastKnownRecordCount = 0;
+var lastKnownNewestTimestamp = null;
+
+function getNewestTimestamp(records) {
+  var newest = null;
+  records.forEach(function(r) {
+    if (!r.timestamp) return;
+    var t = new Date(r.timestamp).getTime();
+    if (!newest || t > newest) newest = t;
+  });
+  return newest;
+}
+
+async function silentSyncCheck() {
+  if (!autoSyncEnabled) return;
+  try {
+    var result = await fetchAllSubmissions();
+    if (!result.success) return;
+
+    var count = result.records.length;
+    var newest = getNewestTimestamp(result.records);
+
+    // First run: initialize trackers
+    if (lastKnownRecordCount === 0) {
+      lastKnownRecordCount = count;
+      lastKnownNewestTimestamp = newest;
+      return;
+    }
+
+    // Detect changes
+    var countChanged = count !== lastKnownRecordCount;
+    var newSubmission = newest && (!lastKnownNewestTimestamp || newest > lastKnownNewestTimestamp);
+
+    if (countChanged || newSubmission) {
+      console.log('[AutoSync] Change detected — count:', count, 'newest:', newest);
+      lastKnownRecordCount = count;
+      lastKnownNewestTimestamp = newest;
+      await syncFromBackend({ silent: true });
+      toast('🔔 New submission(s) received!', 'success');
+    } else {
+      updateSyncStatusIndicator();
+    }
+  } catch (e) {
+    console.warn('[AutoSync] Check failed:', e);
+  }
+}
+
+function startAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  autoSyncTimer = setInterval(silentSyncCheck, AUTO_SYNC_INTERVAL_MS);
+  console.log('[AutoSync] Started — interval:', AUTO_SYNC_INTERVAL_MS + 'ms');
+}
+
+function stopAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  autoSyncTimer = null;
+}
+
+function toggleAutoSync() {
+  autoSyncEnabled = !autoSyncEnabled;
+  if (autoSyncEnabled) {
+    startAutoSync();
+    toast('🔄 Auto-sync ON (every ' + (AUTO_SYNC_INTERVAL_MS/1000) + 's)', 'success');
+  } else {
+    stopAutoSync();
+    toast('⏸ Auto-sync OFF', 'warning');
+  }
+  render();
+}
+
+function updateSyncStatusIndicator() {
+  var el = document.getElementById('syncStatusIndicator');
+  if (!el) return;
+  var last = GB.state.lastSync;
+  if (!last) { el.textContent = 'Never synced'; return; }
+  var secsAgo = Math.round((Date.now() - new Date(last).getTime()) / 1000);
+  var txt;
+  if (secsAgo < 5) txt = 'Just now';
+  else if (secsAgo < 60) txt = secsAgo + 's ago';
+  else if (secsAgo < 3600) txt = Math.round(secsAgo/60) + 'm ago';
+  else txt = Math.round(secsAgo/3600) + 'h ago';
+  el.textContent = 'Last sync: ' + txt + (autoSyncEnabled ? ' • auto-refresh on' : ' • auto-refresh off');
+}
+
 function init() {
   loadLocal();
   if (!GB.state.students.length) {
     syncFromBackend();
   } else {
     render();
-    setTimeout(function() {
-      fetchAllSubmissions().then(function(result) {
-        if (result.success && result.records.length !== GB.state.students.length) {
-          syncFromBackend();
-        }
-      }).catch(function() {});
-    }, 2000);
+    // Prime the auto-sync trackers with initial data
+    setTimeout(silentSyncCheck, 2000);
   }
+
+  // Start auto-sync polling
+  startAutoSync();
+
+  // Update the "X seconds ago" text every 5s
+  setInterval(updateSyncStatusIndicator, 5000);
 
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
     if (e.target.id === 'modalOverlay') closeModal();
