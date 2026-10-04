@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1A5276" />
-  <meta name="description" content="Gradebook v1.2 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
+  <meta name="description" content="Gradebook v1.3 — Drug Administration Mastery. Developed by JEMUEL C. MARI, MAN, RN, LPT." />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <title>Gradebook — Drug Administration Mastery v1.2</title>
+  <title>Gradebook — Drug Administration Mastery v1.3</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -59,6 +59,19 @@
     }
     .toolbar-left h1 { font-size: 1.15rem; color: var(--dark); line-height: 1.2; }
     .toolbar-left small { display: block; font-size: 0.75rem; color: var(--gray); font-weight: 400; margin-top: 0.15rem; }
+    .sync-status {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.7rem; color: var(--secondary);
+      font-weight: 600; margin-top: 0.25rem;
+    }
+    .sync-status::before {
+      content: '●'; color: var(--success); font-size: 0.7rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
     .toolbar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 
     .filter-bar {
@@ -460,10 +473,17 @@
 
 <script>
 /* ============================================================
-   GRADEBOOK — Drug Administration Mastery v1.2
-   NEW: Auto-sort by last name (with toggle)
+   GRADEBOOK — Drug Administration Mastery v1.3
+   NEW: Auto-sync polling every 30 seconds + Last Sync indicator
    ============================================================ */
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
+
+/* ---- AUTO-SYNC CONFIG ---- */
+var AUTO_SYNC_INTERVAL_MS = 30000;   // 30 seconds. Change to 15000 for 15s, 60000 for 60s.
+var autoSyncTimer = null;
+var autoSyncEnabled = true;
+var lastKnownRecordCount = 0;
+var lastKnownNewestTimestamp = null;
 
 var GB = {
   localKey: 'drugAdminMastery_instructor_v1',
@@ -471,8 +491,8 @@ var GB = {
     students: [],
     filterSection: '',
     filterGroup: '',
-    sortBy: 'lastName',   // 'lastName' | 'firstName' | 'group' | 'finalGrade'
-    sortDir: 'asc',       // 'asc' | 'desc'
+    sortBy: 'lastName',
+    sortDir: 'asc',
     settings: {
       courseName: 'NCM 107 Lab — Drug Administration',
       instructorName: 'JEMUEL C. MARI, MAN, RN, LPT',
@@ -524,8 +544,103 @@ async function fetchAllSubmissions() {
   return await res.json();
 }
 
-async function syncFromBackend() {
-  showLoading('Syncing from Google Sheets...');
+/* ============================================================
+   AUTO-SYNC POLLING
+   ============================================================ */
+function getNewestTimestamp(records) {
+  var newest = null;
+  records.forEach(function(r) {
+    if (!r.timestamp) return;
+    var t = new Date(r.timestamp).getTime();
+    if (!newest || t > newest) newest = t;
+  });
+  return newest;
+}
+
+async function silentSyncCheck() {
+  if (!autoSyncEnabled) return;
+  try {
+    var result = await fetchAllSubmissions();
+    if (!result.success) return;
+
+    var count = result.records.length;
+    var newest = getNewestTimestamp(result.records);
+
+    // First run: initialize trackers, then trigger a full sync so data is fresh
+    if (lastKnownRecordCount === 0 && lastKnownNewestTimestamp === null) {
+      lastKnownRecordCount = count;
+      lastKnownNewestTimestamp = newest;
+      if (count > 0 && GB.state.students.length !== count) {
+        await syncFromBackend({ silent: true });
+      }
+      updateSyncStatusIndicator();
+      return;
+    }
+
+    // Detect changes
+    var countChanged = count !== lastKnownRecordCount;
+    var newSubmission = newest && (!lastKnownNewestTimestamp || newest > lastKnownNewestTimestamp);
+
+    if (countChanged || newSubmission) {
+      console.log('[AutoSync] Change detected — count:', count, 'newest:', newest);
+      lastKnownRecordCount = count;
+      lastKnownNewestTimestamp = newest;
+      await syncFromBackend({ silent: true });
+      toast('🔔 New submission(s) received!', 'success');
+    } else {
+      updateSyncStatusIndicator();
+    }
+  } catch (e) {
+    console.warn('[AutoSync] Check failed:', e);
+    updateSyncStatusIndicator();
+  }
+}
+
+function startAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  autoSyncTimer = setInterval(silentSyncCheck, AUTO_SYNC_INTERVAL_MS);
+  console.log('[AutoSync] Started — interval:', AUTO_SYNC_INTERVAL_MS + 'ms');
+}
+
+function stopAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  autoSyncTimer = null;
+}
+
+function toggleAutoSync() {
+  autoSyncEnabled = !autoSyncEnabled;
+  if (autoSyncEnabled) {
+    startAutoSync();
+    toast('🔄 Auto-refresh ON (every ' + (AUTO_SYNC_INTERVAL_MS/1000) + 's)', 'success');
+  } else {
+    stopAutoSync();
+    toast('⏸ Auto-refresh OFF', 'warning');
+  }
+  render();
+}
+
+function updateSyncStatusIndicator() {
+  var el = document.getElementById('syncStatusIndicator');
+  if (!el) return;
+  var last = GB.state.lastSync;
+  if (!last) { el.textContent = 'Never synced'; return; }
+  var secsAgo = Math.round((Date.now() - new Date(last).getTime()) / 1000);
+  var txt;
+  if (secsAgo < 5) txt = 'Just now';
+  else if (secsAgo < 60) txt = secsAgo + 's ago';
+  else if (secsAgo < 3600) txt = Math.round(secsAgo/60) + 'm ago';
+  else txt = Math.round(secsAgo/3600) + 'h ago';
+  el.textContent = 'Last sync: ' + txt + (autoSyncEnabled ? ' • auto-refresh on' : ' • auto-refresh off');
+}
+
+/* ============================================================
+   SYNC FROM BACKEND
+   ============================================================ */
+async function syncFromBackend(opts) {
+  opts = opts || {};
+  var silent = opts.silent === true;
+
+  if (!silent) showLoading('Syncing from Google Sheets...');
   try {
     var result = await fetchAllSubmissions();
     if (!result.success) throw new Error(result.error || 'Sync failed');
@@ -586,11 +701,19 @@ async function syncFromBackend() {
     GB.state.lastSync = new Date().toISOString();
     saveLocal();
     render();
-    toast('✅ Sync complete — Added: ' + added + ', Updated: ' + updated, 'success');
+    updateSyncStatusIndicator();
+
+    if (!silent) {
+      toast('✅ Sync complete — Added: ' + added + ', Updated: ' + updated, 'success');
+    } else if (added + updated > 0) {
+      console.log('[AutoSync] Silently updated — Added: ' + added + ', Updated: ' + updated);
+    }
   } catch (err) {
     console.error(err);
-    showError(err.message);
-    toast('Sync failed: ' + err.message, 'error');
+    if (!silent) {
+      showError(err.message);
+      toast('Sync failed: ' + err.message, 'error');
+    }
   }
 }
 
@@ -641,14 +764,9 @@ function getLastName(fullName) {
   var parts = String(fullName).trim().split(/\s+/);
   if (parts.length === 0) return '';
   if (parts.length === 1) return parts[0];
-  // Handle "Last, First" format
   if (fullName.indexOf(',') > -1) {
     return fullName.split(',')[0].trim();
   }
-  // Standard: assume LastName is the last token
-  // Handles: Juan Dela Cruz → last name = "Cruz"
-  //          Juan Dela Cruz Jr. → last name = "Jr." (may need manual fix)
-  //          Maria Santos → last name = "Santos"
   return parts[parts.length - 1];
 }
 function getFirstName(fullName) {
@@ -858,12 +976,13 @@ function render() {
       '<div class="empty-state">' +
       '<div class="icon">📋</div>' +
       '<h2>No students in the gradebook yet</h2>' +
-      '<p>Click "Sync from Sheet" to pull student data from the backend, or open the Instructor Dashboard to import students by code.</p>' +
+      '<p>Click "Sync Now" to pull student data from the backend, or open the Instructor Dashboard to import students by code.</p>' +
       '<div class="flex gap-1" style="justify-content:center;">' +
-      '<button class="btn btn-primary" onclick="syncFromBackend()">🔄 Sync from Sheet</button>' +
+      '<button class="btn btn-primary" onclick="syncFromBackend()">🔄 Sync Now</button>' +
       '<button class="btn btn-outline" onclick="window.location.href=\'instructor-dashboard.html\'">👨‍🏫 Instructor Dashboard</button>' +
       '</div></div>' +
       renderDeveloperFooter();
+    updateSyncStatusIndicator();
     return;
   }
 
@@ -878,21 +997,26 @@ function render() {
     '</div>' +
     renderStatsSummary() +
     renderDeveloperFooter();
+  updateSyncStatusIndicator();
 }
 
 function renderToolbar() {
-  var lastSync = GB.state.lastSync;
   return '<div class="toolbar no-print">' +
     '<div class="toolbar-left">' +
     '<div class="logo">📊</div>' +
     '<div><h1>Class Record — Gradebook</h1>' +
-    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.2</small></div>' +
+    '<small>' + escapeHtml(GB.state.settings.courseName) + ' — v1.3</small>' +
+    '<div class="sync-status" id="syncStatusIndicator">Checking sync status...</div>' +
+    '</div>' +
     '</div>' +
     '<div class="toolbar-right">' +
     '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'index.html\'">💊 Student App</button>' +
     '<button class="btn btn-outline btn-sm" onclick="window.location.href=\'instructor-dashboard.html\'">👨‍🏫 Dashboard</button>' +
     '<button class="btn btn-outline btn-sm" onclick="openWeightsModal()">⚖️ Weights</button>' +
-    '<button class="btn btn-outline btn-sm" onclick="syncFromBackend()">🔄 Sync' + (lastSync ? ' (' + new Date(lastSync).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + ')' : '') + '</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="toggleAutoSync()" title="Toggle auto-refresh">' +
+      (autoSyncEnabled ? '🔁 Auto-Refresh: ON' : '⏸ Auto-Refresh: OFF') +
+    '</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="syncFromBackend()">🔄 Sync Now</button>' +
     '<button class="btn btn-secondary btn-sm" onclick="exportCSV()">📤 Export CSV</button>' +
     '<button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print</button>' +
     '</div></div>';
@@ -909,12 +1033,6 @@ function renderFilterBar() {
   var sortBy = GB.state.sortBy || 'lastName';
   var sortDir = GB.state.sortDir || 'asc';
   var sortIcon = sortDir === 'asc' ? '↑' : '↓';
-  var sortLabel = {
-    lastName: 'Last Name',
-    firstName: 'First Name',
-    group: 'Section / Group',
-    finalGrade: 'Final Grade'
-  };
 
   return '<div class="filter-bar no-print">' +
     '<div class="filter-group">' +
@@ -993,7 +1111,7 @@ function renderSheetHeader() {
     '<p>School Year ' + escapeHtml(s.schoolYear) + ' &nbsp;|&nbsp; ' + escapeHtml(s.semester) + ' &nbsp;|&nbsp; Instructor: ' + escapeHtml(s.instructorName) + '</p>' +
     filterLine +
     '<p>' + todayLong() + ' &nbsp;|&nbsp; <em>Sorted by Last Name (A–Z)</em></p>' +
-    '<span class="version-tag">App Version 1.2</span>' +
+    '<span class="version-tag">App Version 1.3</span>' +
     '</div>';
 }
 
@@ -1202,7 +1320,7 @@ function renderDeveloperFooter() {
     '<div class="dev-name">JEMUEL C. MARI, MAN, RN, LPT</div>' +
     '<div>Clinical Instructor | Teacher II — Department of Education</div>' +
     '<div><strong>Tarlac State University</strong> — College of Science — Nursing Department</div>' +
-    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.2 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
+    '<div style="margin-top:0.5rem;font-size:0.7rem;">Version 1.3 — © ' + new Date().getFullYear() + ' — All Rights Reserved</div>' +
     '</div>';
 }
 
@@ -1339,97 +1457,8 @@ function closeModal() {
 }
 
 /* ============================================================
-   AUTO-SYNC POLLING — v1.3
-   Silently checks backend for new data every N seconds.
-   Shows a banner + toast when new submissions arrive.
+   INIT — with auto-sync polling
    ============================================================ */
-var AUTO_SYNC_INTERVAL_MS = 30000;   // 30 seconds (change to 15000 for 15s)
-var autoSyncTimer = null;
-var autoSyncEnabled = true;
-var lastKnownRecordCount = 0;
-var lastKnownNewestTimestamp = null;
-
-function getNewestTimestamp(records) {
-  var newest = null;
-  records.forEach(function(r) {
-    if (!r.timestamp) return;
-    var t = new Date(r.timestamp).getTime();
-    if (!newest || t > newest) newest = t;
-  });
-  return newest;
-}
-
-async function silentSyncCheck() {
-  if (!autoSyncEnabled) return;
-  try {
-    var result = await fetchAllSubmissions();
-    if (!result.success) return;
-
-    var count = result.records.length;
-    var newest = getNewestTimestamp(result.records);
-
-    // First run: initialize trackers
-    if (lastKnownRecordCount === 0) {
-      lastKnownRecordCount = count;
-      lastKnownNewestTimestamp = newest;
-      return;
-    }
-
-    // Detect changes
-    var countChanged = count !== lastKnownRecordCount;
-    var newSubmission = newest && (!lastKnownNewestTimestamp || newest > lastKnownNewestTimestamp);
-
-    if (countChanged || newSubmission) {
-      console.log('[AutoSync] Change detected — count:', count, 'newest:', newest);
-      lastKnownRecordCount = count;
-      lastKnownNewestTimestamp = newest;
-      await syncFromBackend({ silent: true });
-      toast('🔔 New submission(s) received!', 'success');
-    } else {
-      updateSyncStatusIndicator();
-    }
-  } catch (e) {
-    console.warn('[AutoSync] Check failed:', e);
-  }
-}
-
-function startAutoSync() {
-  if (autoSyncTimer) clearInterval(autoSyncTimer);
-  autoSyncTimer = setInterval(silentSyncCheck, AUTO_SYNC_INTERVAL_MS);
-  console.log('[AutoSync] Started — interval:', AUTO_SYNC_INTERVAL_MS + 'ms');
-}
-
-function stopAutoSync() {
-  if (autoSyncTimer) clearInterval(autoSyncTimer);
-  autoSyncTimer = null;
-}
-
-function toggleAutoSync() {
-  autoSyncEnabled = !autoSyncEnabled;
-  if (autoSyncEnabled) {
-    startAutoSync();
-    toast('🔄 Auto-sync ON (every ' + (AUTO_SYNC_INTERVAL_MS/1000) + 's)', 'success');
-  } else {
-    stopAutoSync();
-    toast('⏸ Auto-sync OFF', 'warning');
-  }
-  render();
-}
-
-function updateSyncStatusIndicator() {
-  var el = document.getElementById('syncStatusIndicator');
-  if (!el) return;
-  var last = GB.state.lastSync;
-  if (!last) { el.textContent = 'Never synced'; return; }
-  var secsAgo = Math.round((Date.now() - new Date(last).getTime()) / 1000);
-  var txt;
-  if (secsAgo < 5) txt = 'Just now';
-  else if (secsAgo < 60) txt = secsAgo + 's ago';
-  else if (secsAgo < 3600) txt = Math.round(secsAgo/60) + 'm ago';
-  else txt = Math.round(secsAgo/3600) + 'h ago';
-  el.textContent = 'Last sync: ' + txt + (autoSyncEnabled ? ' • auto-refresh on' : ' • auto-refresh off');
-}
-
 function init() {
   loadLocal();
   if (!GB.state.students.length) {
