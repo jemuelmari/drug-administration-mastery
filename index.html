@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <title>💊 Drug Administration Mastery v1.0.1</title>
+  <title>💊 Drug Administration Mastery v1.0.2</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -468,6 +468,44 @@
     .leader-name small { display: block; color: var(--gray); font-weight: 500; font-size: 0.72rem; }
     .leader-score { font-family: var(--font-head); font-weight: 800; color: var(--secondary); font-size: 1rem; }
 
+    /* === SUBMIT HERO BUTTON === */
+    .submit-hero-card {
+      background: linear-gradient(135deg, var(--secondary) 0%, #1B5E20 100%);
+      border-radius: var(--radius); padding: 1.75rem;
+      color: var(--white); margin-bottom: 1.25rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 12px 32px rgba(46,125,50,0.3);
+    }
+    .submit-hero-card::before {
+      content: ''; position: absolute; top: -50%; right: -10%;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .submit-hero-content { position: relative; z-index: 1; }
+    .submit-hero-card h3 { font-size: 1.25rem; margin-bottom: 0.4rem; }
+    .submit-hero-card p { font-size: 0.88rem; opacity: 0.9; margin-bottom: 1rem; }
+    .submit-hero-card .btn { background: var(--white); color: var(--secondary); font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
+    .submit-hero-card .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+
+    /* === DATA TRANSFER DROP ZONE === */
+    .drop-zone {
+      border: 3px dashed var(--primary-light);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      background: var(--light);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .drop-zone .icon { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+    .drop-zone .title { font-family: var(--font-head); font-weight: 700; color: var(--primary); font-size: 1rem; margin-bottom: 0.35rem; }
+    .drop-zone .hint { font-size: 0.82rem; color: var(--gray); }
+
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .mt-1 { margin-top: 0.5rem; }
@@ -490,7 +528,7 @@
       <div class="auth-logo">💊</div>
       <h1>Drug Administration Mastery</h1>
       <p class="auth-subtitle" id="authSubtitle">NCM 107 Lab — Please register to begin</p>
-      <span class="auth-version">Version 1.0.1</span>
+      <span class="auth-version">Version 1.0.2</span>
     </div>
     <div class="auth-tabs" id="authTabs">
       <button class="auth-tab active" data-tab="register" onclick="switchAuthTab('register')">📝 Register</button>
@@ -525,6 +563,11 @@
     </form>
     <div id="loginForm" class="hidden">
       <div class="saved-students" id="savedStudentsArea"></div>
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--gray-light);">
+        <p style="font-size:0.82rem;color:var(--gray);text-align:center;margin-bottom:0.75rem;">Or restore progress from a backup file:</p>
+        <input type="file" id="restoreFileInput" accept=".json,application/json" style="display:none;" onchange="handleRestoreFile(event)" />
+        <button class="btn btn-outline btn-block" onclick="document.getElementById('restoreFileInput').click()">📁 Import Progress from JSON</button>
+      </div>
     </div>
     <div style="text-align:center;margin-top:1.75rem;font-size:0.75rem;color:var(--gray);line-height:1.7;">
       Developed by <strong style="color:var(--primary);">JEMUEL C. MARI, MAN, RN, LPT</strong><br>
@@ -539,7 +582,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-wrap">💊</div>
-      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0.1</small></div>
+      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0.2</small></div>
     </div>
     <div class="student-card">
       <div class="avatar" id="chipAvatar">—</div>
@@ -585,8 +628,9 @@
         <button class="nav-item" id="navCert" data-view="certificate"><span class="icon">🏅</span> Certificate</button>
       </div>
       <div class="nav-section">
-        <div class="nav-section-title">Submit</div>
+        <div class="nav-section-title">Submit & Transfer</div>
         <button class="nav-item" data-view="handoff"><span class="icon">📤</span> Submit Progress</button>
+        <button class="nav-item" data-view="transfer"><span class="icon">💾</span> Backup / Transfer</button>
         <button class="nav-item" data-view="inbox"><span class="icon">📬</span> Instructor Feedback</button>
         <button class="nav-item" data-view="feedback"><span class="icon">💬</span> Send Feedback</button>
       </div>
@@ -601,7 +645,7 @@
       <div>Clinical Instructor</div>
       <div>Teacher II — DepEd</div>
       <div>Tarlac State University</div>
-      <div class="version-tag">v1.0.1</div>
+      <div class="version-tag">v1.0.2</div>
     </div>
   </aside>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open'); this.style.display='none'"></div>
@@ -668,16 +712,56 @@
   </div>
 </div>
 
+<!-- NEW: Submit Confirmation Modal -->
+<div class="modal-overlay" id="submitConfirmModal">
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-icon" style="background:var(--secondary-light);">📤</div>
+      <h2 style="color:var(--secondary);">Submit Progress?</h2>
+      <p>This will send your current progress to your instructor.</p>
+      <div class="modal-student" id="submitPreview"></div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="closeSubmitModal()">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;">Cancel</div>
+        </button>
+        <button class="modal-btn" onclick="confirmSubmit()" style="border-color:var(--secondary);background:var(--secondary-light);">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;color:var(--secondary);">✅ Yes, Submit Now</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: Import JSON Modal -->
+<div class="modal-overlay" id="importConfirmModal">
+  <div class="modal">
+    <div class="modal-content">
+      <div class="modal-icon" style="background:var(--warning-light);">⚠️</div>
+      <h2 style="color:var(--warning);">Replace Progress?</h2>
+      <p>The imported file will REPLACE your current progress on this device. This cannot be undone.</p>
+      <div class="modal-student" id="importPreview"></div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="closeImportModal()">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;">Cancel</div>
+        </button>
+        <button class="modal-btn" onclick="confirmImport()" style="border-color:var(--warning);background:var(--warning-light);">
+          <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;color:var(--warning);">✅ Yes, Import & Replace</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ============================================================
-   ⚠️ BACKEND — REPLACE WITH YOUR APPS SCRIPT URL
+   BACKEND URL
    ============================================================ */
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
 
 var APP = {
-  version: '1.0.1',
+  version: '1.0.2',
   storageKey: 'drugAdminMastery_v1',
   savedSessionsKey: 'drugAdminMastery_savedSessions',
   state: {
@@ -688,7 +772,8 @@ var APP = {
     checklists: { oral: {}, parenteral: {} },
     instructorFeedback: []
   },
-  authMode: 'register'
+  authMode: 'register',
+  pendingImport: null
 };
 
 /* ---------- PERSISTENCE ---------- */
@@ -750,10 +835,6 @@ function getGreeting() {
 
 /* ============================================================
    SCORE MIGRATION UTILITY — v1.0.1
-   Fixes historical scoring errors caused by:
-   1. Case-sensitivity in quiz/game/exam comparisons
-   2. Wrong answer key for ampule dot direction (Unit 10 Q1)
-   Runs automatically on app load. Safe to run multiple times.
    ============================================================ */
 var MIGRATION_KEY = 'drugAdminMastery_migrations';
 var MIGRATION_VERSION = '2025-01-ampule-fix';
@@ -777,10 +858,6 @@ function runMigrations() {
   console.log('[Migration] Running', MIGRATION_VERSION);
   var fixed = { quizzes: 0, games: 0, exams: 0 };
 
-  // Fix 1: Ampule quiz question in Unit 10
-  // Old answer key: "Toward you" (WRONG)
-  // Correct answer: "Away from you"
-  // Award +10 percentage points to any unit10 attempt that scored 80-89.
   try {
     var quizAttempts = APP.state.quizAttempts || {};
     if (quizAttempts.unit10 && quizAttempts.unit10.length) {
@@ -805,11 +882,6 @@ function runMigrations() {
       }
     }
   } catch (e) { console.warn('[Migration] Quiz fix failed:', e); }
-
-  // Fix 2 & 3: Case-sensitivity — no historical data correction possible.
-  // Future submissions use corrected logic.
-
-  // Fix 4: Exam — ampule question not in exam bank. No correction needed.
 
   if (APP.state.student) {
     registerSavedSession(buildStudentRecord());
@@ -1082,6 +1154,7 @@ function renderView(view) {
       case 'exam': return renderExam(main);
       case 'certificate': return renderCertificate(main);
       case 'handoff': return renderHandoff(main);
+      case 'transfer': return renderTransfer(main);
       case 'inbox': return renderInbox(main);
       case 'feedback': return renderFeedback(main);
       default: return renderHome(main);
@@ -1137,7 +1210,7 @@ function isCertificateUnlocked() {
 }
 
 /* ============================================================
-   HOME
+   HOME — with new Submit Hero Card
    ============================================================ */
 function renderHome(main) {
   var pct = getProgressPercent();
@@ -1161,12 +1234,20 @@ function renderHome(main) {
   html += '<div class="hero-stat"><div class="stat-value">' + totalAttempts() + '</div><div class="stat-label">Attempts</div></div>';
   html += '</div></div></div>';
 
+  // === NEW: One-Click Submit Card ===
+  html += '<div class="submit-hero-card fade-in"><div class="submit-hero-content">';
+  html += '<h3>📤 Submit Progress to Instructor</h3>';
+  html += '<p>Click the button below to send your current progress. No code copying needed.</p>';
+  html += '<button class="btn btn-lg" onclick="openSubmitModal()">🚀 Submit Now</button>';
+  html += '</div></div>';
+
   if (submissionCode) {
     html += '<div class="card fade-in" style="border:2px solid var(--secondary);">';
-    html += '<div class="card-header"><div class="card-title">✅ Submitted to Instructor</div></div>';
-    html += '<div class="code-display"><div class="code-label">Your Submission Code</div>';
+    html += '<div class="card-header"><div class="card-title">✅ Last Submission Code</div></div>';
+    html += '<div class="code-display"><div class="code-label">Your Code</div>';
     html += '<div class="code-value">' + escapeHtml(submissionCode) + '</div>';
-    html += '<button class="btn btn-primary btn-sm" onclick="copySubmissionCode()">📋 Copy Code</button></div>';
+    html += '<p style="font-size:0.8rem;color:var(--primary-dark);margin-top:0.5rem;">Give this code to your instructor if requested.</p>';
+    html += '</div>';
     html += '</div>';
   }
 
@@ -1250,7 +1331,7 @@ function renderHome(main) {
   html += '<button class="btn btn-primary" onclick="navigate(\'' + nextUnit() + '\')">📚 Continue Learning</button>';
   html += '<button class="btn btn-secondary" onclick="navigate(\'calculator\')">🧮 Dosage Calculator</button>';
   html += '<button class="btn btn-outline" onclick="navigate(\'drugs\')">🔍 Drug Database</button>';
-  html += '<button class="btn btn-outline" onclick="navigate(\'handoff\')">📤 Submit Progress</button>';
+  html += '<button class="btn btn-outline" onclick="navigate(\'transfer\')">💾 Backup / Transfer</button>';
   html += '</div></div>';
 
   html += '<div class="card" style="text-align:center;background:linear-gradient(135deg,var(--primary-light),var(--secondary-light));border:2px solid var(--primary);">';
@@ -1288,7 +1369,7 @@ var UNITS = [
 ];
 
 /* ============================================================
-   UNIT CONTENT (with corrected ampule direction)
+   UNIT CONTENT (abbreviated for brevity — same as v1.0.1)
    ============================================================ */
 var UNIT_CONTENT = {
   unit1: {
@@ -1297,29 +1378,13 @@ var UNIT_CONTENT = {
       { heading: '📌 Definition', type: 'callout', variant: 'info',
         html: '<strong>Drug Administration</strong> refers to the preparation, delivery, and evaluation of medications prescribed to patients.' },
       { heading: '✨ Importance', type: 'table', headers: ['Area', 'Impact'],
-        rows: [
-          ['Safety', 'Prevents medication errors'],
-          ['Outcomes', 'Promotes therapeutic effect'],
-          ['Patient care', 'Supports patient safety'],
-          ['Quality', 'Enhances quality nursing care']
-        ] },
+        rows: [['Safety', 'Prevents medication errors'], ['Outcomes', 'Promotes therapeutic effect'], ['Patient care', 'Supports patient safety'], ['Quality', 'Enhances quality nursing care']] },
       { heading: '⚖️ Nurse\'s Legal Responsibilities', type: 'list',
         items: ['Follow doctor\'s orders accurately', 'Verify medications before giving', 'Document accurately and promptly', 'Monitor patient responses', 'Report adverse reactions'] },
       { heading: '🩺 Ethical Principles', type: 'table', headers: ['Principle', 'Meaning'],
-        rows: [
-          ['Autonomy', 'Respect patient\'s right to decide'],
-          ['Beneficence', 'Act in patient\'s best interest'],
-          ['Nonmaleficence', 'Do no harm'],
-          ['Justice', 'Fair and equitable care'],
-          ['Veracity', 'Truthfulness'],
-          ['Fidelity', 'Keep promises and commitments']
-        ] },
+        rows: [['Autonomy', 'Respect patient\'s right to decide'], ['Beneficence', 'Act in patient\'s best interest'], ['Nonmaleficence', 'Do no harm'], ['Justice', 'Fair and equitable care'], ['Veracity', 'Truthfulness'], ['Fidelity', 'Keep promises and commitments']] },
       { heading: '📚 Key Terms', type: 'table', headers: ['Term', 'Definition'],
-        rows: [
-          ['Medication Error', 'Any preventable mistake involving medication use'],
-          ['Adverse Drug Reaction (ADR)', 'Unexpected harmful response to a drug'],
-          ['Near Miss', 'Error detected before reaching the patient']
-        ] },
+        rows: [['Medication Error', 'Any preventable mistake involving medication use'], ['Adverse Drug Reaction (ADR)', 'Unexpected harmful response to a drug'], ['Near Miss', 'Error detected before reaching the patient']] },
       { heading: '🌐 WHO Medication Without Harm', type: 'callout', variant: 'warning',
         html: '<strong>Focus Areas:</strong><br>• High-risk medications<br>• Polypharmacy<br>• Transitions of care' },
       { heading: '🚀 Current Trends (2021–2026)', type: 'list',
@@ -1330,14 +1395,7 @@ var UNIT_CONTENT = {
     intro: 'Ethical and legal frameworks guide every medication decision. Nurses are personally accountable for their actions.',
     sections: [
       { heading: '⚖️ Ethical Principles in Medication', type: 'table', headers: ['Principle', 'Application'],
-        rows: [
-          ['Autonomy', 'Patient may refuse medication'],
-          ['Beneficence', 'Choose safest administration route'],
-          ['Nonmaleficence', 'Prevent medication errors'],
-          ['Justice', 'Equal care regardless of background'],
-          ['Veracity', 'Honest about side effects'],
-          ['Fidelity', 'Follow through on scheduled doses']
-        ] },
+        rows: [['Autonomy', 'Patient may refuse medication'], ['Beneficence', 'Choose safest administration route'], ['Nonmaleficence', 'Prevent medication errors'], ['Justice', 'Equal care regardless of background'], ['Veracity', 'Honest about side effects'], ['Fidelity', 'Follow through on scheduled doses']] },
       { heading: '🚫 Common Legal Violations', type: 'list',
         items: ['Failure to verify order', 'Administering wrong drug or dose', 'Failure to document', 'Failure to report adverse reactions', 'Ignoring patient\'s right to refuse'] },
       { heading: '🛡️ Nurse\'s Responsibilities', type: 'callout', variant: 'success',
@@ -1347,234 +1405,114 @@ var UNIT_CONTENT = {
   unit3: {
     intro: 'The nursing process (ADPIE) is applied to every medication administration episode.',
     sections: [
-      { heading: 'A — Assessment', type: 'list',
-        items: ['Allergies', 'Medication history', 'Vital signs', 'Laboratory results', 'Contraindications', 'Patient readiness'] },
+      { heading: 'A — Assessment', type: 'list', items: ['Allergies', 'Medication history', 'Vital signs', 'Laboratory results', 'Contraindications', 'Patient readiness'] },
       { heading: '🔍 Assessment Examples', type: 'table', headers: ['Before giving...', 'Check...'],
-        rows: [
-          ['Antihypertensives', 'Blood pressure'],
-          ['Digoxin', 'Apical pulse'],
-          ['Insulin', 'Blood glucose'],
-          ['Anticoagulants', 'Coagulation profile / bleeding'],
-          ['Opioids', 'Respiratory rate']
-        ] },
-      { heading: 'B — Nursing Diagnosis', type: 'list',
-        items: ['Deficient Knowledge', 'Risk for Injury', 'Risk for Adverse Drug Reaction', 'Ineffective Health Management'] },
-      { heading: 'C — Planning', type: 'callout', variant: 'info',
-        html: '<strong>Expected Outcomes:</strong><br>• Medication administered safely<br>• Desired therapeutic effect achieved<br>• Patient verbalizes understanding' },
-      { heading: 'D — Implementation', type: 'list',
-        items: ['Verify order', 'Prepare medication', 'Apply the 10 Rights', 'Educate patient', 'Administer medication'] },
-      { heading: 'E — Evaluation', type: 'list',
-        items: ['Therapeutic effect', 'Side effects', 'Adverse reactions', 'Patient understanding'] }
+        rows: [['Antihypertensives', 'Blood pressure'], ['Digoxin', 'Apical pulse'], ['Insulin', 'Blood glucose'], ['Anticoagulants', 'Coagulation profile / bleeding'], ['Opioids', 'Respiratory rate']] },
+      { heading: 'B — Nursing Diagnosis', type: 'list', items: ['Deficient Knowledge', 'Risk for Injury', 'Risk for Adverse Drug Reaction', 'Ineffective Health Management'] },
+      { heading: 'C — Planning', type: 'callout', variant: 'info', html: '<strong>Expected Outcomes:</strong><br>• Medication administered safely<br>• Desired therapeutic effect achieved<br>• Patient verbalizes understanding' },
+      { heading: 'D — Implementation', type: 'list', items: ['Verify order', 'Prepare medication', 'Apply the 10 Rights', 'Educate patient', 'Administer medication'] },
+      { heading: 'E — Evaluation', type: 'list', items: ['Therapeutic effect', 'Side effects', 'Adverse reactions', 'Patient understanding'] }
     ]
   },
   unit4: {
     intro: 'The 10 Rights and 3 Checks are the safety backbone of medication administration.',
     sections: [
       { heading: '🔟 The 10 Rights', type: 'table', headers: ['Right', 'Nursing Consideration'],
-        rows: [
-          ['Right Patient', 'Use two identifiers'],
-          ['Right Medication', 'Compare order with label'],
-          ['Right Dose', 'Perform calculations accurately'],
-          ['Right Route', 'Verify prescribed route'],
-          ['Right Time', 'Follow schedule'],
-          ['Right Documentation', 'Record immediately'],
-          ['Right Assessment', 'Assess before giving drug'],
-          ['Right Education', 'Explain medication'],
-          ['Right Evaluation', 'Assess response'],
-          ['Right to Refuse', 'Respect patient\'s decision']
-        ] },
+        rows: [['Right Patient', 'Use two identifiers'], ['Right Medication', 'Compare order with label'], ['Right Dose', 'Perform calculations accurately'], ['Right Route', 'Verify prescribed route'], ['Right Time', 'Follow schedule'], ['Right Documentation', 'Record immediately'], ['Right Assessment', 'Assess before giving drug'], ['Right Education', 'Explain medication'], ['Right Evaluation', 'Assess response'], ['Right to Refuse', 'Respect patient\'s decision']] },
       { heading: '✅ The 3 Checks', type: 'table', headers: ['Check', 'When', 'Purpose'],
-        rows: [
-          ['First Check', 'When removing from storage', 'Verify correct medication'],
-          ['Second Check', 'During preparation', 'Prevent preparation errors'],
-          ['Third Check', 'At bedside before administration', 'Ensure patient safety']
-        ] },
-      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger',
-        html: '• Wrong patient<br>• Wrong drug<br>• Wrong dose<br>• Omitted dose<br>• Wrong documentation' },
-      { heading: '🚫 Common Mistakes', type: 'list',
-        items: ['Failure to read label', 'Failure to identify patient', 'Distractions during preparation'] }
+        rows: [['First Check', 'When removing from storage', 'Verify correct medication'], ['Second Check', 'During preparation', 'Prevent preparation errors'], ['Third Check', 'At bedside before administration', 'Ensure patient safety']] },
+      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger', html: '• Wrong patient<br>• Wrong drug<br>• Wrong dose<br>• Omitted dose<br>• Wrong documentation' },
+      { heading: '🚫 Common Mistakes', type: 'list', items: ['Failure to read label', 'Failure to identify patient', 'Distractions during preparation'] }
     ]
   },
   unit5: {
     intro: 'Physician orders come in different forms — each with its own timing rules.',
     sections: [
       { heading: '📋 Order Types', type: 'table', headers: ['Type', 'Description', 'Example'],
-        rows: [
-          ['Standing', 'Remains in effect until discontinued', 'Metformin 500 mg PO BID'],
-          ['Routine', 'Regularly scheduled medication', 'Amlodipine 5 mg PO OD'],
-          ['PRN', 'Given as needed', 'Paracetamol 500 mg PO PRN pain'],
-          ['Single', 'Administered once', 'One-time dose'],
-          ['STAT', 'Immediately', 'Epinephrine 0.3 mg IM STAT'],
-          ['Now', 'Within a short specified time', 'Within 30 minutes']
-        ] },
-      { heading: '⚠️ Key Points', type: 'callout', variant: 'warning',
-        html: '• Never assume an illegible order<br>• Clarify with the prescriber<br>• Follow agency policy for verbal orders<br>• Document the prescriber\'s name and time received' }
+        rows: [['Standing', 'Remains in effect until discontinued', 'Metformin 500 mg PO BID'], ['Routine', 'Regularly scheduled medication', 'Amlodipine 5 mg PO OD'], ['PRN', 'Given as needed', 'Paracetamol 500 mg PO PRN pain'], ['Single', 'Administered once', 'One-time dose'], ['STAT', 'Immediately', 'Epinephrine 0.3 mg IM STAT'], ['Now', 'Within a short specified time', 'Within 30 minutes']] },
+      { heading: '⚠️ Key Points', type: 'callout', variant: 'warning', html: '• Never assume an illegible order<br>• Clarify with the prescriber<br>• Follow agency policy for verbal orders<br>• Document the prescriber\'s name and time received' }
     ]
   },
   unit6: {
     intro: 'The oral route is the most common and safest. Topical medications act locally or systemically through the skin.',
     sections: [
-      { heading: '💊 Oral Route (PO)', type: 'list',
-        items: ['Administered through the mouth', 'Absorbed in the GI tract', 'Convenient, economical, non-invasive', 'Slow onset of action'] },
-      { heading: '📋 Common Forms', type: 'list',
-        items: ['Tablets, capsules, caplets', 'Syrups, suspensions, powders', 'Sublingual and buccal tablets'] },
-      { heading: '⚠️ Nursing Considerations (Oral)', type: 'callout', variant: 'warning',
-        html: '• Never crush enteric-coated or sustained-release meds<br>• Assess NPO status<br>• Verify swallowing ability<br>• Monitor for aspiration risk<br>• Position patient upright' },
+      { heading: '💊 Oral Route (PO)', type: 'list', items: ['Administered through the mouth', 'Absorbed in the GI tract', 'Convenient, economical, non-invasive', 'Slow onset of action'] },
+      { heading: '📋 Common Forms', type: 'list', items: ['Tablets, capsules, caplets', 'Syrups, suspensions, powders', 'Sublingual and buccal tablets'] },
+      { heading: '⚠️ Nursing Considerations (Oral)', type: 'callout', variant: 'warning', html: '• Never crush enteric-coated or sustained-release meds<br>• Assess NPO status<br>• Verify swallowing ability<br>• Monitor for aspiration risk<br>• Position patient upright' },
       { heading: '🧴 Topical Route', type: 'table', headers: ['Type', 'Example'],
-        rows: [
-          ['Creams (water-based)', 'Hydrocortisone cream'],
-          ['Ointments (oil-based)', 'Mupirocin ointment'],
-          ['Lotions', 'Calamine lotion'],
-          ['Transdermal patches', 'Nitroglycerin, Nicotine, Fentanyl']
-        ] },
-      { heading: '🚫 Topical Considerations', type: 'callout', variant: 'warning',
-        html: '• Do not apply over broken skin unless ordered<br>• Remove previous patch before applying new one<br>• Rotate patch sites<br>• Avoid heating pads over patches' }
+        rows: [['Creams (water-based)', 'Hydrocortisone cream'], ['Ointments (oil-based)', 'Mupirocin ointment'], ['Lotions', 'Calamine lotion'], ['Transdermal patches', 'Nitroglycerin, Nicotine, Fentanyl']] },
+      { heading: '🚫 Topical Considerations', type: 'callout', variant: 'warning', html: '• Do not apply over broken skin unless ordered<br>• Remove previous patch before applying new one<br>• Rotate patch sites<br>• Avoid heating pads over patches' }
     ]
   },
   unit7: {
     intro: 'Ophthalmic and otic routes require precise technique to ensure medication reaches its target without contamination.',
     sections: [
-      { heading: '👁️ Ophthalmic Route', type: 'list',
-        items: ['Medication into the conjunctival sac', 'Treats infection, inflammation, glaucoma', 'Use eye drops and ointments'] },
-      { heading: '👁️ Eye Drop Procedure', type: 'list',
-        items: ['Verify order, identify patient', 'Ask patient to look up', 'Pull lower eyelid downward to expose conjunctival sac', 'Instill drops into the sac, avoid touching eye', 'Ask patient to close eyes gently', 'Press nasolacrimal duct 30 seconds'] },
-      { heading: '👂 Otic Route', type: 'list',
-        items: ['Medication into external auditory canal', 'Treats infection, wax impaction, inflammation', 'Warm drops to room temperature'] },
+      { heading: '👁️ Ophthalmic Route', type: 'list', items: ['Medication into the conjunctival sac', 'Treats infection, inflammation, glaucoma', 'Use eye drops and ointments'] },
+      { heading: '👁️ Eye Drop Procedure', type: 'list', items: ['Verify order, identify patient', 'Ask patient to look up', 'Pull lower eyelid downward to expose conjunctival sac', 'Instill drops into the sac, avoid touching eye', 'Ask patient to close eyes gently', 'Press nasolacrimal duct 30 seconds'] },
+      { heading: '👂 Otic Route', type: 'list', items: ['Medication into external auditory canal', 'Treats infection, wax impaction, inflammation', 'Warm drops to room temperature'] },
       { heading: '👂 Technique by Age', type: 'table', headers: ['Age', 'Pinna Direction'],
-        rows: [
-          ['Adult', 'Up and back'],
-          ['Child <3 yrs', 'Down and back']
-        ] },
-      { heading: '⚠️ Key Considerations', type: 'callout', variant: 'warning',
-        html: '• Administer drops before ointments<br>• Wait 5 minutes between medications<br>• Never touch dropper tip<br>• Use separate containers per patient<br>• Keep patient side-lying 2-5 minutes (otic)' }
+        rows: [['Adult', 'Up and back'], ['Child <3 yrs', 'Down and back']] },
+      { heading: '⚠️ Key Considerations', type: 'callout', variant: 'warning', html: '• Administer drops before ointments<br>• Wait 5 minutes between medications<br>• Never touch dropper tip<br>• Use separate containers per patient<br>• Keep patient side-lying 2-5 minutes (otic)' }
     ]
   },
   unit8: {
     intro: 'Parenteral routes bypass the GI tract for rapid, precise delivery. Each has distinct needle, angle, and site requirements.',
     sections: [
       { heading: '💉 Intradermal (ID)', type: 'table', headers: ['Attribute', 'Specification'],
-        rows: [
-          ['Purpose', 'Allergy testing, TB testing'],
-          ['Sites', 'Inner forearm, upper back'],
-          ['Needle gauge', '25–27 G'],
-          ['Needle length', '¼–⅝ inch'],
-          ['Angle', '5–15 degrees'],
-          ['Volume', '0.01–0.1 mL'],
-          ['Key sign', 'Wheal or bleb forms']
-        ] },
+        rows: [['Purpose', 'Allergy testing, TB testing'], ['Sites', 'Inner forearm, upper back'], ['Needle gauge', '25–27 G'], ['Needle length', '¼–⅝ inch'], ['Angle', '5–15 degrees'], ['Volume', '0.01–0.1 mL'], ['Key sign', 'Wheal or bleb forms']] },
       { heading: '💉 Subcutaneous (SC)', type: 'table', headers: ['Attribute', 'Specification'],
-        rows: [
-          ['Purpose', 'Insulin, anticoagulants, hormones'],
-          ['Sites', 'Abdomen, upper arm, thigh, upper buttock'],
-          ['Needle gauge', '25–31 G'],
-          ['Needle length', '⅜–⅝ inch'],
-          ['Angle', '45–90 degrees'],
-          ['Volume', '≤1 mL']
-        ] },
+        rows: [['Purpose', 'Insulin, anticoagulants, hormones'], ['Sites', 'Abdomen, upper arm, thigh, upper buttock'], ['Needle gauge', '25–31 G'], ['Needle length', '⅜–⅝ inch'], ['Angle', '45–90 degrees'], ['Volume', '≤1 mL']] },
       { heading: '💉 Intramuscular (IM)', type: 'table', headers: ['Site', 'Use', 'Max Volume'],
-        rows: [
-          ['Deltoid', 'Vaccines', '1 mL'],
-          ['Vastus Lateralis', 'Infants', '2–3 mL'],
-          ['Ventrogluteal', 'Adults (safest)', '3–5 mL']
-        ] },
-      { heading: '💉 IM Needle Specs', type: 'callout', variant: 'info',
-        html: '<strong>Gauge:</strong> 20–25 G<br><strong>Length:</strong> 1–1.5 inches<br><strong>Angle:</strong> 90 degrees<br><strong>Volume:</strong> 1–5 mL' },
-      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning',
-        html: '• Rotate insulin sites<br>• Avoid bruised tissue<br>• Do not massage heparin sites<br>• Use ventrogluteal for adults<br>• Aspirate only for IM (per agency policy)' }
+        rows: [['Deltoid', 'Vaccines', '1 mL'], ['Vastus Lateralis', 'Infants', '2–3 mL'], ['Ventrogluteal', 'Adults (safest)', '3–5 mL']] },
+      { heading: '💉 IM Needle Specs', type: 'callout', variant: 'info', html: '<strong>Gauge:</strong> 20–25 G<br><strong>Length:</strong> 1–1.5 inches<br><strong>Angle:</strong> 90 degrees<br><strong>Volume:</strong> 1–5 mL' },
+      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning', html: '• Rotate insulin sites<br>• Avoid bruised tissue<br>• Do not massage heparin sites<br>• Use ventrogluteal for adults<br>• Aspirate only for IM (per agency policy)' }
     ]
   },
   unit9: {
     intro: 'The IV route delivers medication directly into the bloodstream for immediate effect — with higher risk requiring precise technique.',
     sections: [
-      { heading: '🩸 IV Purpose', type: 'list',
-        items: ['Immediate therapeutic effect', 'Emergency medication delivery', 'Fluid therapy', 'Blood products'] },
-      { heading: '🩸 Common Sites', type: 'list',
-        items: ['Dorsal hand veins', 'Cephalic vein', 'Basilic vein', 'Median cubital vein'] },
+      { heading: '🩸 IV Purpose', type: 'list', items: ['Immediate therapeutic effect', 'Emergency medication delivery', 'Fluid therapy', 'Blood products'] },
+      { heading: '🩸 Common Sites', type: 'list', items: ['Dorsal hand veins', 'Cephalic vein', 'Basilic vein', 'Median cubital vein'] },
       { heading: '🩸 Catheter Sizes', type: 'table', headers: ['Gauge', 'Use'],
-        rows: [
-          ['18 G', 'Trauma / blood transfusion'],
-          ['20 G', 'General adult therapy'],
-          ['22 G', 'Older adults'],
-          ['24 G', 'Pediatric patients']
-        ] },
+        rows: [['18 G', 'Trauma / blood transfusion'], ['20 G', 'General adult therapy'], ['22 G', 'Older adults'], ['24 G', 'Pediatric patients']] },
       { heading: '🩸 Angle of Insertion', type: 'callout', variant: 'info', html: '<strong>10–30 degrees</strong>, bevel up, until flashback of blood.' },
       { heading: '🚨 IV Complications', type: 'table', headers: ['Complication', 'Description'],
-        rows: [
-          ['Infiltration', 'IV fluid enters surrounding tissue'],
-          ['Extravasation', 'Vesicant medication leaks into tissue'],
-          ['Phlebitis', 'Vein inflammation'],
-          ['Infection', 'Catheter-related infection']
-        ] },
-      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning',
-        html: '• Follow "slow IV push" recommendation<br>• Monitor for infiltration, phlebitis, extravasation<br>• Assess compatibility before mixing<br>• Use infusion pumps for high-alert meds<br>• Observe for immediate adverse reactions' }
+        rows: [['Infiltration', 'IV fluid enters surrounding tissue'], ['Extravasation', 'Vesicant medication leaks into tissue'], ['Phlebitis', 'Vein inflammation'], ['Infection', 'Catheter-related infection']] },
+      { heading: '⚠️ Nursing Considerations', type: 'callout', variant: 'warning', html: '• Follow "slow IV push" recommendation<br>• Monitor for infiltration, phlebitis, extravasation<br>• Assess compatibility before mixing<br>• Use infusion pumps for high-alert meds<br>• Observe for immediate adverse reactions' }
     ]
   },
   unit10: {
     intro: 'Correct technique in preparing medication from ampules and vials prevents contamination and dosing errors.',
     sections: [
       { heading: '🧪 Ampule Preparation', type: 'list',
-        items: [
-          'Verify order',
-          'Hand hygiene',
-          'Tap ampule neck to move fluid down',
-          'Clean neck with alcohol',
-          'Break ampule with the dot/colored band facing AWAY from you, breaking away from your body',
-          'Use filter needle to withdraw',
-          'Remove air bubbles',
-          'Replace with regular needle before injection'
-        ] },
+        items: ['Verify order', 'Hand hygiene', 'Tap ampule neck to move fluid down', 'Clean neck with alcohol', 'Break ampule with the dot/colored band facing AWAY from you, breaking away from your body', 'Use filter needle to withdraw', 'Remove air bubbles', 'Replace with regular needle before injection'] },
       { heading: '🧪 Vial Preparation', type: 'table', headers: ['Type', 'Characteristic'],
-        rows: [
-          ['Single-dose', 'Discard after use'],
-          ['Multi-dose', 'Contains preservative; multiple withdrawals']
-        ] },
-      { heading: '🧪 Vial Steps', type: 'list',
-        items: ['Verify order', 'Hand hygiene', 'Disinfect rubber stopper', 'Inject air equal to dose', 'Withdraw medication', 'Remove air bubbles', 'Label if necessary'] },
-      { heading: '🧪 Reconstitution', type: 'callout', variant: 'info',
-        html: '<strong>Powder + Diluent = Solution</strong><br><br><strong>Common diluents:</strong><br>• Sterile water<br>• Normal saline (0.9% NaCl)' },
-      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger',
-        html: '• Contamination of needle<br>• Glass particle aspiration<br>• Incorrect dosage<br>• Using wrong diluent' }
+        rows: [['Single-dose', 'Discard after use'], ['Multi-dose', 'Contains preservative; multiple withdrawals']] },
+      { heading: '🧪 Vial Steps', type: 'list', items: ['Verify order', 'Hand hygiene', 'Disinfect rubber stopper', 'Inject air equal to dose', 'Withdraw medication', 'Remove air bubbles', 'Label if necessary'] },
+      { heading: '🧪 Reconstitution', type: 'callout', variant: 'info', html: '<strong>Powder + Diluent = Solution</strong><br><br><strong>Common diluents:</strong><br>• Sterile water<br>• Normal saline (0.9% NaCl)' },
+      { heading: '⚠️ Common Errors', type: 'callout', variant: 'danger', html: '• Contamination of needle<br>• Glass particle aspiration<br>• Incorrect dosage<br>• Using wrong diluent' }
     ]
   },
   unit11: {
     intro: 'Accurate dosage calculation is non-negotiable. Use the standard formula every time.',
     sections: [
-      { heading: '🧮 Standard Formula', type: 'callout', variant: 'info',
-        html: '<div style="text-align:center;font-size:1.3rem;font-family:var(--font-head);font-weight:800;color:var(--primary);padding:1rem;background:#fff;border-radius:10px;">Desired Dose ÷ Stock Dose × Volume Available</div>' },
-      { heading: '💊 Example 1 — Tablet', type: 'callout', variant: 'success',
-        html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/tablet<br><strong>Calculate:</strong> 500 ÷ 250 = <strong>2 tablets</strong>' },
-      { heading: '💧 Example 2 — Liquid', type: 'callout', variant: 'success',
-        html: '<strong>Order:</strong> 250 mg<br><strong>Available:</strong> 125 mg/5 mL<br><strong>Calculate:</strong> 250 ÷ 125 × 5 = <strong>10 mL</strong>' },
-      { heading: '💉 Example 3 — IM Injection', type: 'callout', variant: 'success',
-        html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/mL<br><strong>Calculate:</strong> 500 ÷ 250 × 1 = <strong>2 mL</strong>' },
-      { heading: '⚠️ Safety Reminders', type: 'callout', variant: 'warning',
-        html: '• Always double-check calculations<br>• Have a second nurse verify high-alert doses<br>• Round only at the end<br>• Verify units match (mg vs mcg vs g)' }
+      { heading: '🧮 Standard Formula', type: 'callout', variant: 'info', html: '<div style="text-align:center;font-size:1.3rem;font-family:var(--font-head);font-weight:800;color:var(--primary);padding:1rem;background:#fff;border-radius:10px;">Desired Dose ÷ Stock Dose × Volume Available</div>' },
+      { heading: '💊 Example 1 — Tablet', type: 'callout', variant: 'success', html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/tablet<br><strong>Calculate:</strong> 500 ÷ 250 = <strong>2 tablets</strong>' },
+      { heading: '💧 Example 2 — Liquid', type: 'callout', variant: 'success', html: '<strong>Order:</strong> 250 mg<br><strong>Available:</strong> 125 mg/5 mL<br><strong>Calculate:</strong> 250 ÷ 125 × 5 = <strong>10 mL</strong>' },
+      { heading: '💉 Example 3 — IM Injection', type: 'callout', variant: 'success', html: '<strong>Order:</strong> 500 mg<br><strong>Available:</strong> 250 mg/mL<br><strong>Calculate:</strong> 500 ÷ 250 × 1 = <strong>2 mL</strong>' },
+      { heading: '⚠️ Safety Reminders', type: 'callout', variant: 'warning', html: '• Always double-check calculations<br>• Have a second nurse verify high-alert doses<br>• Round only at the end<br>• Verify units match (mg vs mcg vs g)' }
     ]
   },
   unit12: {
     intro: 'Documentation and safety systems are the final safeguards against medication errors.',
     sections: [
       { heading: '📋 Documentation Formats', type: 'table', headers: ['Format', 'Purpose'],
-        rows: [
-          ['MAR', 'Medication Administration Record'],
-          ['SOAPIE', 'Subjective, Objective, Assessment, Plan, Intervention, Evaluation'],
-          ['FDAR', 'Focus, Data, Action, Response']
-        ] },
-      { heading: '📝 Sample SOAPIE', type: 'callout', variant: 'info',
-        html: '<strong>S:</strong> Patient reports headache.<br><strong>O:</strong> Pain score 7/10.<br><strong>A:</strong> Acute pain.<br><strong>P:</strong> Administer Paracetamol.<br><strong>I:</strong> Paracetamol 500 mg given PO.<br><strong>E:</strong> Pain score reduced to 2/10.' },
-      { heading: '📝 Sample FDAR', type: 'callout', variant: 'info',
-        html: '<strong>Focus:</strong> Pain<br><strong>Data:</strong> Pain score 7/10<br><strong>Action:</strong> Paracetamol administered<br><strong>Response:</strong> Pain decreased to 2/10' },
+        rows: [['MAR', 'Medication Administration Record'], ['SOAPIE', 'Subjective, Objective, Assessment, Plan, Intervention, Evaluation'], ['FDAR', 'Focus, Data, Action, Response']] },
+      { heading: '📝 Sample SOAPIE', type: 'callout', variant: 'info', html: '<strong>S:</strong> Patient reports headache.<br><strong>O:</strong> Pain score 7/10.<br><strong>A:</strong> Acute pain.<br><strong>P:</strong> Administer Paracetamol.<br><strong>I:</strong> Paracetamol 500 mg given PO.<br><strong>E:</strong> Pain score reduced to 2/10.' },
+      { heading: '📝 Sample FDAR', type: 'callout', variant: 'info', html: '<strong>Focus:</strong> Pain<br><strong>Data:</strong> Pain score 7/10<br><strong>Action:</strong> Paracetamol administered<br><strong>Response:</strong> Pain decreased to 2/10' },
       { heading: '🚀 Modern Safety Systems', type: 'table', headers: ['System', 'Function'],
-        rows: [
-          ['BCMA', 'Barcode scanning before administration'],
-          ['Smart Pumps', 'Automatic dose error reduction'],
-          ['eMAR', 'Electronic medication charting'],
-          ['CDSS', 'Provides clinical alerts'],
-          ['AI Alerts', 'Predicts medication error risks'],
-          ['Needleless Systems', 'Reduces needlestick injuries']
-        ] },
-      { heading: '🚨 High-Alert Medications', type: 'callout', variant: 'danger',
-        html: '<strong>ISMP High-Alert List (Examples):</strong><br>• Insulin<br>• Heparin<br>• Opioids (morphine, fentanyl)<br>• Digoxin<br>• Concentrated electrolytes (KCl)<br>• Chemotherapy agents<br><br><strong>Require double-check by 2 nurses.</strong>' }
+        rows: [['BCMA', 'Barcode scanning before administration'], ['Smart Pumps', 'Automatic dose error reduction'], ['eMAR', 'Electronic medication charting'], ['CDSS', 'Provides clinical alerts'], ['AI Alerts', 'Predicts medication error risks'], ['Needleless Systems', 'Reduces needlestick injuries']] },
+      { heading: '🚨 High-Alert Medications', type: 'callout', variant: 'danger', html: '<strong>ISMP High-Alert List (Examples):</strong><br>• Insulin<br>• Heparin<br>• Opioids (morphine, fentanyl)<br>• Digoxin<br>• Concentrated electrolytes (KCl)<br>• Chemotherapy agents<br><br><strong>Require double-check by 2 nurses.</strong>' }
     ]
   }
 };
@@ -1688,7 +1626,6 @@ function submitQuiz(num) {
     var userChoice = null;
     allOpts.forEach(function(o) { if (o.dataset.selected === '1') userChoice = o; });
     if (userChoice) {
-      // FIXED: Case-insensitive, trimmed comparison
       var choice = userChoice.textContent.trim().toLowerCase();
       var correctAns = String(q.answer).trim().toLowerCase();
       if (choice === correctAns) {
@@ -1726,7 +1663,7 @@ function submitQuiz(num) {
 }
 
 /* ============================================================
-   QUIZZES (with corrected unit10 Q1)
+   QUIZZES (unchanged from v1.0.1)
    ============================================================ */
 var QUIZZES = {
   unit1: [
@@ -1838,7 +1775,6 @@ var QUIZZES = {
     { q: 'Check before mixing IV meds:', options: ['Temperature','Compatibility','Color','Odor'], answer: 'Compatibility' }
   ],
   unit10: [
-    // FIXED: Ampule question — dot/colored band faces AWAY from you
     { q: 'Ampule: break with dot/colored band facing:', options: ['Toward you','Away from you','Up','Down'], answer: 'Away from you' },
     { q: 'Ampule needle for withdrawal:', options: ['Regular','Filter','Large','Blunt'], answer: 'Filter' },
     { q: 'Vial rubber stopper must be:', options: ['Not cleaned','Disinfected','Warmed','Cooled'], answer: 'Disinfected' },
@@ -2048,16 +1984,11 @@ function calculateDose() {
    MAR PRACTICE
    ============================================================ */
 var MAR_CASES = [
-  { id: 1, doctorOrder: 'Metformin 500 mg PO BID', patient: 'Juan Dela Cruz, 55 y/o M',
-    correct: { med: 'Metformin', dose: '500 mg', route: 'PO', freq: 'BID' } },
-  { id: 2, doctorOrder: 'Ceftriaxone 1 g IM q24h', patient: 'Maria Santos, 30 y/o F',
-    correct: { med: 'Ceftriaxone', dose: '1 g', route: 'IM', freq: 'q24h' } },
-  { id: 3, doctorOrder: 'Omeprazole 40 mg IV OD', patient: 'Pedro Reyes, 60 y/o M',
-    correct: { med: 'Omeprazole', dose: '40 mg', route: 'IV', freq: 'OD' } },
-  { id: 4, doctorOrder: 'Paracetamol 500 mg PO PRN Fever', patient: 'Ana Lopez, 28 y/o F',
-    correct: { med: 'Paracetamol', dose: '500 mg', route: 'PO', freq: 'PRN' } },
-  { id: 5, doctorOrder: 'Epinephrine 0.3 mg IM STAT', patient: 'Carlos Tan, 40 y/o M',
-    correct: { med: 'Epinephrine', dose: '0.3 mg', route: 'IM', freq: 'STAT' } }
+  { id: 1, doctorOrder: 'Metformin 500 mg PO BID', patient: 'Juan Dela Cruz, 55 y/o M', correct: { med: 'Metformin', dose: '500 mg', route: 'PO', freq: 'BID' } },
+  { id: 2, doctorOrder: 'Ceftriaxone 1 g IM q24h', patient: 'Maria Santos, 30 y/o F', correct: { med: 'Ceftriaxone', dose: '1 g', route: 'IM', freq: 'q24h' } },
+  { id: 3, doctorOrder: 'Omeprazole 40 mg IV OD', patient: 'Pedro Reyes, 60 y/o M', correct: { med: 'Omeprazole', dose: '40 mg', route: 'IV', freq: 'OD' } },
+  { id: 4, doctorOrder: 'Paracetamol 500 mg PO PRN Fever', patient: 'Ana Lopez, 28 y/o F', correct: { med: 'Paracetamol', dose: '500 mg', route: 'PO', freq: 'PRN' } },
+  { id: 5, doctorOrder: 'Epinephrine 0.3 mg IM STAT', patient: 'Carlos Tan, 40 y/o M', correct: { med: 'Epinephrine', dose: '0.3 mg', route: 'IM', freq: 'STAT' } }
 ];
 
 function renderMAR(main) {
@@ -2105,203 +2036,38 @@ function checkMAR(id) {
 }
 
 /* ============================================================
-   CHECKLISTS (Return Demo) — with corrected ampule direction
+   CHECKLISTS
    ============================================================ */
 var CHECKLIST_ORAL = {
   title: 'Return Demonstration — Oral, Ophthalmic & Otic Medication',
   sections: [
-    { title: 'Preparation', steps: [
-      'Verify allergies to medications.',
-      'Assess client\'s ability to swallow (for oral meds).',
-      'Check for vomiting, diarrhea, or conditions affecting absorption.',
-      'Assess eye for lesions, discharge, swelling, redness (ophthalmic).',
-      'Assess ear for redness, abrasions, discharge (otic).',
-      'Review client\'s knowledge of medication and learning needs.',
-      'Perform specific assessments required for the medication (e.g., vital signs).',
-      'Determine if assessment data affect medication administration.',
-      'Verify MAR (client name, drug, dose, route, time, allergies).',
-      'Review drug action, side effects, interactions, normal dose, expiration date.',
-      'Check vital signs and laboratory results when relevant.'
-    ]},
-    { title: 'Planning & Equipment', steps: [
-      'Gather and assemble equipment (MAR, dispensing system, cups, droppers, gloves, sponges, applicators, water, pill crusher).',
-      'Read the medication label three times (from storage, before withdrawing, after withdrawing).',
-      'Check expiration date.'
-    ]},
-    { title: 'Implementation — Introduction', steps: [
-      'Introduce yourself and identify client using agency protocol.',
-      'Explain procedure, purpose, and what client should expect.',
-      'Perform hand hygiene. Follow infection control procedures. Provide privacy.'
-    ]},
-    { title: 'Drug Preparation — Oral (Tablets/Capsules)', steps: [
-      'Place unit-dose tablets or capsules in a medicine cup without removing wrapper until at bedside.',
-      'If using stock bottles, pour the required number into bottle cap, then into cup without touching medication.',
-      'Break scored tablets only if necessary using a tablet cutter.',
-      'Crush tablets only if allowed and mix with small amount of soft food.'
-    ]},
-    { title: 'Drug Preparation — Oral (Liquids)', steps: [
-      'Shake bottle well before pouring.',
-      'Hold bottle with label facing palm and pour away from label.',
-      'Place medication cup at eye level and measure at bottom of meniscus.',
-      'Wipe lip of bottle before recapping.',
-      'For doses <5 mL, use an oral syringe labeled "PO".'
-    ]},
-    { title: 'Drug Preparation — Ophthalmic', steps: [
-      'Verify medication name, strength, and number of drops.',
-      'If using a dropper, draw the correct number of drops into shaft.',
-      'If using ointment, discard the first bead before application.'
-    ]},
-    { title: 'Drug Preparation — Otic', steps: [
-      'Warm medication container by holding in hand or placing in warm water briefly.',
-      'Partially fill dropper with the prescribed amount.'
-    ]},
-    { title: 'Patient Preparation — Oral', steps: [
-      'Assist client to a sitting position or side-lying if unable to sit.',
-      'Check identification and explain medication purpose and effects.'
-    ]},
-    { title: 'Patient Preparation — Ophthalmic', steps: [
-      'Position client sitting or lying with head tilted back.',
-      'Give a sterile absorbent sponge to hold under the eye.'
-    ]},
-    { title: 'Patient Preparation — Otic', steps: [
-      'Position client side-lying with affected ear facing up.',
-      'Explain that they may feel warmth or fullness when drops are instilled.'
-    ]},
-    { title: 'Clean the Area — Ophthalmic', steps: [
-      'Put on clean gloves.',
-      'Use sterile cotton balls moistened with sterile saline to wipe from inner canthus to outer canthus.'
-    ]},
-    { title: 'Clean the Area — Otic', steps: [
-      'If infection is suspected, wear gloves.',
-      'Use cotton-tipped applicators to clean pinna and meatus.'
-    ]},
-    { title: 'Drug Administration — Oral', steps: [
-      'Administer medication at correct time (within 30 min before or after scheduled).',
-      'Give water or preferred juice to swallow medication.',
-      'Check for food–drug incompatibilities before using juice.',
-      'If client cannot hold pill cup, place medication in mouth one tablet/capsule at a time.',
-      'For clients with swallowing difficulty, place medication on the back of the tongue before drinking water.',
-      'If medication tastes unpleasant, offer ice chips first or mix with juice, applesauce, or bread if allowed.',
-      'If client questions medication, verify original order before giving.',
-      'Stay with client until all medications are swallowed.'
-    ]},
-    { title: 'Drug Administration — Ophthalmic', steps: [
-      'Check ophthalmic medication for name, strength, and number of drops.',
-      'Draw correct amount into dropper; if using ointment, discard first bead.',
-      'Ask client to look up and give a sterile sponge.',
-      'Expose lower conjunctival sac by gently pulling down the cheek.',
-      'Stabilize hand on client\'s forehead and instill drops onto outer third of sac, holding dropper 1–2 cm above.',
-      'For ointment, apply 2 cm strip from inner to outer canthus.',
-      'Instruct client to close eyes gently without squeezing.',
-      'For liquid meds, press nasolacrimal duct for 30 seconds.'
-    ]},
-    { title: 'Drug Administration — Otic', steps: [
-      'Warm medication container in hand or warm water briefly.',
-      'Fill dropper with prescribed amount.',
-      'Straighten ear canal by pulling pinna upward and backward.',
-      'Instill drops along side of canal, not directly on eardrum.',
-      'Press tragus gently a few times.',
-      'Keep client side-lying for about 5 minutes.',
-      'Insert small piece of cotton loosely at meatus for 15–20 minutes. Do not push inside.'
-    ]},
-    { title: 'Evaluation', steps: [
-      'Ensure client comfort and safety after administration.',
-      'Document medication, dose, time, route, and client response.',
-      'Record any refusal or omission with reason and action taken.',
-      'Discard used supplies properly.',
-      'Evaluate effects of medication at appropriate time.',
-      'Observe for adverse reactions or side effects and report promptly.'
-    ]}
+    { title: 'Preparation', steps: ['Verify allergies.', 'Assess swallowing.', 'Check for vomiting/diarrhea.', 'Assess eye (ophthalmic).', 'Assess ear (otic).', 'Review learning needs.', 'Perform specific assessments.', 'Determine if data affect admin.', 'Verify MAR.', 'Review drug info.', 'Check VS/labs.'] },
+    { title: 'Planning & Equipment', steps: ['Gather equipment.', 'Read label 3×.', 'Check expiration.'] },
+    { title: 'Implementation', steps: ['Introduce yourself.', 'Explain procedure.', 'Hand hygiene + privacy.'] },
+    { title: 'Drug Preparation — Oral', steps: ['Unit-dose in cup.', 'Stock bottle pour correctly.', 'Break scored tablets only.', 'Crush only if allowed.'] },
+    { title: 'Drug Preparation — Liquid', steps: ['Shake well.', 'Label to palm.', 'Measure at meniscus.', 'Wipe lip.', 'Oral syringe for <5 mL.'] },
+    { title: 'Ophthalmic Prep', steps: ['Verify name/strength/drops.', 'Draw drops.', 'Discard first ointment bead.'] },
+    { title: 'Otic Prep', steps: ['Warm container.', 'Fill dropper.'] },
+    { title: 'Patient Prep', steps: ['Position correctly.', 'Identify + explain.'] },
+    { title: 'Clean Area', steps: ['Gloves on.', 'Wipe eye inner→outer.', 'Clean pinna/meatus.'] },
+    { title: 'Administration — Oral', steps: ['Give at correct time.', 'Provide water.', 'Check incompatibilities.', 'One tablet at a time.', 'Back of tongue if difficulty.', 'Ice chips if unpleasant.', 'Verify if questioned.', 'Stay until swallowed.'] },
+    { title: 'Administration — Ophthalmic', steps: ['Verify + draw.', 'Client looks up.', 'Expose lower sac.', 'Instill outer third.', 'Ointment inner→outer.', 'Close gently.', 'Nasolacrimal pressure 30s.'] },
+    { title: 'Administration — Otic', steps: ['Warm.', 'Fill dropper.', 'Pinna up/back (adult).', 'Instill along canal.', 'Press tragus.', 'Side-lying 5 min.', 'Cotton loosely 15–20 min.'] },
+    { title: 'Evaluation', steps: ['Ensure comfort.', 'Document.', 'Record refusals.', 'Discard supplies.', 'Evaluate effects.', 'Report adverse reactions.'] }
   ]
 };
 
 var CHECKLIST_PARENTERAL = {
   title: 'Return Demonstration — Parenteral Medication (ID, SC, IM)',
   sections: [
-    { title: 'Preparation', steps: [
-      'Verify allergies to medications.',
-      'Verify MAR (client name, drug, dose, route, time, allergies).',
-      'Review drug action, side effects, interactions, normal dose, expiration date.',
-      'Check vital signs and laboratory results when relevant.',
-      'Gather and assemble equipment (syringes, needles, alcohol swabs, sharps container, gloves).',
-      'Read medication label three times (from storage, before withdrawing, after withdrawing).',
-      'Check expiration date.'
-    ]},
-    { title: 'Implementation — Introduction', steps: [
-      'Perform hand hygiene. Follow infection control procedures. Provide privacy.',
-      'Introduce yourself and identify client using agency protocol.',
-      'Explain procedure and expected sensation (expected pain, appearance of wheal for ID route).'
-    ]},
-    { title: 'Drug Preparation — Ampule', steps: [
-      'Flick the ampule\'s upper stem or shake it like a mercury thermometer.',
-      'Place sterile gauze on ampule neck. Break top with the dot/colored band facing AWAY from you, breaking away from the body.',
-      'Dispose of ampule top in sharps container.',
-      'Attach a filter needle to the syringe.',
-      'Remove filter needle cap and insert into ampule center without touching rim.',
-      'Withdraw required dose, holding ampule slightly on its side.',
-      'Replace filter needle with a regular needle and secure cap before injection.'
-    ]},
-    { title: 'Drug Preparation — Vial', steps: [
-      'Prepare the medication vial.',
-      'Mix solution by rolling the vial between palms, not shaking.',
-      'Remove protective cap or clean rubber stopper with antiseptic in circular motion.',
-      'Attach a filter needle to the syringe and ensure it is secure.',
-      'Draw air into syringe equal to medication volume.',
-      'Insert needle into upright vial through center of stopper without contaminating it.',
-      'Inject air with bevel above liquid surface.',
-      'Invert vial at eye level, keep needle tip below fluid, and withdraw prescribed dose.',
-      'Remove needle and recap using scoop method.',
-      'Tap syringe to remove air bubbles.',
-      'Replace filter needle with regular needle of correct gauge and length before injection.'
-    ]},
-    { title: 'Intradermal (ID)', steps: [
-      'Provide privacy and wear clean gloves.',
-      'Select an inner forearm area free of heavy hair or pigmentation.',
-      'Cleanse site with alcohol swab using circular motion outward.',
-      'Allow skin to dry.',
-      'Remove needle cap with non-dominant hand.',
-      'Stretch skin taut with non-dominant hand.',
-      'Hold needle almost flat, bevel up.',
-      'Insert about 1/8 inch so tip is visible under skin.',
-      'Stabilize syringe and inject slowly to form a small wheal.',
-      'Withdraw needle at same angle.',
-      'Do not massage site.',
-      'Discard needle and syringe in sharps container without recapping.',
-      'Remove gloves and perform hand hygiene.',
-      'Circle site with ink for observation.',
-      'Label tape with medication and time for reaction check (usually 30 min).'
-    ]},
-    { title: 'Subcutaneous (SC)', steps: [
-      'Select site free of tenderness, swelling, scarring, or inflammation. Avoid frequently used areas.',
-      'Clean site with antiseptic swab in circular motion outward about 5 cm.',
-      'Hold swab between fingers or place above site.',
-      'Remove needle cap by pulling straight off.',
-      'For 45° angle: hold syringe with palm sideways or upward. For 90° angle: hold syringe with palm downward.',
-      'Pinch skin if less adipose tissue; spread skin if more than ½ inch adipose.',
-      'Insert needle firmly at chosen angle.',
-      'After insertion, stabilize syringe and inject slowly with steady pressure.',
-      'Keep needle in place for 5 seconds.',
-      'Withdraw needle smoothly along insertion line while pressing skin with non-dominant hand.',
-      'If bleeding occurs, apply pressure with sterile swab or gauze.'
-    ]},
-    { title: 'Intramuscular (IM)', steps: [
-      'Assist client into position for chosen site (ventrogluteal, vastus lateralis, deltoid, dorsogluteal).',
-      'Locate site, ensure no tenderness, lumps, or nodules.',
-      'Wear disposable gloves.',
-      'Clean site with antiseptic swab in circular motion outward about 5 cm.',
-      'Remove needle cap by pulling straight off.',
-      'Displace skin using Z-track or spread skin with non-dominant hand.',
-      'Hold syringe in dominant hand, pierce skin quickly at 90° angle.',
-      'Stabilize syringe, aspirate slowly. If blood appears, discard and restart with new setup at another site. If no blood, inject slowly (10 sec per mL).',
-      'Withdraw needle steadily, release displaced tissue if Z-track used.',
-      'Apply gentle pressure with dry cotton ball.',
-      'Do not recap needle. Discard in sharps container.',
-      'Remove gloves and perform hand hygiene.'
-    ]},
-    { title: 'Evaluation', steps: [
-      'Document medication, dose, route, site, time, and assessments.',
-      'Observe for reaction and expected effect at expected time of action.'
-    ]}
+    { title: 'Preparation', steps: ['Verify allergies.', 'Verify MAR.', 'Review drug info.', 'Check VS/labs.', 'Gather equipment.', 'Read label 3×.', 'Check expiration.'] },
+    { title: 'Implementation', steps: ['Hand hygiene + privacy.', 'Introduce.', 'Explain + expected sensation.'] },
+    { title: 'Ampule', steps: ['Flick stem.', 'Break with dot/colored band facing AWAY from you, away from body.', 'Dispose top in sharps.', 'Attach filter needle.', 'Insert to center.', 'Withdraw dose.', 'Replace with regular needle.'] },
+    { title: 'Vial', steps: ['Prepare vial.', 'Roll between palms.', 'Disinfect stopper.', 'Attach filter needle.', 'Draw air = dose.', 'Insert through stopper.', 'Inject air above liquid.', 'Invert + withdraw.', 'Recap scoop method.', 'Tap out bubbles.', 'Replace needle.'] },
+    { title: 'Intradermal (ID)', steps: ['Privacy + gloves.', 'Select forearm.', 'Cleanse outward.', 'Let dry.', 'Remove cap.', 'Stretch skin.', 'Bevel up, almost flat.', 'Insert 1/8 inch.', 'Inject to form wheal.', 'Withdraw same angle.', 'Do NOT massage.', 'Discard sharps.', 'Remove gloves + hygiene.', 'Circle site.', 'Label with time.'] },
+    { title: 'Subcutaneous (SC)', steps: ['Select site.', 'Cleanse 5 cm outward.', 'Hold swab.', 'Remove cap straight.', 'Angle 45° (thin) or 90° (thick).', 'Pinch/spread skin.', 'Insert firmly.', 'Inject slowly.', 'Hold 5 sec.', 'Withdraw smoothly.', 'Apply pressure if bleeding.'] },
+    { title: 'Intramuscular (IM)', steps: ['Position for site.', 'Locate, ensure no lumps.', 'Gloves on.', 'Cleanse outward.', 'Remove cap straight.', 'Z-track or spread.', '90° quick pierce.', 'Stabilize + aspirate.', 'If blood → restart.', 'If no blood → inject 10s/mL.', 'Withdraw steadily.', 'Gentle pressure.', 'No recapping.', 'Sharps container.', 'Remove gloves + hygiene.'] },
+    { title: 'Evaluation', steps: ['Document.', 'Observe for reaction.'] }
   ]
 };
 
@@ -2505,7 +2271,6 @@ function answerGame(idx) {
   var data = g.rounds;
   var item = data[activeGame.round];
   var choice = item.options[idx];
-  // FIXED: Case-insensitive, trimmed comparison
   var correct = String(choice).trim().toLowerCase() === String(item.answer).trim().toLowerCase();
   activeGame.total++;
   if (correct) activeGame.correct++;
@@ -2613,102 +2378,40 @@ function renderLeaderboard(main) {
 }
 
 /* ============================================================
-   EXAM — 30 ITEMS
+   EXAM
    ============================================================ */
 var EXAM_BANK = [
-  { q: 'A nurse is about to administer a medication and notices the order is illegible. What is the PRIORITY action?',
-    options: ['Guess the medication from context','Clarify the order with the prescriber','Administer the closest match','Skip the dose'],
-    answer: 'Clarify the order with the prescriber' },
-  { q: 'Which action demonstrates the "Right Patient" principle?',
-    options: ['Ask the roommate','Use two identifiers','Check the bed number','Assume identity'],
-    answer: 'Use two identifiers' },
-  { q: 'A client refuses to take their medication. The nurse should:',
-    options: ['Force the medication','Respect the decision and document','Hide it in food','Report to the family only'],
-    answer: 'Respect the decision and document' },
-  { q: 'A nurse is preparing a high-alert medication. What safety action is REQUIRED?',
-    options: ['Give as fast as possible','Double-check with a second nurse','Administer alone','Skip documentation'],
-    answer: 'Double-check with a second nurse' },
-  { q: 'The nurse is checking the apical pulse before administering Digoxin. Which Right is this?',
-    options: ['Right Dose','Right Assessment','Right Time','Right Patient'],
-    answer: 'Right Assessment' },
-  { q: 'When should the third medication check be performed?',
-    options: ['Before leaving the storage area','During preparation','At the bedside before administration','After documentation'],
-    answer: 'At the bedside before administration' },
-  { q: 'Which statement about the 10 Rights is CORRECT?',
-    options: ['Only 5 Rights matter','10 Rights include Right to Refuse','Right Time is optional','Right Documentation can be delayed'],
-    answer: '10 Rights include Right to Refuse' },
-  { q: 'A client questions a medication the nurse is about to give. The nurse should:',
-    options: ['Reassure and give the medication','Verify the original order before giving','Skip the dose','Call the family'],
-    answer: 'Verify the original order before giving' },
-  { q: 'Which is the FIRST step in safe medication administration?',
-    options: ['Prepare the medication','Verify the order','Administer quickly','Document'],
-    answer: 'Verify the order' },
-  { q: 'What does the "Right Evaluation" mean?',
-    options: ['Assessing before giving','Assessing the response after giving','Documenting dose','Verifying route'],
-    answer: 'Assessing the response after giving' },
-  { q: 'A nurse is to administer an intradermal injection. What angle should the needle be inserted?',
-    options: ['5–15 degrees','45 degrees','90 degrees','30 degrees'],
-    answer: '5–15 degrees' },
-  { q: 'Which needle gauge is appropriate for a subcutaneous insulin injection?',
-    options: ['18 G','20–22 G','25–31 G','16 G'],
-    answer: '25–31 G' },
-  { q: 'A nurse is giving an IM injection to an adult. Which site is SAFEST?',
-    options: ['Deltoid','Dorsogluteal','Ventrogluteal','Vastus lateralis'],
-    answer: 'Ventrogluteal' },
-  { q: 'When administering ear drops to an adult, the nurse should pull the pinna:',
-    options: ['Down and back','Up and back','Straight up','Forward'],
-    answer: 'Up and back' },
-  { q: 'A client is receiving eye drops AND eye ointment. The nurse should:',
-    options: ['Give ointment first','Give drops first then ointment','Give them together','Give only one'],
-    answer: 'Give drops first then ointment' },
-  { q: 'Which site is PREFERRED for IM injection in an infant?',
-    options: ['Deltoid','Vastus lateralis','Ventrogluteal','Dorsogluteal'],
-    answer: 'Vastus lateralis' },
-  { q: 'A nurse must NEVER crush which type of medication?',
-    options: ['Scored tablet','Enteric-coated tablet','Chewable tablet','Capsule'],
-    answer: 'Enteric-coated tablet' },
-  { q: 'After administering otic drops, the client should remain side-lying for:',
-    options: ['30 seconds','1 minute','2–5 minutes','15 minutes'],
-    answer: '2–5 minutes' },
-  { q: 'Order: Paracetamol 500 mg PO. Available: 250 mg/tablet. How many tablets?',
-    options: ['1','2','3','4'],
-    answer: '2' },
-  { q: 'Order: Amoxicillin 250 mg PO. Available: 125 mg/5 mL. How many mL?',
-    options: ['5 mL','10 mL','15 mL','20 mL'],
-    answer: '10 mL' },
-  { q: 'Order: Ceftriaxone 500 mg IM. Available: 250 mg/mL. How many mL?',
-    options: ['0.5 mL','1 mL','2 mL','3 mL'],
-    answer: '2 mL' },
-  { q: 'Order: Digoxin 0.25 mg PO. Available: 0.125 mg/tablet. How many tablets?',
-    options: ['1','1.5','2','3'],
-    answer: '2' },
-  { q: 'Which formula correctly computes drug dosage?',
-    options: ['Desired ÷ Stock × Volume','Stock ÷ Desired × Volume','Desired × Stock','Desired + Volume'],
-    answer: 'Desired ÷ Stock × Volume' },
-  { q: 'Order: 750 mg. Available: 250 mg/tablet. How many tablets?',
-    options: ['2','2.5','3','4'],
-    answer: '3' },
-  { q: 'When should the nurse document a medication administration?',
-    options: ['At the end of the shift','Immediately after giving','Before giving','The next day'],
-    answer: 'Immediately after giving' },
-  { q: 'Which principle requires the nurse to be truthful about medication side effects?',
-    options: ['Autonomy','Veracity','Justice','Fidelity'],
-    answer: 'Veracity' },
-  { q: 'Which documentation format uses Focus, Data, Action, Response?',
-    options: ['SOAPIE','FDAR','PIE','DAR'],
-    answer: 'FDAR' },
-  { q: 'A "near miss" in medication administration is:',
-    options: ['Harm reached the patient','Error detected before reaching the patient','Adverse reaction','Side effect'],
-    answer: 'Error detected before reaching the patient' },
-  { q: 'Which technology scans medications and patient wristbands before administration?',
-    options: ['Smart pump','BCMA','eMAR','CDSS'],
-    answer: 'BCMA' },
-  { q: 'A nurse is preparing a high-alert IV medication. Which is BEST practice?',
-    options: ['Manual drip','Infusion pump with drug library','Fast IV push','Gravity'],
-    answer: 'Infusion pump with drug library' },
-  { q: 'When breaking an ampule, the dot/colored band should face:',
-    options: ['Toward you','Away from you','Upward','Downward'],
-    answer: 'Away from you' }
+  { q: 'A nurse is about to administer a medication and notices the order is illegible. What is the PRIORITY action?', options: ['Guess the medication from context','Clarify the order with the prescriber','Administer the closest match','Skip the dose'], answer: 'Clarify the order with the prescriber' },
+  { q: 'Which action demonstrates the "Right Patient" principle?', options: ['Ask the roommate','Use two identifiers','Check the bed number','Assume identity'], answer: 'Use two identifiers' },
+  { q: 'A client refuses to take their medication. The nurse should:', options: ['Force the medication','Respect the decision and document','Hide it in food','Report to the family only'], answer: 'Respect the decision and document' },
+  { q: 'A nurse is preparing a high-alert medication. What safety action is REQUIRED?', options: ['Give as fast as possible','Double-check with a second nurse','Administer alone','Skip documentation'], answer: 'Double-check with a second nurse' },
+  { q: 'The nurse is checking the apical pulse before administering Digoxin. Which Right is this?', options: ['Right Dose','Right Assessment','Right Time','Right Patient'], answer: 'Right Assessment' },
+  { q: 'When should the third medication check be performed?', options: ['Before leaving the storage area','During preparation','At the bedside before administration','After documentation'], answer: 'At the bedside before administration' },
+  { q: 'Which statement about the 10 Rights is CORRECT?', options: ['Only 5 Rights matter','10 Rights include Right to Refuse','Right Time is optional','Right Documentation can be delayed'], answer: '10 Rights include Right to Refuse' },
+  { q: 'A client questions a medication the nurse is about to give. The nurse should:', options: ['Reassure and give the medication','Verify the original order before giving','Skip the dose','Call the family'], answer: 'Verify the original order before giving' },
+  { q: 'Which is the FIRST step in safe medication administration?', options: ['Prepare the medication','Verify the order','Administer quickly','Document'], answer: 'Verify the order' },
+  { q: 'What does the "Right Evaluation" mean?', options: ['Assessing before giving','Assessing the response after giving','Documenting dose','Verifying route'], answer: 'Assessing the response after giving' },
+  { q: 'A nurse is to administer an intradermal injection. What angle should the needle be inserted?', options: ['5–15 degrees','45 degrees','90 degrees','30 degrees'], answer: '5–15 degrees' },
+  { q: 'Which needle gauge is appropriate for a subcutaneous insulin injection?', options: ['18 G','20–22 G','25–31 G','16 G'], answer: '25–31 G' },
+  { q: 'A nurse is giving an IM injection to an adult. Which site is SAFEST?', options: ['Deltoid','Dorsogluteal','Ventrogluteal','Vastus lateralis'], answer: 'Ventrogluteal' },
+  { q: 'When administering ear drops to an adult, the nurse should pull the pinna:', options: ['Down and back','Up and back','Straight up','Forward'], answer: 'Up and back' },
+  { q: 'A client is receiving eye drops AND eye ointment. The nurse should:', options: ['Give ointment first','Give drops first then ointment','Give them together','Give only one'], answer: 'Give drops first then ointment' },
+  { q: 'Which site is PREFERRED for IM injection in an infant?', options: ['Deltoid','Vastus lateralis','Ventrogluteal','Dorsogluteal'], answer: 'Vastus lateralis' },
+  { q: 'A nurse must NEVER crush which type of medication?', options: ['Scored tablet','Enteric-coated tablet','Chewable tablet','Capsule'], answer: 'Enteric-coated tablet' },
+  { q: 'After administering otic drops, the client should remain side-lying for:', options: ['30 seconds','1 minute','2–5 minutes','15 minutes'], answer: '2–5 minutes' },
+  { q: 'Order: Paracetamol 500 mg PO. Available: 250 mg/tablet. How many tablets?', options: ['1','2','3','4'], answer: '2' },
+  { q: 'Order: Amoxicillin 250 mg PO. Available: 125 mg/5 mL. How many mL?', options: ['5 mL','10 mL','15 mL','20 mL'], answer: '10 mL' },
+  { q: 'Order: Ceftriaxone 500 mg IM. Available: 250 mg/mL. How many mL?', options: ['0.5 mL','1 mL','2 mL','3 mL'], answer: '2 mL' },
+  { q: 'Order: Digoxin 0.25 mg PO. Available: 0.125 mg/tablet. How many tablets?', options: ['1','1.5','2','3'], answer: '2' },
+  { q: 'Which formula correctly computes drug dosage?', options: ['Desired ÷ Stock × Volume','Stock ÷ Desired × Volume','Desired × Stock','Desired + Volume'], answer: 'Desired ÷ Stock × Volume' },
+  { q: 'Order: 750 mg. Available: 250 mg/tablet. How many tablets?', options: ['2','2.5','3','4'], answer: '3' },
+  { q: 'When should the nurse document a medication administration?', options: ['At the end of the shift','Immediately after giving','Before giving','The next day'], answer: 'Immediately after giving' },
+  { q: 'Which principle requires the nurse to be truthful about medication side effects?', options: ['Autonomy','Veracity','Justice','Fidelity'], answer: 'Veracity' },
+  { q: 'Which documentation format uses Focus, Data, Action, Response?', options: ['SOAPIE','FDAR','PIE','DAR'], answer: 'FDAR' },
+  { q: 'A "near miss" in medication administration is:', options: ['Harm reached the patient','Error detected before reaching the patient','Adverse reaction','Side effect'], answer: 'Error detected before reaching the patient' },
+  { q: 'Which technology scans medications and patient wristbands before administration?', options: ['Smart pump','BCMA','eMAR','CDSS'], answer: 'BCMA' },
+  { q: 'A nurse is preparing a high-alert IV medication. Which is BEST practice?', options: ['Manual drip','Infusion pump with drug library','Fast IV push','Gravity'], answer: 'Infusion pump with drug library' },
+  { q: 'When breaking an ampule, the dot/colored band should face:', options: ['Toward you','Away from you','Upward','Downward'], answer: 'Away from you' }
 ];
 
 function renderExam(main) {
@@ -2886,7 +2589,6 @@ function finishExam() {
   exam.questions.forEach(function(q, i) {
     var userIdx = exam.answers[i];
     var userAns = (userIdx !== undefined && q.options[userIdx]) ? q.options[userIdx] : '(no answer)';
-    // FIXED: Case-insensitive, trimmed comparison
     var isCorrect = String(userAns).trim().toLowerCase() === String(q.answer).trim().toLowerCase();
     if (isCorrect) correct++;
     review.push({ q: q.q, userAnswer: userAns, correctAnswer: q.answer, correct: isCorrect });
@@ -2959,7 +2661,7 @@ function renderCertificate(main) {
 }
 
 /* ============================================================
-   HANDOFF (Submit to Instructor)
+   SUBMIT (Handoff) — one-click submit
    ============================================================ */
 function renderHandoff(main) {
   var s = APP.state.student;
@@ -2967,17 +2669,21 @@ function renderHandoff(main) {
   var avg = averageScore();
   var exam = APP.state.exam;
   var existingCode = APP.state.submissionCode;
-  var html = '<div class="card fade-in"><div class="card-header"><div>';
-  html += '<div class="card-title">📤 Submit Progress to Instructor</div>';
-  html += '<div class="card-subtitle">Send your progress and receive a unique code</div></div></div></div>';
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Submit</p>';
+  html += '<h1>📤 Submit Progress</h1>';
+  html += '<p class="hero-subtitle">Send your current progress to your instructor with one click.</p>';
+  html += '</div></div>';
+
   if (existingCode) {
     html += '<div class="card fade-in" style="background:linear-gradient(135deg,var(--secondary-light),#A5D6A7);border:2px solid var(--secondary);">';
-    html += '<h3 style="text-align:center;color:var(--secondary);margin-bottom:0.75rem;">Already Submitted</h3>';
+    html += '<h3 style="text-align:center;color:var(--secondary);margin-bottom:0.75rem;">✅ Already Submitted</h3>';
     html += '<div class="code-display"><div class="code-label">Your Submission Code</div>';
     html += '<div class="code-value">' + escapeHtml(existingCode) + '</div>';
-    html += '<button class="btn btn-primary" onclick="copySubmissionCode()">📋 Copy Code</button></div>';
-    html += '<button class="btn btn-outline btn-block mt-2" onclick="submitToBackend()">🔄 Resubmit</button></div>';
+    html += '<p style="font-size:0.82rem;color:var(--primary-dark);margin-top:0.5rem;">Your instructor has received your latest progress.</p>';
+    html += '</div></div>';
   }
+
   html += '<div class="card fade-in"><div class="card-header"><div class="card-title">👤 Your Profile</div></div>';
   html += '<table style="font-size:0.88rem;"><tbody>';
   html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Name</td><td style="font-weight:600;">' + escapeHtml(s.fullName) + '</td></tr>';
@@ -2986,23 +2692,56 @@ function renderHandoff(main) {
   html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Group</td><td style="font-weight:600;">' + escapeHtml(s.group || '—') + '</td></tr>';
   html += '<tr><td style="color:var(--gray);padding:0.5rem 0;">Email</td><td style="font-weight:600;">' + escapeHtml(s.email) + '</td></tr>';
   html += '</tbody></table></div>';
+
   html += '<div class="stat-grid fade-in">' +
     '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + pct + '%</div><div class="stat-label">Units Complete</div></div>' +
-    '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">' + avg + '%</div><div class="stat-label">Unit Average</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">' + avg + '%</div><div class="stat-label">Quiz Average</div></div>' +
     '<div class="stat-tile"><div class="stat-icon orange">📝</div><div class="stat-value">' + (exam ? exam.score + '/' + exam.total : '—') + '</div><div class="stat-label">Capstone Exam</div></div>' +
     '</div>';
-  html += '<div class="card fade-in">';
-  html += '<button class="btn btn-primary btn-lg btn-block" onclick="submitToBackend()" id="submitBtn">';
-  html += '🚀 ' + (existingCode ? 'Update Submission' : 'Submit to Instructor') + '</button>';
-  html += '<div id="submitStatus" class="mt-2"></div></div>';
+
+  html += '<div class="submit-hero-card fade-in"><div class="submit-hero-content">';
+  html += '<h3>🚀 Ready to submit?</h3>';
+  html += '<p>Click the button below. Your progress will be sent to your instructor automatically — no code copying needed.</p>';
+  html += '<button class="btn btn-lg" onclick="openSubmitModal()">' + (existingCode ? '🔄 Update Submission' : '🚀 Submit Now') + '</button>';
+  html += '</div></div>';
+
   main.innerHTML = html;
 }
 
+function openSubmitModal() {
+  var s = APP.state.student;
+  var pct = getProgressPercent();
+  var avg = averageScore();
+  var exam = APP.state.exam;
+  var gamesDone = Object.keys(APP.state.games || {}).filter(function(k) {
+    var arr = APP.state.games[k];
+    return arr && arr.length && Math.max.apply(null, arr) >= 90;
+  }).length;
+  var unitsDone = UNIT_KEYS.filter(function(u) { return isUnitComplete(u); }).length;
+
+  document.getElementById('submitPreview').innerHTML =
+    '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.5rem;">What will be sent:</strong>' +
+    '<div style="font-size:0.85rem;line-height:1.9;">' +
+    '• <strong>' + unitsDone + '/12</strong> units completed (' + pct + '%)<br>' +
+    '• Quiz average: <strong>' + avg + '%</strong><br>' +
+    '• Games mastered: <strong>' + gamesDone + '/5</strong><br>' +
+    '• Capstone exam: <strong>' + (exam && exam.submitted ? exam.score + '/' + exam.total + ' (' + exam.percentage + '%)' : 'Not taken') + '</strong><br>' +
+    '• Checklists: self-check + instructor-verified steps<br>' +
+    '</div>' +
+    '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px dashed var(--gray-light);font-size:0.82rem;color:var(--gray);">' +
+    'Student: <strong>' + escapeHtml(s.fullName) + '</strong><br>' +
+    'Section: <strong>' + escapeHtml(s.section) + '</strong> • ' + escapeHtml(s.group || '') +
+    '</div>';
+  document.getElementById('submitConfirmModal').classList.add('show');
+}
+function closeSubmitModal() { document.getElementById('submitConfirmModal').classList.remove('show'); }
+
+async function confirmSubmit() {
+  closeSubmitModal();
+  await submitToBackend();
+}
+
 async function submitToBackend() {
-  var statusEl = document.getElementById('submitStatus');
-  var btn = document.getElementById('submitBtn');
-  if (btn) btn.disabled = true;
-  statusEl.innerHTML = '<div class="callout callout-info">⏳ Submitting...</div>';
   var s = APP.state.student;
   var exam = APP.state.exam;
   var fullData = buildStudentRecord();
@@ -3022,6 +2761,8 @@ async function submitToBackend() {
   params.append('integrityFlags', 0);
   params.append('appVersion', APP.version);
   params.append('dataJson', JSON.stringify(fullData));
+
+  toast('⏳ Submitting to instructor...', 'info');
   try {
     var response = await fetch(BACKEND_URL, { method: 'POST', body: params });
     var result = await response.json();
@@ -3029,18 +2770,16 @@ async function submitToBackend() {
       APP.state.submissionCode = result.code;
       saveState();
       if (APP.state.student) registerSavedSession(buildStudentRecord());
-      statusEl.innerHTML = '<div class="callout callout-success"><strong>✅ ' + (result.isUpdate ? 'Updated!' : 'Submitted!') + '</strong>' +
-        '<div class="code-display" style="margin-top:0.75rem;"><div class="code-label">Your Code</div>' +
-        '<div class="code-value">' + escapeHtml(result.code) + '</div>' +
-        '<button class="btn btn-primary btn-sm" onclick="copySubmissionCode()">📋 Copy</button></div></div>';
-      toast('Submitted! Code: ' + result.code, 'success');
+      toast('✅ Submitted! Code: ' + result.code, 'success');
+      // Re-render current view to reflect new code
+      if (APP.state.currentView === 'handoff') renderHandoff(document.getElementById('mainContent'));
+      else if (APP.state.currentView === 'home') renderHome(document.getElementById('mainContent'));
     } else {
-      statusEl.innerHTML = '<div class="callout callout-danger">❌ ' + escapeHtml(result.error || 'Submission failed') + '</div>';
+      toast('❌ Submission failed: ' + (result.error || 'Unknown error'), 'error');
     }
   } catch (err) {
-    statusEl.innerHTML = '<div class="callout callout-danger">❌ Connection error: ' + escapeHtml(err.message) + '</div>';
+    toast('❌ Connection error: ' + err.message, 'error');
   }
-  if (btn) btn.disabled = false;
 }
 
 function copySubmissionCode() {
@@ -3081,6 +2820,203 @@ function buildStudentRecord() {
     retakeUsed: APP.state.retakeUsed || false,
     submissionCode: APP.state.submissionCode || null
   };
+}
+
+/* ============================================================
+   BACKUP / TRANSFER (Export & Import JSON)
+   ============================================================ */
+function renderTransfer(main) {
+  var s = APP.state.student;
+  var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
+  html += '<p class="hero-greeting">Data</p>';
+  html += '<h1>💾 Backup / Transfer</h1>';
+  html += '<p class="hero-subtitle">Move your progress to another device without redoing quizzes.</p>';
+  html += '</div></div>';
+
+  // --- EXPORT SECTION ---
+  html += '<div class="card fade-in"><div class="card-header"><div>';
+  html += '<div class="card-title">📤 Export Progress (Download JSON)</div>';
+  html += '<div class="card-subtitle">Save your progress as a file you can upload on another device.</div>';
+  html += '</div></div>';
+  html += '<div class="callout callout-info">';
+  html += '<strong>📋 What you get:</strong><br>';
+  html += '• All quiz attempts and unit mastery<br>';
+  html += '• Games scores and badges<br>';
+  html += '• Capstone exam results<br>';
+  html += '• Checklists progress<br>';
+  html += '• Your profile information<br>';
+  html += '</div>';
+  html += '<div class="stat-grid" style="margin-top:1rem;">' +
+    '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + Object.keys(APP.state.progress).length + '/12</div><div class="stat-label">Units</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">' + averageScore() + '%</div><div class="stat-label">Quiz Avg</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon orange">🎮</div><div class="stat-value">' + Object.keys(APP.state.games || {}).length + '/5</div><div class="stat-label">Games</div></div>' +
+    '</div>';
+  html += '<button class="btn btn-primary btn-lg btn-block mt-2" onclick="exportProgress()">📥 Download Backup JSON</button>';
+  html += '<p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:0.5rem;">File name: <code>' + escapeHtml(getExportFilename()) + '</code></p>';
+  html += '</div>';
+
+  // --- IMPORT SECTION ---
+  html += '<div class="card fade-in"><div class="card-header"><div>';
+  html += '<div class="card-title">📁 Import Progress (Upload JSON)</div>';
+  html += '<div class="card-subtitle">Upload a previously exported file to restore your progress.</div>';
+  html += '</div></div>';
+  html += '<div class="callout callout-warning">';
+  html += '<strong>⚠️ Important:</strong> Importing will <strong>REPLACE</strong> your current progress on this device. Make sure you have a backup first if needed.';
+  html += '</div>';
+  html += '<input type="file" id="importFileInput" accept=".json,application/json" style="display:none;" onchange="handleImportFile(event)" />';
+  html += '<div class="drop-zone mt-2" onclick="document.getElementById(\'importFileInput\').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" id="dropZone">';
+  html += '<span class="icon">📁</span>';
+  html += '<div class="title">Tap to browse or drag & drop JSON file</div>';
+  html += '<div class="hint">Supported format: <code>.json</code> exported from this app</div>';
+  html += '</div>';
+  html += '<div id="importStatus" class="mt-2"></div>';
+  html += '</div>';
+
+  // --- INFO SECTION ---
+  html += '<div class="card fade-in">';
+  html += '<div class="card-header"><div class="card-title">ℹ️ How to use on a new device</div></div>';
+  html += '<ol style="margin-left:1.5rem;font-size:0.88rem;line-height:1.9;">';
+  html += '<li>On your <strong>old device</strong>: click <strong>Download Backup JSON</strong> above.</li>';
+  html += '<li>Transfer the file to your <strong>new device</strong> (email, Google Drive, USB, etc.).</li>';
+  html += '<li>On the <strong>new device</strong>: open this app, log in with the same details (or register).</li>';
+  html += '<li>Go to <strong>Backup / Transfer</strong> → click <strong>Import Progress</strong>.</li>';
+  html += '<li>Select the JSON file → confirm → your progress is restored!</li>';
+  html += '<li>Click <strong>Submit Progress</strong> to sync the restored data with your instructor.</li>';
+  html += '</ol>';
+  html += '</div>';
+
+  main.innerHTML = html;
+}
+
+function getExportFilename() {
+  var s = APP.state.student;
+  var name = (s.studentNo || s.fullName || 'student').replace(/[^A-Za-z0-9-]/g, '_');
+  var date = new Date().toISOString().slice(0, 10);
+  return 'drug-admin-progress_' + name + '_' + date + '.json';
+}
+
+function exportProgress() {
+  try {
+    var record = buildStudentRecord();
+    var json = JSON.stringify(record, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = getExportFilename();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('✅ Backup downloaded!', 'success');
+  } catch (e) {
+    console.error(e);
+    toast('❌ Export failed: ' + e.message, 'error');
+  }
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.add('dragover');
+}
+function handleDragLeave(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    processImportFile(e.dataTransfer.files[0]);
+  }
+}
+function handleImportFile(e) {
+  if (e.target.files && e.target.files[0]) {
+    processImportFile(e.target.files[0]);
+  }
+}
+
+function processImportFile(file) {
+  var statusEl = document.getElementById('importStatus');
+  statusEl.innerHTML = '<div class="callout callout-info">⏳ Reading file...</div>';
+
+  var reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      var parsed = JSON.parse(evt.target.result);
+
+      // Validate structure
+      if (!parsed || !parsed.student || !parsed.student.fullName) {
+        throw new Error('Invalid file — missing student information');
+      }
+      if (parsed.schema !== 'drug-admin-mastery-v1') {
+        // Warn but continue — could be from a related version
+        console.warn('[Import] Schema mismatch:', parsed.schema);
+      }
+
+      APP.pendingImport = parsed;
+      var pct = calcProgressPct(parsed.progress || {});
+      var avg = calcAvg(parsed.quizAttempts || {});
+
+      document.getElementById('importPreview').innerHTML =
+        '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.5rem;">File contents:</strong>' +
+        '<div style="font-size:0.85rem;line-height:1.9;">' +
+        '• Student: <strong>' + escapeHtml(parsed.student.fullName) + '</strong><br>' +
+        '• Student No: <strong>' + escapeHtml(parsed.student.studentNo || '—') + '</strong><br>' +
+        '• Section: <strong>' + escapeHtml(parsed.student.section || '—') + '</strong><br>' +
+        '• Units complete: <strong>' + pct + '%</strong><br>' +
+        '• Quiz average: <strong>' + avg + '%</strong><br>' +
+        '• Exported: <strong>' + (parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString() : '—') + '</strong>' +
+        '</div>' +
+        '<div class="callout callout-warning" style="margin-top:0.75rem;font-size:0.8rem;">' +
+        'Your <strong>current</strong> progress: ' + getProgressPercent() + '% units • ' + averageScore() + '% avg. This will be replaced.' +
+        '</div>';
+
+      document.getElementById('importConfirmModal').classList.add('show');
+      statusEl.innerHTML = '';
+    } catch (err) {
+      statusEl.innerHTML = '<div class="callout callout-danger">❌ ' + escapeHtml(err.message) + '</div>';
+    }
+  };
+  reader.onerror = function() {
+    statusEl.innerHTML = '<div class="callout callout-danger">❌ Failed to read file</div>';
+  };
+  reader.readAsText(file);
+}
+
+function closeImportModal() {
+  document.getElementById('importConfirmModal').classList.remove('show');
+  APP.pendingImport = null;
+  var fi = document.getElementById('importFileInput');
+  if (fi) fi.value = '';
+}
+
+function confirmImport() {
+  var data = APP.pendingImport;
+  if (!data) return;
+
+  // Restore state
+  APP.state.student = data.student;
+  APP.state.progress = data.progress || {};
+  APP.state.quizAttempts = data.quizAttempts || {};
+  APP.state.games = data.games || {};
+  APP.state.badges = data.badges || {};
+  APP.state.exam = data.exam || null;
+  APP.state.examHistory = data.examHistory || [];
+  APP.state.feedback = data.feedback || [];
+  APP.state.checklists = data.checklists || { oral: {}, parenteral: {} };
+  APP.state.instructorFeedback = data.instructorFeedback || [];
+  APP.state.retakeAllowed = data.retakeAllowed || false;
+  APP.state.retakeCode = data.retakeCode || null;
+  APP.state.retakeUsed = data.retakeUsed || false;
+  APP.state.submissionCode = data.submissionCode || null;
+
+  saveState();
+  registerSavedSession(buildStudentRecord());
+  updateStudentChip();
+  closeImportModal();
+  toast('✅ Progress restored from backup!', 'success');
+  navigate('home');
 }
 
 /* ============================================================
@@ -3187,11 +3123,11 @@ async function submitFeedback() {
 }
 
 /* ============================================================
-   INIT (with migration call)
+   INIT
    ============================================================ */
 function init() {
   loadState();
-  runMigrations();  // Fix historical scores (ampule fix + case-insensitivity)
+  runMigrations();
   document.querySelectorAll('.nav-item').forEach(function(n) {
     n.addEventListener('click', function() { navigate(n.dataset.view); });
   });
@@ -3207,6 +3143,12 @@ function init() {
   });
   document.getElementById('drugModal').addEventListener('click', function(e) {
     if (e.target.id === 'drugModal') closeDrugModal();
+  });
+  document.getElementById('submitConfirmModal').addEventListener('click', function(e) {
+    if (e.target.id === 'submitConfirmModal') closeSubmitModal();
+  });
+  document.getElementById('importConfirmModal').addEventListener('click', function(e) {
+    if (e.target.id === 'importConfirmModal') closeImportModal();
   });
   if (APP.state.student && APP.state.student.fullName) {
     showApp();
