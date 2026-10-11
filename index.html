@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <title>💊 Drug Administration Mastery v1.0.2</title>
+  <title>💊 Drug Administration Mastery v1.0.3</title>
   <style>
     :root {
       --primary: #1A5276; --primary-dark: #0E2F44; --primary-light: #E3EEF5;
@@ -468,7 +468,6 @@
     .leader-name small { display: block; color: var(--gray); font-weight: 500; font-size: 0.72rem; }
     .leader-score { font-family: var(--font-head); font-weight: 800; color: var(--secondary); font-size: 1rem; }
 
-    /* === SUBMIT HERO BUTTON === */
     .submit-hero-card {
       background: linear-gradient(135deg, var(--secondary) 0%, #1B5E20 100%);
       border-radius: var(--radius); padding: 1.75rem;
@@ -488,7 +487,6 @@
     .submit-hero-card .btn { background: var(--white); color: var(--secondary); font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
     .submit-hero-card .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 
-    /* === DATA TRANSFER DROP ZONE === */
     .drop-zone {
       border: 3px dashed var(--primary-light);
       border-radius: var(--radius);
@@ -528,7 +526,7 @@
       <div class="auth-logo">💊</div>
       <h1>Drug Administration Mastery</h1>
       <p class="auth-subtitle" id="authSubtitle">NCM 107 Lab — Please register to begin</p>
-      <span class="auth-version">Version 1.0.2</span>
+      <span class="auth-version">Version 1.0.3</span>
     </div>
     <div class="auth-tabs" id="authTabs">
       <button class="auth-tab active" data-tab="register" onclick="switchAuthTab('register')">📝 Register</button>
@@ -575,14 +573,13 @@
     </div>
   </div>
 </div>
-
 <!-- ============================ APP ============================ -->
 <div class="app-container" id="appContainer" style="display:none;">
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-wrap">💊</div>
-      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0.2</small></div>
+      <div><h1>Drug Admin Mastery</h1><small>NCM 107 Lab — v1.0.3</small></div>
     </div>
     <div class="student-card">
       <div class="avatar" id="chipAvatar">—</div>
@@ -645,7 +642,7 @@
       <div>Clinical Instructor</div>
       <div>Teacher II — DepEd</div>
       <div>Tarlac State University</div>
-      <div class="version-tag">v1.0.2</div>
+      <div class="version-tag">v1.0.3</div>
     </div>
   </aside>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open'); this.style.display='none'"></div>
@@ -712,7 +709,7 @@
   </div>
 </div>
 
-<!-- NEW: Submit Confirmation Modal -->
+<!-- Submit Confirmation Modal -->
 <div class="modal-overlay" id="submitConfirmModal">
   <div class="modal">
     <div class="modal-content">
@@ -732,19 +729,19 @@
   </div>
 </div>
 
-<!-- NEW: Import JSON Modal -->
+<!-- Import JSON Modal (with safety preview) -->
 <div class="modal-overlay" id="importConfirmModal">
   <div class="modal">
     <div class="modal-content">
       <div class="modal-icon" style="background:var(--warning-light);">⚠️</div>
       <h2 style="color:var(--warning);">Replace Progress?</h2>
-      <p>The imported file will REPLACE your current progress on this device. This cannot be undone.</p>
-      <div class="modal-student" id="importPreview"></div>
+      <p>Review the file below. Your current progress on this device will be <strong>replaced</strong>. A safety backup will be kept for 24 hours.</p>
+      <div class="modal-student" id="importPreview" style="max-height:400px;overflow-y:auto;"></div>
       <div class="modal-actions">
         <button class="modal-btn" onclick="closeImportModal()">
           <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;">Cancel</div>
         </button>
-        <button class="modal-btn" onclick="confirmImport()" style="border-color:var(--warning);background:var(--warning-light);">
+        <button class="modal-btn" id="importConfirmBtn" onclick="confirmImport()" style="border-color:var(--warning);background:var(--warning-light);">
           <div style="flex:1;text-align:center;font-family:var(--font-head);font-weight:700;color:var(--warning);">✅ Yes, Import & Replace</div>
         </button>
       </div>
@@ -753,7 +750,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script>
 /* ============================================================
    BACKEND URL
@@ -761,7 +757,7 @@
 var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwPhWiAEAQUdEBuPb2dKs1GboekRUQ941r9MsNyJUdi0Ycv8KM7Z2UffnviVqcS7HfC/exec';
 
 var APP = {
-  version: '1.0.2',
+  version: '1.0.3',
   storageKey: 'drugAdminMastery_v1',
   savedSessionsKey: 'drugAdminMastery_savedSessions',
   state: {
@@ -773,7 +769,9 @@ var APP = {
     instructorFeedback: []
   },
   authMode: 'register',
-  pendingImport: null
+  pendingImport: null,
+  pendingImportWarnings: [],
+  pendingImportIdentityMismatch: false
 };
 
 /* ---------- PERSISTENCE ---------- */
@@ -834,7 +832,7 @@ function getGreeting() {
 }
 
 /* ============================================================
-   SCORE MIGRATION UTILITY — v1.0.1
+   SCORE MIGRATION UTILITY
    ============================================================ */
 var MIGRATION_KEY = 'drugAdminMastery_migrations';
 var MIGRATION_VERSION = '2025-01-ampule-fix';
@@ -1210,7 +1208,28 @@ function isCertificateUnlocked() {
 }
 
 /* ============================================================
-   HOME — with new Submit Hero Card
+   BACKUP METADATA
+   ============================================================ */
+function getBackupMetaKey() { return 'drugAdminMastery_backupMeta'; }
+function getLastBackupInfo() {
+  try {
+    var raw = localStorage.getItem(getBackupMetaKey());
+    if (!raw) return null;
+    var meta = JSON.parse(raw);
+    if (meta.undoAvailableUntil && Date.now() > meta.undoAvailableUntil) {
+      meta.canUndo = false;
+    }
+    return meta;
+  } catch (e) { return null; }
+}
+function setBackupMeta(meta) {
+  try { localStorage.setItem(getBackupMetaKey(), JSON.stringify(meta)); } catch (e) {}
+}
+function clearBackupMeta() {
+  try { localStorage.removeItem(getBackupMetaKey()); } catch (e) {}
+}
+/* ============================================================
+   HOME PAGE
    ============================================================ */
 function renderHome(main) {
   var pct = getProgressPercent();
@@ -1234,7 +1253,7 @@ function renderHome(main) {
   html += '<div class="hero-stat"><div class="stat-value">' + totalAttempts() + '</div><div class="stat-label">Attempts</div></div>';
   html += '</div></div></div>';
 
-  // === NEW: One-Click Submit Card ===
+  // One-Click Submit Card
   html += '<div class="submit-hero-card fade-in"><div class="submit-hero-content">';
   html += '<h3>📤 Submit Progress to Instructor</h3>';
   html += '<p>Click the button below to send your current progress. No code copying needed.</p>';
@@ -1368,9 +1387,6 @@ var UNITS = [
   { n: 12, title: 'Documentation & Safety Systems', desc: 'MAR, SOAPIE, FDAR, BCMA, smart pumps', icon: '📊' }
 ];
 
-/* ============================================================
-   UNIT CONTENT (abbreviated for brevity — same as v1.0.1)
-   ============================================================ */
 var UNIT_CONTENT = {
   unit1: {
     intro: 'Drug administration is the preparation, delivery, and evaluation of medications prescribed to patients. It is a core nursing responsibility that demands knowledge, skill, and accountability.',
@@ -1663,7 +1679,7 @@ function submitQuiz(num) {
 }
 
 /* ============================================================
-   QUIZZES (unchanged from v1.0.1)
+   QUIZZES DATA
    ============================================================ */
 var QUIZZES = {
   unit1: [
@@ -1931,7 +1947,6 @@ function openDrug(idx) {
   document.getElementById('drugModal').classList.add('show');
 }
 function closeDrugModal() { document.getElementById('drugModal').classList.remove('show'); }
-
 /* ============================================================
    DOSAGE CALCULATOR
    ============================================================ */
@@ -2661,7 +2676,7 @@ function renderCertificate(main) {
 }
 
 /* ============================================================
-   SUBMIT (Handoff) — one-click submit
+   SUBMIT (Handoff)
    ============================================================ */
 function renderHandoff(main) {
   var s = APP.state.student;
@@ -2771,7 +2786,6 @@ async function submitToBackend() {
       saveState();
       if (APP.state.student) registerSavedSession(buildStudentRecord());
       toast('✅ Submitted! Code: ' + result.code, 'success');
-      // Re-render current view to reflect new code
       if (APP.state.currentView === 'handoff') renderHandoff(document.getElementById('mainContent'));
       else if (APP.state.currentView === 'home') renderHome(document.getElementById('mainContent'));
     } else {
@@ -2823,66 +2837,95 @@ function buildStudentRecord() {
 }
 
 /* ============================================================
-   BACKUP / TRANSFER (Export & Import JSON)
+   BACKUP / TRANSFER — with all safety features
    ============================================================ */
 function renderTransfer(main) {
   var s = APP.state.student;
+  var lastBackup = getLastBackupInfo();
+
   var html = '<div class="hero fade-in" style="padding:1.75rem 2rem;"><div class="hero-content">';
   html += '<p class="hero-greeting">Data</p>';
   html += '<h1>💾 Backup / Transfer</h1>';
-  html += '<p class="hero-subtitle">Move your progress to another device without redoing quizzes.</p>';
+  html += '<p class="hero-subtitle">Move your progress to another device safely.</p>';
   html += '</div></div>';
 
-  // --- EXPORT SECTION ---
+  if (lastBackup && lastBackup.canUndo) {
+    html += '<div class="card fade-in" style="background:var(--warning-light);border:2px solid var(--warning);">';
+    html += '<div class="card-header"><div class="card-title" style="color:var(--warning);">↩️ Undo Last Restore</div></div>';
+    html += '<p style="font-size:0.88rem;">You recently restored a backup on ' + new Date(lastBackup.timestamp).toLocaleString() + '. You can undo it and return to your previous progress (available for 24 hours).</p>';
+    html += '<button class="btn btn-outline mt-2" onclick="undoLastRestore()">↩️ Undo Restore</button>';
+    html += '</div>';
+  }
+
   html += '<div class="card fade-in"><div class="card-header"><div>';
   html += '<div class="card-title">📤 Export Progress (Download JSON)</div>';
   html += '<div class="card-subtitle">Save your progress as a file you can upload on another device.</div>';
   html += '</div></div>';
+
   html += '<div class="callout callout-info">';
-  html += '<strong>📋 What you get:</strong><br>';
-  html += '• All quiz attempts and unit mastery<br>';
-  html += '• Games scores and badges<br>';
-  html += '• Capstone exam results<br>';
-  html += '• Checklists progress<br>';
+  html += '<strong>📋 What gets included:</strong><br>';
+  html += '• All 12 units progress and quiz attempts<br>';
+  html += '• All 5 mastery games scores<br>';
+  html += '• Capstone exam results and history<br>';
+  html += '• Return demonstration checklists<br>';
   html += '• Your profile information<br>';
+  html += '• Submission code (if any)';
   html += '</div>';
+
   html += '<div class="stat-grid" style="margin-top:1rem;">' +
-    '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + Object.keys(APP.state.progress).length + '/12</div><div class="stat-label">Units</div></div>' +
+    '<div class="stat-tile"><div class="stat-icon green">📚</div><div class="stat-value">' + Object.keys(APP.state.progress || {}).length + '/12</div><div class="stat-label">Units</div></div>' +
     '<div class="stat-tile"><div class="stat-icon purple">🎯</div><div class="stat-value">' + averageScore() + '%</div><div class="stat-label">Quiz Avg</div></div>' +
     '<div class="stat-tile"><div class="stat-icon orange">🎮</div><div class="stat-value">' + Object.keys(APP.state.games || {}).length + '/5</div><div class="stat-label">Games</div></div>' +
     '</div>';
+
   html += '<button class="btn btn-primary btn-lg btn-block mt-2" onclick="exportProgress()">📥 Download Backup JSON</button>';
   html += '<p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:0.5rem;">File name: <code>' + escapeHtml(getExportFilename()) + '</code></p>';
+
+  if (lastBackup && lastBackup.exportDate) {
+    html += '<p style="font-size:0.78rem;color:var(--secondary);text-align:center;margin-top:0.35rem;">✓ Last backup: ' + new Date(lastBackup.exportDate).toLocaleString() + '</p>';
+  }
+
   html += '</div>';
 
-  // --- IMPORT SECTION ---
   html += '<div class="card fade-in"><div class="card-header"><div>';
   html += '<div class="card-title">📁 Import Progress (Upload JSON)</div>';
   html += '<div class="card-subtitle">Upload a previously exported file to restore your progress.</div>';
   html += '</div></div>';
+
   html += '<div class="callout callout-warning">';
-  html += '<strong>⚠️ Important:</strong> Importing will <strong>REPLACE</strong> your current progress on this device. Make sure you have a backup first if needed.';
+  html += '<strong>⚠️ Read before importing:</strong><br>';
+  html += '• Your <strong>current progress will be replaced</strong><br>';
+  html += '• The app auto-backs up your data before restoring (undo available for 24h)<br>';
+  html += '• Only import <strong>your own backup file</strong><br>';
+  html += '• Only import a file exported from this app';
   html += '</div>';
+
   html += '<input type="file" id="importFileInput" accept=".json,application/json" style="display:none;" onchange="handleImportFile(event)" />';
-  html += '<div class="drop-zone mt-2" onclick="document.getElementById(\'importFileInput\').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" id="dropZone">';
+  html += '<div class="drop-zone mt-2" onclick="openImportPicker()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" id="dropZone">';
   html += '<span class="icon">📁</span>';
   html += '<div class="title">Tap to browse or drag & drop JSON file</div>';
-  html += '<div class="hint">Supported format: <code>.json</code> exported from this app</div>';
+  html += '<div class="hint">Supported format: <code>.json</code> exported from this app (max 1 MB)</div>';
   html += '</div>';
   html += '<div id="importStatus" class="mt-2"></div>';
   html += '</div>';
 
-  // --- INFO SECTION ---
   html += '<div class="card fade-in">';
   html += '<div class="card-header"><div class="card-title">ℹ️ How to use on a new device</div></div>';
   html += '<ol style="margin-left:1.5rem;font-size:0.88rem;line-height:1.9;">';
-  html += '<li>On your <strong>old device</strong>: click <strong>Download Backup JSON</strong> above.</li>';
-  html += '<li>Transfer the file to your <strong>new device</strong> (email, Google Drive, USB, etc.).</li>';
-  html += '<li>On the <strong>new device</strong>: open this app, log in with the same details (or register).</li>';
+  html += '<li>On your <strong>old device</strong>: click <strong>Download Backup JSON</strong>.</li>';
+  html += '<li>Transfer the file to your <strong>new device</strong> (email, Drive, USB, etc.).</li>';
+  html += '<li>On the <strong>new device</strong>: open this app and register or log in with the same details.</li>';
   html += '<li>Go to <strong>Backup / Transfer</strong> → click <strong>Import Progress</strong>.</li>';
-  html += '<li>Select the JSON file → confirm → your progress is restored!</li>';
-  html += '<li>Click <strong>Submit Progress</strong> to sync the restored data with your instructor.</li>';
+  html += '<li>Select the JSON file → review the preview → confirm.</li>';
+  html += '<li>Click <strong>🚀 Submit Now</strong> to sync the restored data with your instructor.</li>';
   html += '</ol>';
+  html += '<div class="callout callout-danger" style="margin-top:1rem;">';
+  html += '<strong>🚫 Do NOT:</strong><br>';
+  html += '• Don\'t edit the JSON file manually (breaks integrity)<br>';
+  html += '• Don\'t import someone else\'s backup<br>';
+  html += '• Don\'t import while taking the Capstone Exam<br>';
+  html += '• Don\'t import a file from another app';
+  html += '</div>';
   html += '</div>';
 
   main.innerHTML = html;
@@ -2897,6 +2940,9 @@ function getExportFilename() {
 
 function exportProgress() {
   try {
+    if (APP.state.exam && !APP.state.exam.submitted && APP.state.exam.questions) {
+      if (!confirm('⚠️ You have a Capstone Exam in progress. Continue anyway?')) return;
+    }
     var record = buildStudentRecord();
     var json = JSON.stringify(record, null, 2);
     var blob = new Blob([json], { type: 'application/json' });
@@ -2908,11 +2954,25 @@ function exportProgress() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('✅ Backup downloaded!', 'success');
+
+    var meta = getLastBackupInfo() || {};
+    meta.exportDate = new Date().toISOString();
+    setBackupMeta(meta);
+
+    toast('✅ Backup downloaded! Store it safely.', 'success');
+    if (APP.state.currentView === 'transfer') renderTransfer(document.getElementById('mainContent'));
   } catch (e) {
     console.error(e);
     toast('❌ Export failed: ' + e.message, 'error');
   }
+}
+
+function openImportPicker() {
+  if (APP.state.exam && !APP.state.exam.submitted && APP.state.exam.questions && APP.state.exam.questions.length > 0) {
+    toast('⚠️ Cannot import during an active Capstone Exam', 'error');
+    return;
+  }
+  document.getElementById('importFileInput').click();
 }
 
 function handleDragOver(e) {
@@ -2926,6 +2986,10 @@ function handleDragLeave(e) {
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('dropZone').classList.remove('dragover');
+  if (APP.state.exam && !APP.state.exam.submitted && APP.state.exam.questions && APP.state.exam.questions.length > 0) {
+    toast('⚠️ Cannot import during an active Capstone Exam', 'error');
+    return;
+  }
   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
     processImportFile(e.dataTransfer.files[0]);
   }
@@ -2936,47 +3000,279 @@ function handleImportFile(e) {
   }
 }
 
+function validateAndSanitizeImport(parsed) {
+  var errors = [];
+  var warnings = [];
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Invalid file — not a valid JSON object');
+  }
+  if (!parsed.student || typeof parsed.student !== 'object') {
+    throw new Error('Invalid backup — missing student information');
+  }
+  if (!parsed.student.fullName || typeof parsed.student.fullName !== 'string') {
+    throw new Error('Invalid backup — missing student name');
+  }
+
+  if (parsed.schema !== 'drug-admin-mastery-v1') {
+    warnings.push('This file was created by a different version (' + escapeHtml(parsed.schema || 'unknown') + '). Some data may not transfer.');
+  }
+  if (parsed.appVersion && parsed.appVersion !== APP.version) {
+    warnings.push('File version: ' + escapeHtml(parsed.appVersion) + '. App version: ' + APP.version + '.');
+  }
+
+  var s = parsed.student;
+  var safeStudent = {
+    firstName: String(s.firstName || '').slice(0, 60),
+    lastName: String(s.lastName || '').slice(0, 60),
+    fullName: String(s.fullName || '').slice(0, 120),
+    studentNo: String(s.studentNo || '').slice(0, 40),
+    section: String(s.section || '').slice(0, 40),
+    group: String(s.group || '').slice(0, 40),
+    email: String(s.email || '').toLowerCase().slice(0, 100),
+    registeredAt: s.registeredAt || new Date().toISOString(),
+    lastActive: new Date().toISOString()
+  };
+
+  var current = APP.state.student;
+  var identityMismatch = false;
+  if (current) {
+    var sameNo = current.studentNo && safeStudent.studentNo &&
+                 current.studentNo.trim().toLowerCase() === safeStudent.studentNo.trim().toLowerCase();
+    var sameEmail = current.email && safeStudent.email &&
+                    current.email.trim().toLowerCase() === safeStudent.email.trim().toLowerCase();
+    var sameName = current.fullName && safeStudent.fullName &&
+                   current.fullName.trim().toLowerCase() === safeStudent.fullName.trim().toLowerCase();
+
+    if (!sameNo && !sameEmail && !sameName) {
+      warnings.push('🚨 IDENTITY MISMATCH: The imported file belongs to "' + safeStudent.fullName + '" (' + safeStudent.studentNo + '), but you are logged in as "' + current.fullName + '" (' + current.studentNo + '). Importing someone else\'s backup is not allowed.');
+      identityMismatch = true;
+    }
+  }
+
+  var safeProgress = {};
+  var rawProgress = parsed.progress && typeof parsed.progress === 'object' ? parsed.progress : {};
+  UNIT_KEYS.forEach(function(u) {
+    if (rawProgress[u] && typeof rawProgress[u] === 'object') {
+      var p = rawProgress[u];
+      var score = parseInt(p.score, 10);
+      if (isNaN(score)) score = 0;
+      score = Math.max(0, Math.min(100, score));
+      safeProgress[u] = {
+        completed: !!p.completed,
+        score: score,
+        date: p.date || new Date().toISOString()
+      };
+    }
+  });
+
+  var safeAttempts = {};
+  var rawAttempts = parsed.quizAttempts && typeof parsed.quizAttempts === 'object' ? parsed.quizAttempts : {};
+  UNIT_KEYS.forEach(function(u) {
+    if (Array.isArray(rawAttempts[u])) {
+      safeAttempts[u] = rawAttempts[u]
+        .map(function(v) { return Math.max(0, Math.min(100, parseInt(v, 10) || 0)); })
+        .slice(0, 50);
+    }
+  });
+
+  var safeGames = {};
+  var rawGames = parsed.games && typeof parsed.games === 'object' ? parsed.games : {};
+  var validGameKeys = ['route','rights','dosage','order','safety'];
+  validGameKeys.forEach(function(g) {
+    if (Array.isArray(rawGames[g])) {
+      safeGames[g] = rawGames[g]
+        .map(function(v) { return Math.max(0, Math.min(100, parseInt(v, 10) || 0)); })
+        .slice(0, 50);
+    }
+  });
+
+  var safeBadges = {};
+  if (parsed.badges && typeof parsed.badges === 'object') {
+    Object.keys(parsed.badges).forEach(function(k) {
+      safeBadges[k] = !!parsed.badges[k];
+    });
+  }
+
+  var safeExam = null;
+  if (parsed.exam && typeof parsed.exam === 'object' && parsed.exam.submitted) {
+    var ex = parsed.exam;
+    safeExam = {
+      score: Math.max(0, Math.min(100, parseInt(ex.score, 10) || 0)),
+      total: Math.max(1, Math.min(200, parseInt(ex.total, 10) || 30)),
+      percentage: Math.max(0, Math.min(100, parseInt(ex.percentage, 10) || 0)),
+      passed: !!ex.passed,
+      submitted: true,
+      takenAt: ex.takenAt || new Date().toISOString(),
+      submittedAt: ex.submittedAt || new Date().toISOString(),
+      questions: Array.isArray(ex.questions) ? ex.questions.slice(0, 100) : [],
+      answers: ex.answers && typeof ex.answers === 'object' ? ex.answers : {},
+      review: Array.isArray(ex.review) ? ex.review.slice(0, 100) : []
+    };
+  }
+
+  var safeHistory = [];
+  if (Array.isArray(parsed.examHistory)) {
+    parsed.examHistory.slice(0, 20).forEach(function(h) {
+      if (h && typeof h === 'object') {
+        safeHistory.push({
+          score: Math.max(0, parseInt(h.score, 10) || 0),
+          total: Math.max(1, parseInt(h.total, 10) || 30),
+          percentage: Math.max(0, parseInt(h.percentage, 10) || 0),
+          passed: !!h.passed,
+          submitted: !!h.submitted,
+          archivedAt: h.archivedAt || h.submittedAt || new Date().toISOString()
+        });
+      }
+    });
+  }
+
+  var safeChecklists = { oral: {}, parenteral: {} };
+  if (parsed.checklists && typeof parsed.checklists === 'object') {
+    ['oral','parenteral'].forEach(function(k) {
+      if (parsed.checklists[k] && typeof parsed.checklists[k] === 'object') {
+        var rawList = parsed.checklists[k];
+        Object.keys(rawList).slice(0, 500).forEach(function(id) {
+          var item = rawList[id];
+          if (item && typeof item === 'object') {
+            safeChecklists[k][id] = {
+              self: !!item.self,
+              instructor: !!item.instructor
+            };
+          }
+        });
+      }
+    });
+  }
+
+  var safeFeedback = Array.isArray(parsed.feedback) ? parsed.feedback.slice(0, 50) : [];
+  var safeInstructorFeedback = Array.isArray(parsed.instructorFeedback) ? parsed.instructorFeedback.slice(0, 50) : [];
+
+  var importedTime = parsed.exportedAt ? new Date(parsed.exportedAt).getTime() : 0;
+  var currentTime = 0;
+  if (current && current.lastActive) {
+    currentTime = new Date(current.lastActive).getTime();
+  }
+  if (importedTime && currentTime && importedTime < currentTime) {
+    var hoursAgo = Math.round((currentTime - importedTime) / 3600000);
+    warnings.push('⏰ This backup is ' + hoursAgo + ' hour(s) older than your current progress. Restoring it will LOSE any work done since then.');
+  }
+
+  return {
+    sanitized: {
+      schema: 'drug-admin-mastery-v1',
+      appVersion: APP.version,
+      exportedAt: parsed.exportedAt || new Date().toISOString(),
+      student: safeStudent,
+      progress: safeProgress,
+      quizAttempts: safeAttempts,
+      games: safeGames,
+      badges: safeBadges,
+      exam: safeExam,
+      examHistory: safeHistory,
+      feedback: safeFeedback,
+      checklists: safeChecklists,
+      instructorFeedback: safeInstructorFeedback,
+      retakeAllowed: !!parsed.retakeAllowed,
+      retakeCode: parsed.retakeCode ? String(parsed.retakeCode).slice(0, 20) : null,
+      retakeUsed: !!parsed.retakeUsed,
+      submissionCode: parsed.submissionCode ? String(parsed.submissionCode).slice(0, 40) : null
+    },
+    warnings: warnings,
+    errors: errors,
+    identityMismatch: identityMismatch
+  };
+}
+
 function processImportFile(file) {
   var statusEl = document.getElementById('importStatus');
   statusEl.innerHTML = '<div class="callout callout-info">⏳ Reading file...</div>';
 
+  if (file.size > 1048576) {
+    statusEl.innerHTML = '<div class="callout callout-danger">❌ File is too large (max 1 MB). This doesn\'t look like a valid backup.</div>';
+    return;
+  }
+  if (file.size < 50) {
+    statusEl.innerHTML = '<div class="callout callout-danger">❌ File is too small to be a valid backup.</div>';
+    return;
+  }
+
+  if (!file.name.toLowerCase().endsWith('.json')) {
+    if (!confirm('⚠️ This file doesn\'t have a .json extension. Import anyway?')) {
+      statusEl.innerHTML = '<div class="callout callout-warning">Import cancelled.</div>';
+      return;
+    }
+  }
+
   var reader = new FileReader();
   reader.onload = function(evt) {
+    var parsed;
     try {
-      var parsed = JSON.parse(evt.target.result);
+      parsed = JSON.parse(evt.target.result);
+    } catch (err) {
+      statusEl.innerHTML = '<div class="callout callout-danger">❌ File is not valid JSON. It may be corrupted or from a different app.</div>';
+      return;
+    }
 
-      // Validate structure
-      if (!parsed || !parsed.student || !parsed.student.fullName) {
-        throw new Error('Invalid file — missing student information');
-      }
-      if (parsed.schema !== 'drug-admin-mastery-v1') {
-        // Warn but continue — could be from a related version
-        console.warn('[Import] Schema mismatch:', parsed.schema);
-      }
-
-      APP.pendingImport = parsed;
-      var pct = calcProgressPct(parsed.progress || {});
-      var avg = calcAvg(parsed.quizAttempts || {});
-
-      document.getElementById('importPreview').innerHTML =
-        '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.5rem;">File contents:</strong>' +
-        '<div style="font-size:0.85rem;line-height:1.9;">' +
-        '• Student: <strong>' + escapeHtml(parsed.student.fullName) + '</strong><br>' +
-        '• Student No: <strong>' + escapeHtml(parsed.student.studentNo || '—') + '</strong><br>' +
-        '• Section: <strong>' + escapeHtml(parsed.student.section || '—') + '</strong><br>' +
-        '• Units complete: <strong>' + pct + '%</strong><br>' +
-        '• Quiz average: <strong>' + avg + '%</strong><br>' +
-        '• Exported: <strong>' + (parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString() : '—') + '</strong>' +
-        '</div>' +
-        '<div class="callout callout-warning" style="margin-top:0.75rem;font-size:0.8rem;">' +
-        'Your <strong>current</strong> progress: ' + getProgressPercent() + '% units • ' + averageScore() + '% avg. This will be replaced.' +
-        '</div>';
-
-      document.getElementById('importConfirmModal').classList.add('show');
-      statusEl.innerHTML = '';
+    var result;
+    try {
+      result = validateAndSanitizeImport(parsed);
     } catch (err) {
       statusEl.innerHTML = '<div class="callout callout-danger">❌ ' + escapeHtml(err.message) + '</div>';
+      return;
     }
+
+    if (result.errors && result.errors.length) {
+      statusEl.innerHTML = '<div class="callout callout-danger">❌ ' + result.errors.join('<br>') + '</div>';
+      return;
+    }
+
+    APP.pendingImport = result.sanitized;
+    APP.pendingImportWarnings = result.warnings;
+    APP.pendingImportIdentityMismatch = result.identityMismatch;
+
+    var s = result.sanitized;
+    var pct = calcProgressPct(s.progress);
+    var avg = calcAvg(s.quizAttempts);
+
+    var warnHtml = '';
+    if (result.warnings.length) {
+      warnHtml = '<div class="callout callout-warning" style="margin-top:0.75rem;">' +
+        '<strong>⚠️ Warnings:</strong><br>' +
+        result.warnings.map(function(w) { return '• ' + escapeHtml(w); }).join('<br>') +
+        '</div>';
+    }
+
+    var identityBlock = '';
+    if (result.identityMismatch) {
+      identityBlock = '<div class="callout callout-danger" style="margin-top:0.75rem;">' +
+        '<strong>🚨 STOP — Wrong Student File</strong><br>' +
+        'This file belongs to a DIFFERENT student. Do NOT import another student\'s backup — this is an academic integrity violation.' +
+        '</div>';
+    }
+
+    document.getElementById('importPreview').innerHTML =
+      '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.5rem;">📄 File contents:</strong>' +
+      '<div style="font-size:0.85rem;line-height:1.9;">' +
+      '• Student: <strong>' + escapeHtml(s.student.fullName) + '</strong><br>' +
+      '• Student No: <strong>' + escapeHtml(s.student.studentNo || '—') + '</strong><br>' +
+      '• Section: <strong>' + escapeHtml(s.student.section || '—') + '</strong><br>' +
+      '• Group: <strong>' + escapeHtml(s.student.group || '—') + '</strong><br>' +
+      '• Units complete: <strong>' + pct + '%</strong><br>' +
+      '• Quiz average: <strong>' + avg + '%</strong><br>' +
+      '• Games played: <strong>' + Object.keys(s.games).length + '/5</strong><br>' +
+      '• Capstone exam: <strong>' + (s.exam && s.exam.submitted ? s.exam.score + '/' + s.exam.total + ' (' + s.exam.percentage + '%)' : 'Not taken') + '</strong><br>' +
+      '• Exported: <strong>' + (s.exportedAt ? new Date(s.exportedAt).toLocaleString() : '—') + '</strong>' +
+      '</div>' +
+      identityBlock +
+      warnHtml +
+      '<div class="callout callout-info" style="margin-top:0.75rem;font-size:0.82rem;">' +
+      '<strong>Your current state:</strong> ' + getProgressPercent() + '% units • ' + averageScore() + '% avg<br>' +
+      'Restoring will <strong>replace</strong> the above. A safety backup of your current data will be kept for 24 hours.' +
+      '</div>';
+
+    document.getElementById('importConfirmModal').classList.add('show');
+    statusEl.innerHTML = '';
   };
   reader.onerror = function() {
     statusEl.innerHTML = '<div class="callout callout-danger">❌ Failed to read file</div>';
@@ -2987,6 +3283,8 @@ function processImportFile(file) {
 function closeImportModal() {
   document.getElementById('importConfirmModal').classList.remove('show');
   APP.pendingImport = null;
+  APP.pendingImportWarnings = null;
+  APP.pendingImportIdentityMismatch = false;
   var fi = document.getElementById('importFileInput');
   if (fi) fi.value = '';
 }
@@ -2994,6 +3292,34 @@ function closeImportModal() {
 function confirmImport() {
   var data = APP.pendingImport;
   if (!data) return;
+
+  if (APP.pendingImportIdentityMismatch) {
+    var confirmed = confirm(
+      '🚨 ACADEMIC INTEGRITY WARNING\n\n' +
+      'You are about to import a backup that belongs to ANOTHER student.\n\n' +
+      'Are you ABSOLUTELY SURE this is your own file?\n\n' +
+      'Click OK only if this is your own backup.'
+    );
+    if (!confirmed) return;
+  }
+
+  // Auto-backup current state before restore
+  try {
+    var snapshot = {
+      state: JSON.parse(JSON.stringify(APP.state)),
+      timestamp: new Date().toISOString(),
+      undoAvailableUntil: Date.now() + (24 * 60 * 60 * 1000)
+    };
+    localStorage.setItem('drugAdminMastery_lastRestoreSnapshot', JSON.stringify(snapshot));
+
+    var meta = getLastBackupInfo() || {};
+    meta.canUndo = true;
+    meta.timestamp = snapshot.timestamp;
+    meta.undoAvailableUntil = snapshot.undoAvailableUntil;
+    setBackupMeta(meta);
+  } catch (e) {
+    console.warn('[Import] Auto-backup failed:', e);
+  }
 
   // Restore state
   APP.state.student = data.student;
@@ -3010,17 +3336,96 @@ function confirmImport() {
   APP.state.retakeCode = data.retakeCode || null;
   APP.state.retakeUsed = data.retakeUsed || false;
   APP.state.submissionCode = data.submissionCode || null;
+  APP.state.currentView = 'home';
 
   saveState();
   registerSavedSession(buildStudentRecord());
   updateStudentChip();
   closeImportModal();
-  toast('✅ Progress restored from backup!', 'success');
+  toast('✅ Progress restored! Click "Submit Now" to sync with your instructor.', 'success');
   navigate('home');
 }
 
+function undoLastRestore() {
+  try {
+    var raw = localStorage.getItem('drugAdminMastery_lastRestoreSnapshot');
+    if (!raw) {
+      toast('No restore to undo', 'warning');
+      return;
+    }
+    var snapshot = JSON.parse(raw);
+    if (!snapshot.undoAvailableUntil || Date.now() > snapshot.undoAvailableUntil) {
+      toast('Undo window expired (24 hours)', 'warning');
+      localStorage.removeItem('drugAdminMastery_lastRestoreSnapshot');
+      var meta = getLastBackupInfo() || {};
+      meta.canUndo = false;
+      setBackupMeta(meta);
+      return;
+    }
+    if (!confirm('Restore your previous progress (before the last import)?')) return;
+
+    APP.state = snapshot.state;
+    saveState();
+    registerSavedSession(buildStudentRecord());
+    updateStudentChip();
+
+    localStorage.removeItem('drugAdminMastery_lastRestoreSnapshot');
+    var meta2 = getLastBackupInfo() || {};
+    meta2.canUndo = false;
+    setBackupMeta(meta2);
+
+    toast('✅ Previous progress restored!', 'success');
+    navigate('home');
+  } catch (e) {
+    console.error(e);
+    toast('❌ Undo failed: ' + e.message, 'error');
+  }
+}
+
+function handleRestoreFile(event) {
+  if (event.target.files && event.target.files[0]) {
+    // Reuse the same processing logic
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        var parsed = JSON.parse(evt.target.result);
+        var result = validateAndSanitizeImport(parsed);
+        if (result.errors && result.errors.length) {
+          toast('❌ ' + result.errors[0], 'error');
+          return;
+        }
+        APP.pendingImport = result.sanitized;
+        APP.pendingImportWarnings = result.warnings;
+        APP.pendingImportIdentityMismatch = result.identityMismatch;
+        var s = result.sanitized;
+        var pct = calcProgressPct(s.progress);
+        var avg = calcAvg(s.quizAttempts);
+
+        document.getElementById('importPreview').innerHTML =
+          '<strong style="font-family:var(--font-head);display:block;margin-bottom:0.5rem;">📄 File contents:</strong>' +
+          '<div style="font-size:0.85rem;line-height:1.9;">' +
+          '• Student: <strong>' + escapeHtml(s.student.fullName) + '</strong><br>' +
+          '• Student No: <strong>' + escapeHtml(s.student.studentNo || '—') + '</strong><br>' +
+          '• Section: <strong>' + escapeHtml(s.student.section || '—') + '</strong><br>' +
+          '• Units complete: <strong>' + pct + '%</strong><br>' +
+          '• Quiz average: <strong>' + avg + '%</strong><br>' +
+          '• Exported: <strong>' + (s.exportedAt ? new Date(s.exportedAt).toLocaleString() : '—') + '</strong>' +
+          '</div>' +
+          (result.warnings.length ? '<div class="callout callout-warning" style="margin-top:0.75rem;font-size:0.82rem;">' + result.warnings.map(function(w) { return '• ' + escapeHtml(w); }).join('<br>') + '</div>' : '') +
+          '<div class="callout callout-info" style="margin-top:0.75rem;font-size:0.82rem;">This will <strong>replace</strong> any existing data on this device.</div>';
+
+        document.getElementById('importConfirmModal').classList.add('show');
+      } catch (err) {
+        toast('❌ Invalid file: ' + err.message, 'error');
+      }
+    };
+    reader.readAsText(file);
+  }
+}
+
 /* ============================================================
-   INBOX (Instructor Feedback)
+   INBOX
    ============================================================ */
 function renderInbox(main) {
   var feedback = APP.state.instructorFeedback || [];
