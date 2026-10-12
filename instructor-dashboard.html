@@ -414,7 +414,7 @@ function viewStudent(id) {
   var s = DB.state.students.find(function(x) { return x.id === id; });
   if (!s) return;
   document.getElementById('modalTitle').textContent = s.name;
-  var html = '<div class="flex gap-1 flex-wrap mb-2">';
+  var html = '<div class="flex gap-2 flex-wrap mb-2">';
   html += '<span class="pill pill-info">' + getStudentPercent(s) + '% Complete</span>';
   html += '<span class="pill pill-primary">Unit Avg ' + getUnitAvg(s) + '%</span>';
   if (s.examTakenAt) html += '<span class="pill ' + (isExamPassed(s) ? 'pill-success' : 'pill-danger') + '">Exam ' + getExamScore(s) + '/' + getExamTotal(s) + '</span>';
@@ -429,6 +429,17 @@ function viewStudent(id) {
   html += '<button class="btn btn-outline" onclick="sendFeedback(\'' + s.id + '\')">💬 Send Feedback</button>';
   html += '<button class="btn btn-outline" onclick="grantRetake(\'' + s.id + '\')">🔓 Grant Retake</button>';
   html += '<button class="btn btn-outline" onclick="closeModal()">Close</button>';
+  html += '</div>';
+  // NEW: Download Backup section
+  html += '<div style="margin-top:1.25rem;padding-top:1rem;border-top:2px dashed var(--gray-light);">';
+  html += '<p style="font-size:0.85rem;font-weight:700;font-family:var(--font-head);margin-bottom:0.5rem;">💾 Backup File for Student</p>';
+  html += '<p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.75rem;">Download this student\'s progress as a JSON file. Send it to them so they can restore their progress on another device.</p>';
+  if (s.progress || s.quizAttempts || s.games) {
+    html += '<button class="btn btn-success btn-block" onclick="downloadStudentBackup(\'' + s.id + '\')">📥 Download Backup JSON</button>';
+    html += '<p style="font-size:0.72rem;color:var(--gray);margin-top:0.4rem;text-align:center;">File: <code>' + escapeHtml(getStudentBackupFilename(s)) + '</code></p>';
+  } else {
+    html += '<div class="callout callout-warning" style="font-size:0.8rem;">⚠️ This student has no synced progress yet. Ask them to click "Submit Progress" in the app first.</div>';
+  }
   html += '</div>';
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('show');
