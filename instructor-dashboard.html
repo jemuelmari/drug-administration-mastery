@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="theme-color" content="#1A5276"/>
 <link rel="icon" href="icon.svg" type="image/svg+xml"/>
-<title>Instructor Dashboard — Drug Administration Mastery v1.0</title>
+<title>Instructor Dashboard — Drug Administration Mastery v1.1</title>
 <style>
 :root{--primary:#1A5276;--primary-dark:#0E2F44;--secondary:#2E7D32;--accent:#C62828;--success:#43A047;--warning:#F57C00;--purple:#6A1B9A;--dark:#0F1B26;--light:#F1F8F4;--white:#FFF;--gray:#607D8B;--gray-light:#CFD8DC;--radius:12px;--radius-sm:8px;--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow:0 4px 16px rgba(0,0,0,.08);--shadow-lg:0 12px 32px rgba(0,0,0,.12);--font-head:'Inter','Montserrat',sans-serif;--font-body:'Inter','Open Sans',sans-serif}
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font-body);background:var(--light);color:var(--dark);line-height:1.5;font-size:14px}
@@ -29,7 +29,7 @@ h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;line-height:1.25}h1{fon
 .topbar-left h1{font-size:1.5rem;color:var(--dark)}.topbar-left p{font-size:.85rem;color:var(--gray);margin:0}
 .topbar-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem 1rem;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:var(--font-head);font-weight:600;font-size:.82rem;transition:all .15s;text-decoration:none;white-space:nowrap}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}.btn-secondary{background:var(--secondary);color:#fff}.btn-outline{background:#fff;color:var(--dark);border:1.5px solid var(--gray-light)}.btn-outline:hover{border-color:var(--primary);color:var(--primary)}.btn-danger{background:var(--accent);color:#fff}.btn-sm{padding:.4rem .75rem;font-size:.78rem}.btn-lg{padding:.75rem 1.5rem;font-size:.9rem}.btn-block{width:100%}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}.btn-secondary{background:var(--secondary);color:#fff}.btn-outline{background:#fff;color:var(--dark);border:1.5px solid var(--gray-light)}.btn-outline:hover{border-color:var(--primary);color:var(--primary)}.btn-danger{background:var(--accent);color:#fff}.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#2E7D32}.btn-sm{padding:.4rem .75rem;font-size:.78rem}.btn-lg{padding:.75rem 1.5rem;font-size:.9rem}.btn-block{width:100%}
 .card{background:#fff;border-radius:var(--radius);padding:1.35rem;box-shadow:var(--shadow-sm);border:1px solid var(--gray-light);margin-bottom:1.25rem}
 .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
 .card-title{font-size:1.05rem;font-weight:700;margin:0}.card-subtitle{font-size:.8rem;color:var(--gray);margin:.15rem 0 0}
@@ -336,7 +336,14 @@ async function confirmImport(code, mode, existingId) {
     progress: payload.progress || {},
     quizAttempts: payload.quizAttempts || {},
     games: payload.games || {},
-    checklists: payload.checklists || { oral: {}, parenteral: {} }
+    checklists: payload.checklists || { oral: {}, parenteral: {} },
+    exam: payload.exam || null,
+    examHistory: payload.examHistory || [],
+    badges: payload.badges || {},
+    feedback: payload.feedback || [],
+    instructorFeedback: payload.instructorFeedback || [],
+    retakeAllowed: payload.retakeAllowed || false,
+    retakeUsed: payload.retakeUsed || false
   };
 
   if (mode === 'update' && existingId) {
@@ -430,7 +437,7 @@ function viewStudent(id) {
   html += '<button class="btn btn-outline" onclick="grantRetake(\'' + s.id + '\')">🔓 Grant Retake</button>';
   html += '<button class="btn btn-outline" onclick="closeModal()">Close</button>';
   html += '</div>';
-  // NEW: Download Backup section
+  // Download Backup section
   html += '<div style="margin-top:1.25rem;padding-top:1rem;border-top:2px dashed var(--gray-light);">';
   html += '<p style="font-size:0.85rem;font-weight:700;font-family:var(--font-head);margin-bottom:0.5rem;">💾 Backup File for Student</p>';
   html += '<p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.75rem;">Download this student\'s progress as a JSON file. Send it to them so they can restore their progress on another device.</p>';
@@ -522,6 +529,107 @@ function grantRetake(id) {
   document.getElementById('modalBody').innerHTML = html;
 }
 
+/* ============================================================
+   DOWNLOAD STUDENT BACKUP — Instructor Tool
+   ============================================================ */
+function getStudentBackupFilename(s) {
+  var name = (s.studentNo || s.name || 'student').replace(/[^A-Za-z0-9-]/g, '_');
+  var date = new Date().toISOString().slice(0, 10);
+  return 'drug-admin-progress_' + name + '_' + date + '.json';
+}
+
+function buildExamObject(s) {
+  // Rebuild the nested exam object from flat fields stored in instructor record.
+  // If the instructor record already has a full exam object (from recent imports), use it.
+  if (s.exam && typeof s.exam === 'object' && s.exam.submitted) {
+    return s.exam;
+  }
+  if (!s.examTakenAt && !s.examPercentage) return null;
+  var score = parseInt(s.examScore, 10);
+  var total = parseInt(s.examTotal, 10) || 30;
+  var pct = parseInt(s.examPercentage, 10);
+  if (isNaN(score) || isNaN(pct)) return null;
+  return {
+    score: score,
+    total: total,
+    percentage: pct,
+    passed: isExamPassed(s),
+    submitted: true,
+    takenAt: s.examTakenAt || new Date().toISOString(),
+    submittedAt: s.examTakenAt || new Date().toISOString(),
+    questions: [],
+    answers: {},
+    review: []
+  };
+}
+
+function downloadStudentBackup(id) {
+  var s = DB.state.students.find(function(x) { return x.id === id; });
+  if (!s) {
+    toast('Student not found', 'error');
+    return;
+  }
+
+  // Build a full backup record matching the student app's schema
+  var backup = {
+    schema: 'drug-admin-mastery-v1',
+    appVersion: '1.0.3',
+    exportedAt: new Date().toISOString(),
+    exportedBy: 'instructor',
+    instructorName: DB.state.settings.instructorName || 'Instructor',
+    student: {
+      firstName: (s.name || '').split(' ')[0] || '',
+      lastName: (s.name || '').split(' ').slice(1).join(' ') || '',
+      fullName: s.name || '',
+      studentNo: s.studentNo || '',
+      section: s.section || '',
+      group: s.group || '',
+      email: s.email || '',
+      registeredAt: s.enrolled || s.examTakenAt || new Date().toISOString(),
+      lastActive: s.lastActive || new Date().toISOString()
+    },
+    progress: s.progress || {},
+    quizAttempts: s.quizAttempts || {},
+    games: s.games || {},
+    badges: s.badges || {},
+    exam: buildExamObject(s),
+    examHistory: s.examHistory || [],
+    feedback: s.feedback || [],
+    checklists: s.checklists || { oral: {}, parenteral: {} },
+    instructorFeedback: s.instructorFeedback || [],
+    retakeAllowed: !!s.retakeAllowed,
+    retakeCode: s.retakeCode || null,
+    retakeUsed: !!s.retakeUsed,
+    submissionCode: s.submissionCode || null
+  };
+
+  try {
+    var json = JSON.stringify(backup, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = getStudentBackupFilename(s);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast('✅ Backup downloaded for ' + s.name, 'success');
+
+    // Show success message inside modal
+    var statusDiv = document.createElement('div');
+    statusDiv.className = 'callout callout-success';
+    statusDiv.style.marginTop = '0.75rem';
+    statusDiv.innerHTML = '<strong>✅ Backup downloaded!</strong><br>Send the file to <strong>' + escapeHtml(s.name) + '</strong>. They can import it via <strong>Backup / Transfer</strong> in the student app.';
+    var modalBody = document.getElementById('modalBody');
+    if (modalBody) modalBody.appendChild(statusDiv);
+  } catch (e) {
+    console.error(e);
+    toast('❌ Download failed: ' + e.message, 'error');
+  }
+}
+
 function renderSync(main) {
   var html = '<div class="topbar"><div class="topbar-left"><h1>☁️ Sync from Google Sheets</h1>';
   html += '<p>Bulk import all submissions</p></div>';
@@ -557,10 +665,18 @@ async function doSync() {
         retakeActive: existing ? existing.retakeActive : 'NO',
         retakeCode: existing ? existing.retakeCode : null,
         lastActive: rec.timestamp,
+        enrolled: existing ? existing.enrolled : new Date().toISOString().slice(0, 10),
         progress: payload && payload.progress || {},
         quizAttempts: payload && payload.quizAttempts || {},
         games: payload && payload.games || {},
-        checklists: payload && payload.checklists || { oral: {}, parenteral: {} }
+        checklists: payload && payload.checklists || { oral: {}, parenteral: {} },
+        exam: payload && payload.exam || null,
+        examHistory: payload && payload.examHistory || [],
+        badges: payload && payload.badges || {},
+        feedback: payload && payload.feedback || [],
+        instructorFeedback: payload && payload.instructorFeedback || [],
+        retakeAllowed: payload && payload.retakeAllowed || false,
+        retakeUsed: payload && payload.retakeUsed || false
       };
       if (existing) {
         var idx = DB.state.students.findIndex(function(x) { return x.id === existing.id; });
